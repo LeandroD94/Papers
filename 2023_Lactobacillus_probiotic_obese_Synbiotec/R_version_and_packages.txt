@@ -1,0 +1,54 @@
+R version 4.2.1 (2022-06-23)   running on Ubuntu 22.04.1 LTS
+ 
+
+$Package
+[1] "DESeq2"
+
+$Version
+[1] "1.36.0"
+
+
+ 
+
+$Package
+[1] "phyloseq"
+
+$Version
+[1] "1.40.0"
+
+
+ 
+
+$Package
+[1] "ggplot2"
+
+$Version
+[1] "3.3.6"
+
+
+ 
+
+$Package
+[1] "vegan"
+
+$Version
+[1] "2.6-2"
+
+
+ 
+
+[1] "Dendextend"
+[1] ‘1.16.0’
+
+ 
+
+[1] "egg"
+[1] ‘0.4.5’
+
+ 
+
+[1] "ggh4x"
+[1] ‘0.2.2’
+
+ 
+
