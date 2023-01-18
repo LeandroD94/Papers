@@ -1,0 +1,21 @@
+sample.ID	Nazionality	Sample	Gender	CAD	BAV	Atrial Fibrillation(AF)	Smoke	Calcification Degree
+ID1946-16S-11-LC11	Germany	G11	M	Yes	Yes	no	no	Severe
+ID1946-16S-13-LC13	Germany	G13	M	Yes	No	no	no	Mild
+ID1946-16S-10-LC10	Germany	G10	M	No	No	yes	no	Severe
+ID1946-16S-14-LC14	Germany	G14	M	Yes	Yes	yes	yes	Severe
+ID1946-16S-1-LC1	Italy	I1	M	Yes	No	yes	yes	Mild
+ID1946-16S-19-LC19	Germany	G19	M	Yes	Yes	yes	yes	Severe
+ID1946-16S-16-LC16	Germany	G16	F	No	Yes	yes	yes	Severe
+ID1946-16S-18-LC18	Germany	G18	M	No	Yes	yes	yes	Severe
+ID1946-16S-15-LC15	Germany	G15	M	No	No	no	no	Mild
+ID1946-16S-9-LC9	Italy	I9	F	No	Yes	no	no	Severe
+ID1946-16S-12-LC12	Germany	G12	M	Yes	No	yes	yes	Severe
+ID1946-16S-8-LC8	Italy	I8	M	Yes	No	no	no	Mild
+ID1946-16S-3-LC3	Italy	I3	M	Yes	Yes	yes	yes	Severe
+ID1946-16S-7-LC7	Italy	I7	M	No	Yes	no	no	Severe
+ID1946-16S-20-LC20	Germany	G20	M	Yes	No	yes	no	Severe
+ID1946-16S-2-LC2	Italy	I2	F	No	Yes	yes	no	Severe
+ID1946-16S-17-LC17	Germany	G17	M	Yes	No	no	no	Severe
+ID1946-16S-4-LC4	Italy	I4	M	Yes	Yes	no	no	Severe
+ID1946-16S-5-LC5	Italy	I5	M	Yes	No	yes	yes	Severe
+ID1946-16S-6-LC6	Italy	I6	F	Yes	No	no	no	Mild
