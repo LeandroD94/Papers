@@ -1,0 +1,23 @@
+FASTQ_Forward,FASTQ_Reverse,Sample_name,FASTQ_code,Condition,Gender,Age,CRC_site,CRC_Type,Grading,Stage
+ID2115-1-MR1_S1_L001_R1_001.fastq.gz,ID2115-1-MR1_S1_L001_R2_001.fastq.gz,HPV+1,MR1,CRC+HPV,F,89,rectum,Squamous carcinoma,G2,pT4N0
+ID2115-2-MR2_S2_L001_R1_001.fastq.gz,ID2115-2-MR2_S2_L001_R2_001.fastq.gz,HPV+2,MR2,CRC+HPV,F,53,Descending colon,Squamous carcinoma,G2,pT3N0
+ID2115-3-MR3_S3_L001_R1_001.fastq.gz,ID2115-3-MR3_S3_L001_R2_001.fastq.gz,HPV+3,MR3,CRC+HPV,F,57,rectum,Squamous carcinoma,G3,pT3N0
+ID2115-4-MR4_S4_L001_R1_001.fastq.gz,ID2115-4-MR4_S4_L001_R2_001.fastq.gz,HPV+4,MR4,CRC+HPV,F,44,rectum,"Adenocarcinoma, NOS",G2,pT3N0
+ID2115-5-MR5_S5_L001_R1_001.fastq.gz,ID2115-5-MR5_S5_L001_R2_001.fastq.gz,HPV+5,MR5,CRC+HPV,F,50,Ascending colon,"Adenocarcinoma, NOS",G2,pT4N0
+ID2115-6-MR6_S6_L001_R1_001.fastq.gz,ID2115-6-MR6_S6_L001_R2_001.fastq.gz,HPV+6,MR6,CRC+HPV,F,80,rectum,Basaloid carcinoma,G1,pT2N0
+ID2115-7-MR7_S7_L001_R1_001.fastq.gz,ID2115-7-MR7_S7_L001_R2_001.fastq.gz,HPV+7,MR7,CRC+HPV,M,49,Ascending colon,"Adenocarcinoma, NOS",G2,pT2N0
+ID2115-8-MR8_S8_L001_R1_001.fastq.gz,ID2115-8-MR8_S8_L001_R2_001.fastq.gz,HPV+8,MR8,CRC+HPV,M,63,Descending colon,"Adenocarcinoma, NOS",G3,pT3N2a
+ID2115-9-MR9_S9_L001_R1_001.fastq.gz,ID2115-9-MR9_S9_L001_R2_001.fastq.gz,HPV+9,MR9,CRC+HPV,M,74,Ascending colon,"Adenocarcinoma, NOS",G3,pT4aN2a
+ID2115-10-MR10_S10_L001_R1_001.fastq.gz,ID2115-10-MR10_S10_L001_R2_001.fastq.gz,HPV+10,MR10,CRC+HPV,F,83,Descending colon,"Adenocarcinoma, NOS",G3,pT3N2b
+ID2115-21-MR11_S11_L001_R1_001.fastq.gz,ID2115-21-MR11_S11_L001_R2_001.fastq.gz,Control_1,MR21,Paraffin_control,Null,Null,Null,Null,Null,Null
+ID2115-12-MR12_S12_L001_R1_001.fastq.gz,ID2115-12-MR12_S12_L001_R2_001.fastq.gz,HPV-2,MR12,CRC,F,59,Descending colon,"Adenocarcinoma, NOS",G3,pT4N2a
+ID2115-13-MR13_S13_L001_R1_001.fastq.gz,ID2115-13-MR13_S13_L001_R2_001.fastq.gz,HPV-3,MR13,CRC,M,51,Descending colon,"Adenocarcinoma, NOS",G2,pT3N0
+ID2115-14-MR14_S14_L001_R1_001.fastq.gz,ID2115-14-MR14_S14_L001_R2_001.fastq.gz,HPV-4,MR14,CRC,M,54,Rectum,"Adenocarcinoma, NOS",G2,pT2N0
+ID2115-15-MR15_S15_L001_R1_001.fastq.gz,ID2115-15-MR15_S15_L001_R2_001.fastq.gz,HPV-5,MR15,CRC,F,58,Descending colon,"Adenocarcinoma, NOS",G2,pT3N0
+ID2115-16-MR16_S16_L001_R1_001.fastq.gz,ID2115-16-MR16_S16_L001_R2_001.fastq.gz,HPV-6,MR16,CRC,F,58,Descending colon,"Adenocarcinoma, NOS",G2,pT1N0
+ID2115-17-MR17_S17_L001_R1_001.fastq.gz,ID2115-17-MR17_S17_L001_R2_001.fastq.gz,HPV-7,MR17,CRC,F,47,Descending colon,"Adenocarcinoma, NOS",G2,pT3N0
+ID2115-18-MR18_S18_L001_R1_001.fastq.gz,ID2115-18-MR18_S18_L001_R2_001.fastq.gz,HPV-8,MR18,CRC,F,48,Rectum,"Adenocarcinoma, NOS",G2,pT4N2b
+ID2115-19-MR19_S19_L001_R1_001.fastq.gz,ID2115-19-MR19_S19_L001_R2_001.fastq.gz,HPV-9,MR19,CRC,M,82,Ascending colon,"Adenocarcinoma, NOS",G3,pT4aN0
+ID2115-20-MR20_S20_L001_R1_001.fastq.gz,ID2115-20-MR20_S20_L001_R2_001.fastq.gz,HPV-10,MR20,CRC,F,81,Ascending colon,"Adenocarcinoma, NOS",G2,pT4aN2b
+ID2115-21-MR21_S21_L001_R1_001.fastq.gz,ID2115-21-MR21_S21_L001_R2_001.fastq.gz,HPV-1,MR11,CRC,M,65,Ascending colon,"Adenocarcinoma, NOS",G3,pT3N2a
+ID2115-21-MR22_S22_L001_R1_001.fastq.gz,ID2115-21-MR22_S22_L001_R2_001.fastq.gz,Control_2,MR22,Paraffin_control,Null,Null,Null,Null,Null,Null
