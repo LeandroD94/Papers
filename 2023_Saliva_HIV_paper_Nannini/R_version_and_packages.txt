@@ -1,0 +1,54 @@
+R version 4.3.0 (2023-04-21)   running on Ubuntu 22.04.2 LTS
+ 
+
+$Package
+[1] "DESeq2"
+
+$Version
+[1] "1.40.1"
+
+
+ 
+
+$Package
+[1] "phyloseq"
+
+$Version
+[1] "1.44.0"
+
+
+ 
+
+$Package
+[1] "ggplot2"
+
+$Version
+[1] "3.4.2"
+
+
+ 
+
+$Package
+[1] "vegan"
+
+$Version
+[1] "2.6-4"
+
+
+ 
+
+[1] "Dendextend"
+[1] ‘1.17.1’
+
+ 
+
+NULL
+
+ 
+
+$Package
+[1] "mixOmics"
+
+$Version
+[1] "6.24.0"
+
