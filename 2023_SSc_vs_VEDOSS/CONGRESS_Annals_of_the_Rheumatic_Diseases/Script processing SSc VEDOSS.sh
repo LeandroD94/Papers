@@ -1,4 +1,4 @@
-# Operative Sistem: Ubuntu 22.04 (Linux)
+# Operative System: Ubuntu 22.04 (Linux)
 # required: conda, qiime2-2022.8, picrust-2.5, lefse-1.1.2, R-4.2
 
 ########################## PROCESSING RAW FILES ############################
