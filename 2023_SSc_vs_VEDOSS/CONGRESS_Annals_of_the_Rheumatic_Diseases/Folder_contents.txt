@@ -1,0 +1,1 @@
+This folder contains the scripts related to the "pre-analysis" SSc vs VEDOSS, published for the congress "Annals of the Rheumatic Diseases".
