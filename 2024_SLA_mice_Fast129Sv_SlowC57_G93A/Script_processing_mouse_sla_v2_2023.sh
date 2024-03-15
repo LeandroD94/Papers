@@ -1,4 +1,4 @@
-# Operative Sistem: Ubuntu 22.04 (Linux)
+# Operative System: Ubuntu 22.04 (Linux)
 # required: conda, qiime2-2022.8, bowtie-2.2.5, picrust-2.5, lefse-1.1.2, R-4.2
 
 
