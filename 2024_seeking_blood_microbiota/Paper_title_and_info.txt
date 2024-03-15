@@ -3,3 +3,10 @@ Title: Experimental tests strongly challenge the evidence of a healthy human blo
 Leandro Di Gloria*,Simone Baldi,Lavinia Curini,Sara Bertorello,Giulia Nannini,Francesco Cei,Elena Niccolai,Matteo Ramazzotti#,Amedeo Amedei#
 
 https://doi.org/10.21203/rs.3.rs-3921147/v1
+
+
+ABSTRACT:
+The advent of next-generation sequencing (NGS) technologies has made it doable to investigate the microbial communities in various environments, including all the different human body districts. Hence, the previously established belief of several body sites’ sterilities, including human blood, has now been challenged. However, the metagenomics investigation of habitats with an anticipated low microbial biomass may be susceptible to many and dangerous misinterpretations. Here, we critically evaluate the results of 16S targeted amplicon sequencing performed on the total DNA collected from healthy donors’ blood samples in the light of specific negative controls aimed at addressing potential bias in order to supply the research in this area with trustworthy data.
+Our negative controls, were prepared by inflating the initial DNA quantity through sequences that can be recognised and subsequently discarded. We found that only three organisms resulted sporadically present among the samples, mostly attributable to bacteria ubiquitous in laboratory reagents. 
+Despite we are not fully able to confirm or deny the existence of healthy blood microbiota, our results strongly suggest that living bacteria, or at least their residual DNA sequences, are not a common and peculiar feature of human blood in healthy people. Finally, our study poses relevant questions on the design of controls in this peculiar research topic in order to avoid spurious results that appear to contaminate current high throughput research.
+
