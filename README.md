@@ -1,6 +1,6 @@
 Hi everyone!
 
-In this repository I store and share the scripts that I used to analyse the data of the scientific publications where I'm involved. At this regard, it is worth to mention that the professor Matteo Ramazzotti (my PhD tutor) cooperated in the design of most of those analyses scripts.
+In this repository I store and share the scripts that I used to analyse the data of the scientific publications where I'm involved. At this regard, it is worth to mention that the professor Matteo Ramazzotti (https://github.com/matteoramazzotti) cooperated in the design of most of those analyses scripts.
 
 The folder names begin with the year of publication (NB: this is often different from the year in which the script and the analyses have been performed) and reports a quick summary of the paper topic and/or its first author name.
 In particular, in each folder of this repository the following files are always featured:
