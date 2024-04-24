@@ -1,3 +1,21 @@
-Oral microbiota signatures associated with viremia and CD4 recovery in treatment-naïve HIV-1-infected patients 
+Oral microbiota signatures associated with viremia and CD4 recovery in treatment-naïve HIV-1-infected patients
 
-Giulia Nannini*, Leandro Di Gloria*, Edda Russo, Gaetana Sterrantino, Seble Tekle Kiros, Marco Coppi, Elena Niccolai, Simone Baldi, Matteo Ramazzotti, Vincenzo Di Pilato, Filippo Lagi, Gianluca Bartolucci, Gian Maria Rossolini, Alessandro Bartoloni, Amedeo Amedei
+Giulia Nannini*, Leandro Di Gloria, Edda Russo, Gaetana Sterrantino, Seble Tekle Kiros, Marco Coppi, Elena Niccolai, Simone Baldi, Matteo Ramazzotti, Vincenzo Di Pilato, Filippo Lagi, Gianluca Bartolucci, Gian Maria Rossolini, Alessandro Bartoloni, Amedeo Amedei
+
+https://doi.org/10.1016/j.micinf.2024.105339
+
+
+
+### Abstract
+
+Purpose
+Few reports focused on the role of oral microbiome diversity in HIV infection. We characterized the microbiota-immunity axis in a cohort of treatment-naïve HIV-1-infected patients undergoing antiretroviral therapy (ART) focusing on the oral microbiome (OM) and immunological responsivity.
+
+Methods
+The sequencing of 16S rRNA V3–V4 hypervariable region was performed on salivary samples of 15 healthy control (HC) and 12 HIV + patients before starting ART and after reaching virological suppression. Then, we correlated the OM composition with serum cytokines and the Short Chain Fatty acids (SCFAs).
+
+Results
+The comparison between HIV patients and HC oral microbiota showed differences in the bacterial α-diversity and richness. We documented a negative correlation between oral Prevotella and intestinal valeric acid at before starting ART and a positive correlation between oral Veillonella and gut acetic acid after reaching virological suppression. Finally, an increase in the phylum Proteobacteria was observed comparing saliva samples of immunological responders (IRs) patients against immunological non-responders (INRs).
+
+Conclusions
+For the first time, we described an increase in the oral pro-inflammatory Proteobacteria phylum in INRs compared to IRs. We provided more evidence that saliva could be a non-invasive and less expensive approach for research involving the oral cavity microbiome in HIV patients.
