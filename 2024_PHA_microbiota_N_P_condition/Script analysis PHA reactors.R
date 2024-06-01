@@ -77,6 +77,8 @@ sample_data(data)$Experiment_day<-factor(sample_data(data)$Experiment_day,
                                          levels = unique(sample_data(data)$Experiment_day))
 
 
+#save.image("PHAmicrobiota_NvsP_Rdata_before_filters.RData")
+
 
 
 #################### FILTERING NOISES FROM DATA SET ####################
@@ -388,9 +390,12 @@ plot_ordination(data.sqrt_prop, ordBC, color = "Reactor_Type") +
   geom_point(size=2.6) +
   geom_point(size=5, alpha= 0.5) +
   theme_classic(base_size = 9) +
-  geom_path(aes(group=Sample_Type), color="gray", size= 0.14) +
+  theme(legend.text = element_text(size= 10.2),
+        legend.margin = margin(0,-2,0,0) 
+        ) +
+  geom_path(aes(group=Sample_Type), color="gray", size= 0.22) +
   geom_text(aes(label= Experiment_day), 
-            color="black", size=1.6,
+            color="black", size=2.1, vjust=0,
             alpha=0.9,
             show.legend = FALSE) +
   labs(
@@ -445,7 +450,7 @@ suppressWarnings(rm(top, others, tabella))
 
 tabella$Reactor_Type<-gsub("N_limitation","N limiting",tabella$Reactor_Type)
 tabella$Reactor_Type<-gsub("P_limitation","P limiting",tabella$Reactor_Type)
-levels(tabella$Sample_name)
+#levels(tabella$Sample_name)
 
 ggplot(data=tabella, aes(x=Experiment_day, y=Abundance, fill=Phylum)) +
   facet_grid(cols= vars(Reactor_Type),scales = "free_x", space = "free_x") + 
@@ -463,6 +468,31 @@ ggplot(data=tabella, aes(x=Experiment_day, y=Abundance, fill=Phylum)) +
        title = "Five most abundant phyla", 
        caption = " 'Others' includes every phylum below rank 5 ")
 ggsave(file="Results/N_and_P/TOP_5_phyla_EVERY_SAMPLE_CuoioDep_Nlim_Plim.png",width=7.5,height=5, dpi=300)
+dev.off()
+
+
+# to match the colors with the other abundances figure...
+colors_reorderd<-c("Verrucomicrobiota"="springgreen3",
+                   "Chloroflexi"="violet", # unique
+                   "Actinobacteriota"="blue",  # unique
+                   "Bacteroidota"="firebrick3",
+                   "Proteobacteria"="deepskyblue3",
+                   "Others"="darkslategray3")
+ggplot(data=tabella, aes(x=Experiment_day, y=Abundance, fill=Phylum)) +
+  facet_grid(cols= vars(Reactor_Type),scales = "free_x", space = "free_x") + 
+  geom_bar(stat="identity", position="stack") +
+  theme_classic(base_size =12) +
+  scale_fill_manual(values=colors_reorderd) +
+  theme(axis.text.x=element_text(angle=50, vjust=1, hjust = 1, size= 8.2), 
+        legend.key.size = unit(0.4, "cm"),
+        legend.text = element_text ( size = 12 ),
+        legend.position="bottom",
+        #legend.margin = margin(0,0,0,0),
+  ) +
+  guides(fill=guide_legend(nrow=2)) +
+  labs(x="Experiment day", y="Percent abundance", 
+       caption = " 'Others' includes every phylum below rank 5 ")
+ggsave(file="Results/N_and_P/TOP_5_phyla_EVERY_SAMPLE_Colors_match_with_other2figures.png",width=7.5,height=5, dpi=300) 
 dev.off()
 
 write.xlsx(file = "Results/N_and_P/TOP_5_phyla_EVERY_SAMPLE.xlsx", row.names = F,
@@ -511,10 +541,42 @@ ggplot(data=tabella, aes(x=Experiment_day, y=Abundance, fill=Genus)) +
 ggsave(file="Results/N_and_P/TOP_10_Genera_EVERY_SAMPLE_CuoioDep_Nlim_Plim.png",width=7.5,height=5,dpi=300)
 dev.off()
 
+# again, but setting colors to have the same bacteria with the same color among the abundances plot...
+# unique(tabella$Genus)
+# those are in common with P --> Thauera (Yellow) Prosthecobacter (darkblue) Planktosalinus (pink) Azoarcus (red) Neomegalonema (dark green) Paracoccus (blue)
+fill_color_to_match_P<-c("Subsaxibacter"="lightgreen",
+                         "67-14"="coral4",
+                         "Stappia"="coral", #
+                         "Thauera"="yellow2", #
+                         "Prosthecobacter"="blue2",
+                         "Azoarcus"="firebrick3", #
+                         "Neomegalonema"="chartreuse4", #
+                         "Flavobacterium"="yellow4", #
+                         "Planktosalinus"="violet", #
+                         "Paracoccus"="deepskyblue4", #
+                         "Others"="darkslategray3")
+ggplot(data=tabella, aes(x=Experiment_day, y=Abundance, fill=Genus)) +
+  facet_grid(cols= vars(Reactor_Type),scales = "free_x", space = "free_x") +
+  geom_bar(stat="identity", position="stack") +
+  theme_classic(base_size =12) +
+  scale_fill_manual(values=fill_color_to_match_P) +
+  theme(axis.text.x=element_text(angle=50, vjust=1, hjust = 1, size= 8.2), 
+        legend.key.size = unit(0.4, "cm"),
+        legend.text = element_text ( size = 11.8 ),
+        legend.position="bottom", 
+        legend.margin = margin(0,0,0,0)
+  ) + 
+  guides(fill=guide_legend(nrow=3)) + 
+  labs(x="Experiment day", y="Percent abundance",
+       caption = " 'Others' includes every genus below rank 10 ")
+ggsave(file="Results/N_and_P/TOP_10_Genera_EVERY_SAMPLE_Colors_match_with_other2figures.png",width=7.5,height=5,dpi=300)
+
+
 write.xlsx(file = "Results/N_and_P/TOP_10_genera_EVERY_SAMPLE.xlsx", row.names = F,
            cbind.data.frame("mean"=as.numeric(apply(otu_table(prune.dat_top),1,mean)), "Genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]]))
 
 rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabella_others, top, others, data.target)
+
 
 
 
@@ -753,6 +815,25 @@ ggplot(data=tabella, aes(y=Abundance, x=Experiment_day, fill=Phylum)) +
 ggsave(file="Results/N_lim_reactor/Abundances/TOP5_phyla_abundances_second_half.png",width=7,height=6.5, dpi=300) 
 dev.off()
 
+# to match the colors with the P related figure...
+colors_reorderd<-c("Verrucomicrobiota"="springgreen3","Firmicutes"="gold3","Planctomycetota"="coral","Bacteroidota"="firebrick3","Proteobacteria"="deepskyblue3","Others"="darkslategray3")
+ggplot(data=tabella, aes(y=Abundance, x=Experiment_day, fill=Phylum)) +
+  theme_classic(base_size =14) + 
+  theme(panel.spacing.y = unit(2,"pt"))+
+  scale_x_discrete (expand = c(0.01,0) ) +
+  scale_fill_manual(values=colors_reorderd) +
+  geom_bar(stat="identity", position="stack", width = 0.95) +
+  theme(axis.text.x=element_text(angle=50, vjust=1, hjust = 1, size=11),
+        legend.key.size = unit(0.4, "cm"),
+        legend.text = element_text ( size = 14.1 ),
+        legend.position="bottom",legend.margin = margin(2,0,5,0)
+  ) +
+  guides(fill=guide_legend(nrow=3)) +
+  labs(x="Experiment day", y="Percent abundance", caption = " 'Others' includes every phylum below rank 5 ")
+ggsave(file="Results/N_lim_reactor/Abundances/TOP5_phyla_abundances_second_half_Colors_match_with_P.png",width=7,height=6.5, dpi=300) 
+dev.off()
+
+
 # means of TOP5 phyla (no inoculum)
 write.xlsx(file = "Results/N_lim_reactor/Abundances/TOP5_phyla_second_half_averages.xlsx", row.names = F,
            cbind.data.frame("mean"=as.numeric(apply(otu_table(prune.dat_top),1,mean)), "phylum"= as.data.frame(tax_table(prune.dat_top))[["Phylum"]]))
@@ -794,6 +875,36 @@ ggplot(data=tabella, aes(y=Abundance, x=Experiment_day, fill=Genus)) + theme_cla
   guides(fill=guide_legend(nrow=4)) + 
   labs(x="Experiment day", y="Percent abundance", caption = " 'Others' includes every genus below rank 10 ")
 ggsave(file="Results/N_lim_reactor/Abundances/TOP10_genera_abundances_second_half.png",width=7,height=6.5, dpi=300) 
+dev.off()
+
+# again, but setting colors to have the same bacteria with the same color among the two conditions...
+# unique(tabella$Genus)
+# those are in common with P --> Thauera (Yellow) Prosthecobacter (darkblue) Planktosalinus (pink) Azoarcus (red) Neomegalonema (dark green) Paracoccus (blue)
+fill_color_to_match_P<-c("Azonexus"="wheat",
+                         "Gemmobacter"="magenta",
+                         "Stappia"="coral",
+                         "Thauera"="yellow2",
+                         "Prosthecobacter"="blue2",
+                         "Azoarcus"="firebrick3",
+                         "Neomegalonema"="chartreuse4",
+                         "Flavobacterium"="yellow4",
+                         "Planktosalinus"="violet",
+                         "Paracoccus"="deepskyblue4",
+                         "Others"="darkslategray3")
+ggplot(data=tabella, aes(y=Abundance, x=Experiment_day, fill=Genus)) + theme_classic(base_size =14) + 
+  # facet_grid2(Sampling_date+Sample_Type~., scales = "free", space="free", strip = strip_nested(size="constant"))+
+  theme(panel.spacing.y = unit(2,"pt"))+
+  scale_fill_manual(values=fill_color_to_match_P) +
+  scale_x_discrete (expand = c(0.01,0) ) +
+  geom_bar(stat="identity", position="stack", width = 0.95) +
+  theme(axis.text.x=element_text(angle=50, vjust=1, hjust = 1, size=11),
+        legend.key.size = unit(0.4, "cm"),
+        legend.text = element_text ( size = 12.5 )) + 
+  theme(legend.position="bottom",
+        legend.margin = margin(0,0,0,0)) +
+  guides(fill=guide_legend(nrow=4)) + 
+  labs(x="Experiment day", y="Percent abundance", caption = " 'Others' includes every genus below rank 10 ")
+ggsave(file="Results/N_lim_reactor/Abundances/TOP10_genera_abundances_second_half_colors_match_P.png",width=7,height=6.5, dpi=300) 
 dev.off()
 
 # means of TOP10 genera (no inoculum)
