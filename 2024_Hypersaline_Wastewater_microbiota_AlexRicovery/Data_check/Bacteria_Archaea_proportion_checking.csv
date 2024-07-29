@@ -1,0 +1,3 @@
+;total_ASV_count;Percent_proportion;Minor_count_among_samples;Major_count_among_samples;FASTQ_with_less_count;FASTQ_with_more_count
+Archaea;25;0,00440837026078155;0;8;AX2;AX1
+Bacteria;567078;99,9955916297392;34085;64400;AX10;AX7
