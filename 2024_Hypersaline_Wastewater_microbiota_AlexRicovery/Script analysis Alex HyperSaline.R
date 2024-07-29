@@ -31,6 +31,9 @@ fill_color_19<-c("darkblue","brown4","springgreen2","wheat","lightcoral","coral"
 # NB: there is always an extra color which will be the "Others" group
 
 
+# <-- data backup saved here
+
+
 
 ####################### IMPORTING DATA #####################
 
@@ -387,14 +390,45 @@ dev.off()
 
 # means of TOP genera
 to_save<- cbind.data.frame("mean"=as.numeric(apply(otu_table(prune.dat_top),1,mean)),
-                           "standard_dev"=as.numeric(apply(otu_table(prune.dat_top),1,sd)),
+                           # "standard_dev"=as.numeric(apply(otu_table(prune.dat_top),1,sd)),
                            "genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]]
                            )
 to_save<-to_save[order(to_save$mean, decreasing=T), ]
 write.xlsx(file = "Results/Abundances/TOP_genera_Averages_EverySample.xlsx", row.names = F, to_save )
 
-suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabella_others, top, others, to_save))
 
+# extra: only top 10 genera
+tabella2<-tabella
+tabella2[tabella2$Genus %in% to_save$genus[11:19 ], "Genus" ] <- "Others"  # to_save is already ordered
+ggplot(data=tabella2, aes(x=Experiment_day_char, y=Abundance, fill=Genus)) +
+  geom_bar( stat="identity", position="stack", na.rm = F) + 
+  theme_classic(base_size =8.5) +
+  scale_fill_manual(values=fill_color_10) +
+  theme(axis.text.x=element_text(angle=35,
+                                 vjust=1,
+                                 hjust=1,
+                                 size= 7
+  ),
+  axis.text.y=element_text(size=6.2),
+  axis.title.y = element_text(size=8),
+  axis.title =element_text(size=10),
+  strip.text = element_text(size=6.5),
+  legend.key.height = unit(0.25, "cm"),
+  legend.key.width = unit(0.38, "cm"),
+  title = element_text ( size = 8 ),
+  legend.text = element_text ( size = 8.5 ),
+  legend.position="bottom",
+  legend.margin = margin(-10,10,2,5),
+  plot.margin = margin(4,1,4,1)) +
+  guides(fill=guide_legend(nrow=4)) +
+  labs(x="", y="Percentual abundance of clades",
+       title = "Most abundant identified genera",
+       fill="",
+       caption = " 'Others' includes every genus below rank 10 ")
+ggsave(file="Results/Abundances/TOP_genera_VERSION_WITH_10GENERA.png",width=5,height=4, dpi=300)
+
+
+suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabella_others, top, others, to_save))
 
 
 
