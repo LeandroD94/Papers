@@ -8,8 +8,9 @@ In particular, in each folder of this repository the following files are always 
 * Linux or R scripts that have been used.
 
 Through the informations provided and, naturally, the paper title or DOI, it is possible to easily find on PUBMED the paper where also the raw sequences GEO/SRA code is reported (it is always provided in "Data availability" section of our papers if the analyses regards the microbiome, otherwise a RData with every matrix necessary is featured in this repository folder).
-Therefore, by obtaining those raw data and using the uploaded scripts, any user can reproduce and check every published results (and also get more information or alternative aesthetics of the plots!)
+Therefore, by obtaining those raw data and using the uploaded scripts, ever user can reproduce and check every published results (and also get more information or alternative aesthetics of the plots!)
 
 Finally, I'm always available through my e-mail (leandro.di.gloria@gmail.com) if any further information is required.
 
-Leandro
+Take care!
+Leandro D
