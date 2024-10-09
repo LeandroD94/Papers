@@ -1,0 +1,6 @@
+Sample_name	FASTQ_ID	Type	Time_point	State_description	Exp_Date	Exp_Day
+P1	1607849	Partial_Nitr	1	AGS inoculum	20/04/2023	1
+P3	1607851	Partial_Nitr	3	Started the experiment in a lab reactor	31/07/2023	102
+P4	1607852	Partial_Nitr	4		12/09/2023	145
+P5	1607853	Partial_Nitr	5		26/09/2023	159
+P6	1607854	Partial_Nitr	6		25/10/2023	188
