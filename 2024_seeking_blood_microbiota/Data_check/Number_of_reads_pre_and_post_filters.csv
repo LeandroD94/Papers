@@ -1,0 +1,16 @@
+Original;percentual_host;After_quality_filter;After_contam_filter;Kit;Subject;Samples;abundance_host
+27147;1.2%;1404;1071; QIAamp® DNA Microbiome Kit;H1_M;Blood1;17
+16809;0.3%;1406;1235; QIAamp® DNA Microbiome Kit;H2_M;Blood3;4
+8342;14.1%;512;366; QIAamp® DNA Microbiome Kit;H3_M;Blood5;72
+15841;61.8%;1071;471;DNeasy® Blood & Tissue Kit ;H1_B;Blood2;662
+38390;57.5%;1374;1130;DNeasy® Blood & Tissue Kit ;H2_B;Blood4;790
+18155;41.7%;1162;870;DNeasy® Blood & Tissue Kit ;H3_B;Blood6;485
+7509;28.2%;528;427;DNeasy® Blood & Tissue Kit ;H4_B;Blood7;149
+7730;39.5%;1577;840;DNeasy® Blood & Tissue Kit ;H5_B;Blood9;623
+10736;33.6%;1301;1257;DNeasy® Blood & Tissue Kit ;H6_B;Blood10;437
+254663;0%;205137;204930; QIAamp® DNA Microbiome Kit;ENC_M;E_Coli3;0
+19605;0.9%;2419;2314; QIAamp® DNA Microbiome Kit;H4_M;Blood8;22
+72474;2.5%;5652;3482; QIAamp® DNA Microbiome Kit;H6_M;Blood11;141
+134409;0%;99700;99142;DNeasy® Blood & Tissue Kit ;ENC_B;E_Coli4;0
+5830;23.5%;540;436;DNeasy® Blood & Tissue Kit ;OTC_B;Mice_DNA1;127
+52588;0%;7190;6817; QIAamp® DNA Microbiome Kit;OTC_M;Mice_DNA2;0

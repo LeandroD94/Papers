@@ -1,0 +1,16 @@
+FASTQ_ID;Donor_Condition;ng.ul;X260.280;X260.230;Sample_Type;Donor_gender;Sample_code;Kit;FASTQ_Order;FASTQ_original_names
+LDG11;Healthy1;10.4;2.08;0.3;Healthy;F;H1_M;Microbiome_kit;1;00000_ID3003_11-LDG11-A1-C2
+LDG12;Healthy2;8.8;1.87;0.24;Healthy;M;H2_M;Microbiome_kit;3;00000_ID3003_12-LDG12-A1-D2
+LDG13;Healthy3;11.8;1.96;0.36;Healthy;F;H3_M;Microbiome_kit;5;00000_ID3003_13-LDG13-A1-E2
+LDG16;Healthy1;12.6;1.62;0.77;Healthy;F;H1_B;Blood_Tissue_kit;2;00000_ID3003_16-LDG16-A1-H2
+LDG17;Healthy2;7.2;1.68;0.39;Healthy;M;H2_B;Blood_Tissue_kit;4;00000_ID3003_17-LDG17-A1-A3
+LDG18;Healthy3;6.1;1.77;0.62;Healthy;F;H3_B;Blood_Tissue_kit;6;00000_ID3003_18-LDG18-A1-B3
+LDG19;Healthy4;14.7;1.7;0.54;Healthy;M;H4_B;Blood_Tissue_kit;7;00000_ID3003_19-LDG19-A1-C3
+LDG20;Healthy5;22.9;1.72;0.57;Healthy;M;H5_B;Blood_Tissue_kit;9;00000_ID3003_20-LDG20-A1-D3
+LDG21;Healthy6;14.3;1.54;0.51;Healthy;F;H6_B;Blood_Tissue_kit;10;00000_ID3003_21-LDG21-A1-E3
+LDG22;Coli_colture;4.6;1.85;0.3;Contaminant_trap;/;Coli_colture_M;Microbiome_kit;3;00000_ID3003_22-LDG22-A1-F3
+LDG23;Healthy4;3.3;1.8;0.76;Healthy;M;H4_M;Microbiome_kit;8;00000_ID3003_23-LDG23-A1-G3
+LDG25;Healthy6;8.3;1.15;0.09;Healthy;F;H6_M;Microbiome_kit;11;00000_ID3003_25-LDG25-A1-A4
+LDG30;Coli_colture;1.1;1.63;0.56;Contaminant_trap;/;Coli_colture_B;Blood_Tissue_kit;4;00000_ID3003_30-LDG30-A1-F4
+LDG5;Mice_cell;9.1;1.35;0.56;Contaminant_trap;/;Mice_cell_B;Blood_Tissue_kit;1;00000_ID3003_5-LDG5-A1-E1
+LDG6;Mice_cell;2.7;1.07;0.04;Contaminant_trap;/;Mice_cell_M;Microbiome_kit;2;00000_ID3003_6-LDG6-A1-F1

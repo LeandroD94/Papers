@@ -1,0 +1,4 @@
+Raw reads abundance (sequenced, considering the pairs as one)
+690228Reads abundance after every filter
+324788Percentual of remaining vs original
+47.06 %

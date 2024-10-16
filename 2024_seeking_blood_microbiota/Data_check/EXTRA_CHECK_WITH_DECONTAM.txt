@@ -1,0 +1,13 @@
+Contaminants according to Decontam frequency method
+Escherichia-Shigella Ruminococcus
+ 
+
+Contaminants according to Decontam prevalence method (threshold 0.3)
+Escherichia-Shigella Cutibacterium Clostridia_UCG-014 Methylobacterium-Methylorubrum NA_ f Xanthobacteraceae Bacteroides Bifidobacterium Roseburia Alistipes NA_ f Lachnospiraceae Christensenellaceae_R-7_group Subdoligranulum Sphingomonas
+ 
+
+Genera remaining if the above contaminants are excluded
+Burkholderia-Caballeronia-Paraburkholderia Leifsonia Akkermansia Ruminococcus Helicobacter Pseudomonas Flavobacterium Lactobacillus Phascolarctobacterium Lachnospiraceae_ND3007_group Prevotella Coprococcus
+ 
+NB: The remaining genera are Burkholderia, Leifsonia, Flavobacterium... and other genera which are VERY abundant in controls... 
+There is also Pseudomonas, featured in controls and renowned as potential contaminant... and also Helicobacter (!)... this method does not appear to work properly on this dataset, as expected
