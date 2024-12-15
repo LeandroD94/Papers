@@ -1,0 +1,17 @@
+Studying the microbiota and microbiome evolution of a pilot scale AGS (aerobic granular sludge) reactor starting from a floccular inoculum.
+
+Briefly, this reactor was inoculated with 1.5 m3 activated sludge taken from a full-scale sequencing batch reactor (SBR) treating municipal wastewater (Tavarnelle wastewater treatment plant).
+From that moment on, the pilot plant was fed with real municipal wastewater from a combined sewer system of a peripheral area of the municipality of Florence.
+Due to the presence of low levels of carbon to nitrogen ratios in the raw influent (4.5 g COD/g N), 150 mg COD/L of acetic acid was added to the row influent to speed up the granulation process.
+The pilot plant is equipped with a chopper pump that collects wastewater from the sewer system and transports it to the pretreatments. Pretreatments include two screening steps in series (cut-off of 2 and 1 cm, respectively), followed by cyclonic sand removal.
+The reactor cycle structure consists of six phases: anaerobic phases of i) feeding and ii) mixing; iii) an aerobic phase with external air supply; iv) a mixed anoxic phase; v) settling and consequent vi) withdrawal of the effluent. 
+Granulation from flocculant sludge to AGS was achieved through the application of metabolic and hydraulic selective pressure .
+
+Furthermore, also a mature laboratory scale AGS reactor ("other_AGS") and a biological replicate of the inoculum ("other_CAS") have been included, along with other samples, with the objective to check for eventual biases. 
+
+The project is composed of three main sections:
+* 16S amplicon sequencing based analysis,
+* total DNA sequencing based analysis,
+* total RNA sequencing based analysis.
+
+Project founded by IDRO.SMART (https://www.publiacqua.it/idrosmart-investiamo-sullinnovazione)
