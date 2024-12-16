@@ -1,0 +1,6 @@
+FASTQ_ID	Correspective	Sample_name	Experiment_day	Time_point	Notes
+1623909_S50	other_reactor	other_reactor	other_reactor	0	lab scale
+1623906_S47	L1	LS1	1	1	Inoculum
+1623907_S48	L13	LS13	57	2	Still half granular
+1623905_S46	L25	LS25	115	3	Granular, white spheres
+1623908_S49	LD39	LS39	164	4	Directly extracted, mature, with denitrif activity
