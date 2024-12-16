@@ -1,0 +1,8 @@
+Date	Sample_name	FASTQ_ID	Type	Time_point	Experiment_day	State_description	Project	Notes
+10_10_23	LR1	1608261_S34	Mixed liquor	1	1	Actual inoculum (flocs)	IDROSMART	Also RNA available
+06_12_23	LR13	1608262_S35	Mixed liquor	13	57	Granules are now well visibile	IDROSMART	Also RNA available
+04_01_24	LR19	1608263_S36	Mixed liquor	19	86	Still half flocculent and half granular	IDROSMART	Also RNA available
+02_02_24	LR25	1608264_S37	Mixed liquor	25	115	Already granular	IDROSMART	Also RNA available, white spheres are visible again
+13_02_24	LR28	1608265_S38	Mixed liquor	28	126	Bigger granules	IDROSMART	Also RNA available
+22_03_24	LR39	1608266_S39	Mixed liquor	39	164	Final state	IDROSMART	Also RNA available
+16_06_23	other_AGS	1517645_S46	Mixed liquor	other_AGS	other_AGS	Another already mature AGS reactor	IDROSMART	This sample has been stored at -20C in gly 20% (unlike the others)
