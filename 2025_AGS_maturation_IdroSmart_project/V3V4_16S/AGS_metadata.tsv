@@ -1,0 +1,59 @@
+Date	Sample_name	FASTQ_ID	Type	Time_point	Experiment_day	State_description	Project	Notes
+21_07_23	other_CAS	1607840	Mixed liquor	1	other_CAS	"Corrisponde a Old Lotti 1(""OL1""), vecchio inoculo prima del riavvio esperimento"	IDROSMART	DNA purified directly
+10_10_23	L1	1607793	Mixed liquor	1	1	Actual inoculum (flocs)	IDROSMART	Also RNA available
+18_10_23	L2	1607794	Mixed liquor	2	8		IDROSMART	
+24_10_23	L3	1607795	Mixed liquor	3	14		IDROSMART	
+31_10_23	L4	1607796	Mixed liquor	4	21	Actual AGS selection started	IDROSMART	
+02_11_23	LD5	1607835	Direct extract	5	23		IDROSMART	"Same as L5 but DNA purified directly (""D"")"
+02_11_23	L5	1607797	Mixed liquor	5	23		IDROSMART	
+07_11_23	LD6	1607836	Direct extract	6	28		IDROSMART	
+07_11_23	I6	1607841	Influent	6	28		IDROSMART	"Influent (""I"")"
+07_11_23	L6	1607798	Mixed liquor	6	28		IDROSMART	
+09_11_23	L7	1607799	Mixed liquor	7	30		IDROSMART	It has been in fridge for a night before being stored at -80
+14_11_23	L8	1607800	Mixed liquor	8	35		IDROSMART	It has been in fridge for a night before being stored at -80
+21_11_23	LD9	1607837	Direct extract	9	42		IDROSMART	
+21_11_23	L9	1607801	Mixed liquor	9	42		IDROSMART	
+21_11_23	O9	1607846	Out	9	42		IDROSMART	"Effluent (""O"" stands for ""out"")"
+24_11_23	I10	1607842	Influent	10	45	Searching for faster sedimentation	IDROSMART	
+24_11_23	L10	1607802	Mixed liquor	10	45	Searching for faster sedimentation	IDROSMART	
+24_11_23	O10	1607847	Out	10	45	Searching for faster sedimentation	IDROSMART	
+28_11_23	L11	1607803	Mixed liquor	11	49		IDROSMART	There has been some issue in the reactor (?)
+30_11_23	L12	1607804	Mixed liquor	12	51		IDROSMART	
+06_12_23	L13	1607805	Mixed liquor	13	57	Granules are now well visibile	IDROSMART	Also RNA available
+07_12_23	L14	1607806	Mixed liquor	14	58		IDROSMART	
+12_12_23	L15	1607807	Mixed liquor	15	63		IDROSMART	Collected by prof Rama, it has been in fridge for a nigth, biomass at -20 for few days
+15_12_23	L16	1607808	Mixed liquor	16	66		IDROSMART	Collected by prof Rama, biomass at -20 for few day
+18_12_23	L17	1607809	Mixed liquor	17	69		IDROSMART	The mixed liquor has been stored in fridge for days
+21_12_23	L18	1607810	Mixed liquor	18	72		IDROSMART	
+04_01_24	L19	1607811	Mixed liquor	19	86	Still half flocculent and half granular	IDROSMART	Also RNA available
+08_01_24	L20	1607812	Mixed liquor	20	90		IDROSMART	
+12_01_24	L21	1607813	Mixed liquor	21	94	Much more granular than before	IDROSMART	… there are white spheres (?) visible
+16_01_24	L22	1607814	Mixed liquor	22	98	Optimization started (phase skipping)	IDROSMART	
+25_01_24	I23	1607843	Influent	23	106		IDROSMART	
+24_01_24	L23	1607815	Mixed liquor	23	106	Bigger granules	IDROSMART	
+17_01_24	O23	1607848	Out	23	106	Sedimentation rate now above 6m/h	IDROSMART	Despite the name, its more near to Lotti 22 than 23… but it is pertaining to the new sedim speed
+29_01_24	L24	1607816	Mixed liquor	24	111		IDROSMART	
+02_02_24	L25	1607817	Mixed liquor	25	115		IDROSMART	Also RNA available, white spheres are visible again
+05_02_24	L26	1607818	Mixed liquor	26	118	Now discarding through a lower hole	IDROSMART	In fridge for two days before being stored at -80
+07_02_24	L27	1607819	Mixed liquor	27	120		IDROSMART	
+07_02_24	O27	1607863	Out	27	120		IDROSMART	Doubt: maybe nitrifing bacteria have been lost
+13_02_24	L28	1607820	Mixed liquor	28	126	Bigger granules	IDROSMART	Also RNA available
+19_02_24	L29	1607821	Mixed liquor	29	129		IDROSMART	
+23_02_24	L30	1607822	Mixed liquor	30	136	Faster sedimentation (personal evaluat)	IDROSMART	It has been in fridge a day before being stored at -80
+27_02_24	L31	1607823	Mixed liquor	31	140		IDROSMART	It has been in fridge a day before being stored at -80, big black mass in the falcon
+29_02_24	I32	1607844	Influent	32	142		IDROSMART	"Also the ""water"" of the influent has been included in this sample"
+29_02_24	L32	1607824	Mixed liquor	32	142		IDROSMART	Also RNA available
+06_03_24	L33	1607825	Mixed liquor	33	148		IDROSMART	It has been in fridge a day before being stored at -80, it was quite smelly
+09_03_24	L34	1607826	Mixed liquor	34	151		IDROSMART	It has been in fridge a day before being stored at -80
+12_03_24	L35	1607827	Mixed liquor	35	154		IDROSMART	In fridge for few hours, then stored at -80
+15_03_24	L36	1607828	Mixed liquor	36	157		IDROSMART	In fridge for few hours, then stored at -80
+18_03_24	L37	1607829	Mixed liquor	37	160	Now there is denitrifying activity	IDROSMART	In fridge for few hours then stored at -80, strange mass in the falcon, stronger centrifugation then usual
+21_03_24	L38	1607830	Mixed liquor	38	163		IDROSMART	Stronger centrifugation then usual
+22_03_24	LD39	1607838	Direct extract	39	164		IDROSMART	
+22_03_24	L39	1607831	Mixed liquor	39	164		IDROSMART	Stronger centrifugation then usual
+27_03_24	LD40	1607839	Direct extract	40	169		IDROSMART	In fridge for a night before being extracted
+27_03_24	I40	1607845	Influent	40	169		IDROSMART	Rainy day
+27_03_24	L40	1607832	Mixed liquor	40	169		IDROSMART	In fridge for a night before being stored
+03_04_24	L41	1607833	Mixed liquor	41	176		IDROSMART	Rainy days then it has been nutrished with a very diluited influent
+11_04_24	L42	1607834	Mixed liquor	42	184		IDROSMART	Collected by prof. Rama, very diluited influent
+16_06_23	other_AGS	1498733	Mixed liquor	43	other_AGS	Another already mature AGS reactor	IDROSMART	This sample has been stored in gly 20% (unlike the others)
