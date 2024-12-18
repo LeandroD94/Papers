@@ -6,7 +6,7 @@ Leandro Di Gloria*,Simone Baldi,Lavinia Curini,Sara Bertorello,Giulia Nannini,Fr
 # Corresponding author
 
 THE FEBS JOURNAL
-DOI:
+DOI: 10.1111/febs.17362
 
 
 ABSTRACT:
