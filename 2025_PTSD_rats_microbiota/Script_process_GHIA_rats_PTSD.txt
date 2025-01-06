@@ -1,0 +1,168 @@
+#!/user/bin/env bash
+
+# Operative System: Debian GNU/Linux 11 (bullseye)
+# programs required: conda, qiime2-amplicon-2024.2, bowtie-2.5.2, R-4.3.2
+
+
+
+
+#################### PREPARING REQUIRED VARIABLES ############################
+
+
+### TO USE THIS SCRIPT AS A "PROGRAM"
+shopt -s expand_aliases
+source ~/miniconda3/etc/profile.d/conda.sh
+# these rows loads the environment variable "into the script"
+
+
+Bowtie2db=/media/matteo/SSD1/reference/Bwt2_indexed_rat/Rnor6
+
+
+
+# Downloading QIIME2 UNITE 10.0 trained classifier
+# info on https://forum.qiime2.org/t/pre-trained-unite-its-classifiers-for-qiime-2024-5-and-older/24140
+# wget unite_ver10_dynamic_all_04.04.2024-Q2-2024.2.qza
+# UNITE_db=/media/matteo/SSD1/reference/unite_ver10_dynamic_all_04.04.2024_Bayes.qza
+
+# ref for 16S V4 region
+silva_ref=/media/matteo/SSD1/reference/silva-138-99-seqs-V4_515-806.qza
+silva_tax=/media/matteo/SSD1/reference/silva-138-99-tax-V4_515-806.qza
+
+threads=31
+
+
+
+########################### PROCESSING RAW FILES #############################
+
+mkdir QIIME
+chmod +rwx QIIME
+
+
+
+##### FASTQ CHECKSUM
+
+md5sum raw_FASTQ_dir/* | sed 's+raw_FASTQ_dir/++g' | sed 's/  / \t/' > QIIME/checksum_FASTQ.tsv
+
+dir raw_FASTQ_dir/ | sed '/R2_001/d' >R1.txt
+cat R1.txt | sed 's/R1_001/R2_001/' >R2.txt
+paste R1.txt R2.txt --delimiters='\t' > QIIME/FASTQ_pairs.tsv
+rm R1.txt R2.txt
+
+
+
+##### OPENING QIIME ENVIRONMENT
+
+conda activate qiime2-amplicon-2024.2
+
+cd QIIME
+
+qiime tools import --type 'SampleData[PairedEndSequencesWithQuality]' --input-path ../raw_FASTQ_dir --input-format CasavaOneEightSingleLanePerSampleDirFmt --output-path demux-paired-end.qza
+
+
+
+##### DENOISING, QUALITY LENGTH TRIMMING and MERGING
+
+qiime demux summarize --i-data demux-paired-end.qza --o-visualization demux.qzv --p-n 500000 # of total pool!
+
+qiime tools view demux.qzv
+#echo -e "\n put that demux.qzv in this site https://view.qiime2.org/ \n"
+
+
+# NB: only V4, it is shorter than V3-V4...
+qiime dada2 denoise-paired --i-demultiplexed-seqs demux-paired-end.qza --p-trim-left-f 0 --p-trim-left-r 0 --p-trunc-len-f 249 --p-trunc-len-r 150 --o-table table.qza --o-representative-sequences rep-seqs.qza --o-denoising-stats denoising-stats.qza --p-n-threads $threads
+
+qiime tools export --input-path denoising-stats.qza --output-path ./      ### to export and create the table of absolute and relative read abundances
+cat stats.tsv | grep -v "q2:types" > DADA2_Initial_and_processed_reads.tsv
+cat DADA2_Initial_and_processed_reads.tsv | sed 's/age of input /_/g'| sed 's/passed filter/filtered/' | cut -f 1,2,4,7,9
+
+
+chmod +rwx stats.tsv
+
+
+
+
+################# REMOVING EUCARYOTIC ASV (CONTAMINANTS) #########################
+
+qiime tools export --input-path rep-seqs.qza --output-path ./ # it will export "dna-sequences.fasta"
+
+conda deactivate # to use bowtie2
+
+
+
+bowtie2 -x $Bowtie2db -U dna-sequences.fasta --al eucar_contaminant_ASV.fasta -S bowtie2_SAM_output.txt -f -p $threads 2> percentuals_aligned_bowtie2.txt
+
+mkdir eucar_contaminants
+mv rep-seqs.qza eucar_contaminants/rep-seqs_with_euc_contam.qza
+#cp rep-seqs.qza eucar_contaminants/rep-seqs_with_euc_contam.qza
+
+grep -Fwv -f eucar_contaminant_ASV.fasta dna-sequences.fasta > decontaminated_seq.fasta
+
+echo -e " Number of human contaminant ASV sequences:" $(grep ">" eucar_contaminant_ASV.fasta | wc -l ) "among" $(grep ">" decontaminated_seq.fasta | wc -l) "ASVs" > eucar_contaminants/Number_of_eucar_Contaminant.txt
+
+chmod +rwx dna-sequences.fasta
+rm dna-sequences.fasta
+
+mv eucar_contaminant_ASV.fasta eucar_contaminants/eucar_contaminant_ASV.fasta
+mv bowtie2_SAM_output.txt eucar_contaminants/bowtie2_SAM_output.txt
+mv percentuals_aligned_bowtie2.txt eucar_contaminants/percentuals_aligned_bowtie2.txt
+
+
+
+conda activate qiime2-amplicon-2024.2
+
+qiime tools import --input-path decontaminated_seq.fasta --output-path clean_rep-seqs.qza --type FeatureData[Sequence]
+
+# NB: every ASV absent in the taxonomic table will be discarded by phyloseq automatically
+
+
+
+
+######################### TAXONOMIC CLASSIFICATION ##################################
+
+
+#### CLASSIFICATION THROUGH GLOBAL ALIGNMENT
+qiime feature-classifier classify-consensus-vsearch --i-query clean_rep-seqs.qza --i-reference-reads $silva_ref --i-reference-taxonomy $silva_tax --p-perc-identity 0.99 --p-threads $threads --o-classification taxonomy_vsearch.qza --o-search-results vsearch_hits.qza --verbose 2> ASV_matched_in_SILVA.txt
+
+
+
+################# COMPUTING THE PHYLOGENETIC TREE DE NOVO #############################
+
+
+#### DE NOVO TREE ALIGNMENT
+
+qiime alignment mafft --i-sequences clean_rep-seqs.qza --o-alignment aligned-seqs.qza
+qiime alignment mask --i-alignment aligned-seqs.qza --o-masked-alignment masked-aligned-rep-seqs.qza
+qiime phylogeny fasttree --i-alignment masked-aligned-rep-seqs.qza --o-tree unrooted-tree.qza
+qiime phylogeny midpoint-root --i-tree unrooted-tree.qza --o-rooted-tree rooted-tree.qza
+
+rm aligned-seqs.qza masked-aligned-rep-seqs.qza unrooted-tree.qza
+
+
+#### FOR THE CONTAMINATED SEQS TOO (TO PERFORM FURTHER CHECKS)
+
+qiime alignment mafft --i-sequences eucar_contaminants/rep-seqs_with_euc_contam.qza --o-alignment aligned-seqs.qza
+qiime alignment mask --i-alignment aligned-seqs.qza --o-masked-alignment masked-aligned-rep-seqs.qza
+qiime phylogeny fasttree --i-alignment masked-aligned-rep-seqs.qza --o-tree unrooted-tree.qza
+qiime phylogeny midpoint-root --i-tree unrooted-tree.qza --o-rooted-tree eucar_contaminants/rooted-tree_with_contam.qza
+
+rm aligned-seqs.qza masked-aligned-rep-seqs.qza unrooted-tree.qza
+
+
+
+
+############# EXPORTING ORIGINAL NUMBER OF READS ############################
+
+qiime demux summarize --i-data demux-paired-end.qza --o-visualization original_reads.qzv
+qiime tools export --input-path original_reads.qzv  --output-path Raw_Reads_Info
+mv Raw_Reads_Info/per-sample-fastq-counts.tsv Original_number_of_reads_for_sample.tsv
+chmod +rw Original_number_of_reads_for_sample.tsv
+chmod +rw Raw_Reads_Info -R
+rm Raw_Reads_Info -R
+
+
+
+############# CLEANING THE FOLDER FROM QIIME TEMP FILES #####################
+
+rm denoising-stats.qza demux-paired-end.qza stats.tsv original_reads.qzv
+
+

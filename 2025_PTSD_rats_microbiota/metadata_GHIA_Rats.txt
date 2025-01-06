@@ -1,0 +1,36 @@
+FASTQ_ID	Sample_Type	Sample_Group	Genotype	Sample_name_complete	Mouse_ID	Sample_name	Organism	Note
+GHIA_Colon_1	Colon	Control	WT	Rat_Colon_C_1	Rat1	R_C_C_1	Rat	To discard, due to sample mislabeling
+GHIA_Colon_10	Colon	Control	WT	Rat_Colon_C_10	Rat10	R_C_C_10	Rat	
+GHIA_Colon_11	Colon	Shocked	WT	Rat_Colon_S_11	Rat11	R_C_S_11	Rat	
+GHIA_Colon_12	Colon	Shocked	WT	Rat_Colon_S_12	Rat12	R_C_S_12	Rat	
+GHIA_Colon_13	Colon	Shocked	WT	Rat_Colon_S_13	Rat13	R_C_S_13	Rat	
+GHIA_Colon_14	Colon	Shocked	WT	Rat_Colon_S_14	Rat14	R_C_S_14	Rat	
+GHIA_Colon_15	Colon	Shocked	WT	Rat_Colon_S_15	Rat15	R_C_S_15	Rat	
+GHIA_Colon_16	Colon	Shocked	WT	Rat_Colon_S_16	Rat16	R_C_S_16	Rat	
+GHIA_Colon_17	Colon	Shocked	WT	Rat_Colon_S_17	Rat17	R_C_S_17	Rat	
+GHIA_Colon_18	Colon	Shocked	WT	Rat_Colon_S_18	Rat18	R_C_S_18	Rat	
+GHIA_Colon_2	Colon	Control	WT	Rat_Colon_C_2	Rat2	R_C_C_2	Rat	
+GHIA_Colon_3	Colon	Control	WT	Rat_Colon_C_3	Rat3	R_C_C_3	Rat	
+GHIA_Colon_4	Colon	Control	WT	Rat_Colon_C_4	Rat4	R_C_C_4	Rat	
+GHIA_Colon_5	Colon	Control	WT	Rat_Colon_C_5	Rat5	R_C_C_5	Rat	
+GHIA_Colon_6	Colon	Control	WT	Rat_Colon_C_6	Rat6	R_C_C_6	Rat	
+GHIA_Colon_7	Colon	Control	WT	Rat_Colon_C_7	Rat7	R_C_C_7	Rat	
+GHIA_Colon_8	Colon	Control	WT	Rat_Colon_C_8	Rat8	R_C_C_8	Rat	
+GHIA_Colon_9	Colon	Control	WT	Rat_Colon_C_9	Rat9	R_C_C_9	Rat	
+GHIA_Faeces_1	Faeces	Control	WT	Rat_F_C_1	Rat1	R_F_C_1	Rat	To discard, because its paired sample was mislabeled
+GHIA_Faeces_10	Faeces	Control	WT	Rat_F_C_10	Rat10	R_F_C_10	Rat	
+GHIA_Faeces_11	Faeces	Shocked	WT	Rat_F_S_11	Rat11	R_F_S_11	Rat	
+GHIA_Faeces_12	Faeces	Shocked	WT	Rat_F_S_12	Rat12	R_F_S_12	Rat	
+GHIA_Faeces_13	Faeces	Shocked	WT	Rat_F_S_13	Rat13	R_F_S_13	Rat	
+GHIA_Faeces_14	Faeces	Shocked	WT	Rat_F_S_14	Rat14	R_F_S_14	Rat	
+GHIA_Faeces_15	Faeces	Shocked	WT	Rat_F_S_15	Rat15	R_F_S_15	Rat	
+GHIA_Faeces_16	Faeces	Shocked	WT	Rat_F_S_16	Rat16	R_F_S_16	Rat	
+GHIA_Faeces_17	Faeces	Shocked	WT	Rat_F_S_17	Rat17	R_F_S_17	Rat	
+GHIA_Faeces_18	Faeces	Shocked	WT	Rat_F_S_18	Rat18	R_F_S_18	Rat	
+GHIA_Faeces_2	Faeces	Control	WT	Rat_F_C_2	Rat2	R_F_C_2	Rat	
+GHIA_Faeces_3	Faeces	Control	WT	Rat_F_C_3	Rat3	R_F_C_3	Rat	
+GHIA_Faeces_4	Faeces	Control	WT	Rat_F_C_4	Rat4	R_F_C_4	Rat	
+GHIA_Faeces_5	Faeces	Control	WT	Rat_F_C_5	Rat5	R_F_C_5	Rat	
+GHIA_Faeces_6	Faeces	Control	WT	Rat_F_C_6	Rat6	R_F_C_6	Rat	
+GHIA_Faeces_7	Faeces	Control	WT	Rat_F_C_7	Rat7	R_F_C_7	Rat	
+GHIA_Faeces_8	Faeces	Control	WT	Rat_F_C_8	Rat8	R_F_C_8	Rat	
