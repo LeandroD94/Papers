@@ -1,0 +1,37 @@
+#Default config file for eukdetect. Copy and edit for analysis
+
+#Directory where EukDetect output should be written
+output_dir: 'EukDetect_output'
+  
+#Indicate whether reads are paired (true) or single (false)
+paired_end: true 
+
+#filename excluding sample name. no need to edit if paired_end = false
+fwd_suffix: "_R1_001.fastq.gz" 
+
+#filename excludign sample name. no need to edit if paired_end = false
+rev_suffix: "_R2_001.fastq.gz"
+
+#file name excluding sample name. no need to edit if paired_end = true 
+se_suffix: ".fastq.gz" 
+
+#length of your reads. pre-trimming reads not recommended
+readlen: 150
+
+#full path to directory with raw fastq files
+fq_dir: '/home/matteo/Desktop/Works_DONE/Benchmark_DNAseq_activated_sludge/Creating_mock_in_silico'
+
+#full path to folder with eukdetect database files
+database_dir: "/media/matteo/SSD4/reference/EukDetect_db_v9"
+
+#name of database. Default is original genomes only database name
+database_prefix: "ncbi_eukprot_met_arch_markers.fna"
+
+#full path to eukdetect installation folder
+eukdetect_dir: "/home/matteo/Desktop/programs/EukDetect"
+
+#list sample names here. fastqs must correspond to {samplename}{se_suffix} for SE reads or {samplename}{fwd_suffix} and {samplename}{rev_suffix} for PE
+#each sample name should be preceded by 2 spaces and followed by a colon character
+samples:
+  mock_AGS_DNAseq:
+  mock_AGS_DNAseq:
