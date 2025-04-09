@@ -1,0 +1,12 @@
+Title: 
+"Testing the limits of metagenomic classifications on short reads: a benchmark across multiple methods aiming to characterise wastewater treating microbial communities"
+
+DOI:
+work in progress
+
+Authors:
+Leandro Di Gloria, Matteo Ramazzotti
+
+Abstract:
+Biological wastewater treatment processes, such as activated sludge (AS) and aerobic granular sludge (AGS), have proven to be crucial systems for achieving both efficient waste purification and the recovery of valuable resources like poly-hydroxy-alkanoates (PHA). Gaining a deeper understanding of the microbial communities underpinning these technologies would enable their optimization, ultimately reducing costs and increasing efficiency. To support this research, we quantitatively compared classification methods differing in read length (raw reads, contigs and MAGs), overall search approach (Kaiju, Kraken2, RiboFrame and kMetaShot), as well as source databases to assess the classification performances at both the genus and species levels using an in silico-generated mock community designed to provide a simplified yet comprehensive representation of the complex microbial ecosystems found in AS and AGS.
+Particular attention was given to the misclassification of eukaryotes as bacteria and vice versa, as well as the occurrence of false negatives. Notably, Kaiju emerged as the most accurate classifier at both the genus and species levels, followed by RiboFrame and kMetaShot. However, our findings highlight the substantial risk of misclassification across all classifiers and databases, which could significantly hinder the advancement of these technologies by introducing noises and mistakes for key microbial clades.
