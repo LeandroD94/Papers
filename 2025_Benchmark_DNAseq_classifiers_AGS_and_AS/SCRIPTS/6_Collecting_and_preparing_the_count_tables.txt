@@ -1,0 +1,161 @@
+# required: bash and R
+
+
+
+### Building the summary of Kaiju results
+
+alias kaiju2table="/home/matteo/Desktop/programs/kaiju_v1_10_1/bin/kaiju2table"
+#Kaiju_DB=/media/matteo/SSD4/reference/kaiju_db_nr_euk_2023-05-10
+Kaiju_DB=/media/matteo/SSD4/reference/Kaiju_complete_nr_2024  # more updated nodes
+
+output_names=$(ls Kaiju_output | grep -E "output.txt|output_PLUS.txt" | sed 's#^#Kaiju_output/#g')  # this is the list of inputs for the row below
+kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r genus -l genus -o Kaiju_output/kaiju_classif_summary.tsv $output_names
+# inputs written as last argument
+# -r choose the depth of taxonomic classification
+# -m filters out taxa (of "r" level") with relative abundance below m threshold
+# -l chooses which taxon level will be printed in the output
+# -p adds the full taxonomic name (from phylum to species), not just the identified one (can't be used with l)
+
+# Few entries are missing because they lack of the genus level in NCBI (but not in SILVA)! Taking these rows from the species level.
+kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r species -l species -o Kaiju_output/kaiju_classif_summary_species_level.tsv $output_names
+
+grep "Moranbacteria bacterium" Kaiju_output/kaiju_classif_summary_species_level.tsv  > missing_genus_to_add_from_species.txt
+# NB: Moranii is Moranbacteria in Kaiju db, differently from Kraken2 nt_core 
+grep "Kaiserbacteria bacterium" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt
+grep "Nomurabacteria bacterium" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt
+grep "SH-PL14" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt
+grep "Magasanik" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt   # none
+grep "Saccharimonadia bacterium" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt
+grep "Solirubrobacterales bacterium" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt   # 67-14
+grep -e "OPS17|OPS 17" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt # none
+grep -e "37-13" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt # none
+grep -e "Actinobacteria bacterium IMCC26207" Kaiju_output/kaiju_classif_summary_species_level.tsv  >> missing_genus_to_add_from_species.txt # none (NB: different codes)
+# Transforming the species name (various species) ensuring the manual parsing between SILVA and NCBI databases (which is coded in another script)
+sed "s/Actinobacteria bacterium IMCC26207/IMCC26207/g" -i missing_genus_to_add_from_species.txt
+sed "s/ bacterium.*/ bacterium/g" -i missing_genus_to_add_from_species.txt
+sed "s/uncultured //g" -i missing_genus_to_add_from_species.txt
+cat Kaiju_output/kaiju_classif_summary.tsv  missing_genus_to_add_from_species.txt > temp.tsv   # both of the files (original and updated) in an unique file
+mv temp.tsv Kaiju_output/kaiju_classif_summary.tsv   # overwriting the original one
+rm missing_genus_to_add_from_species.txt
+
+# NB: now different rows of the same species are in the genus output !
+
+
+# rm Kaiju_output/*_output.txt     # still useful, see script 9
+
+
+
+
+### Gathering the outputs of the programs in an unique folder...
+
+mkdir Obtained_Counts_mock
+
+cp RiboFr_output/*/mock*genus.cnt Obtained_Counts_mock/          # from RiboFrame (full and V3-V4)
+cp Kaiju_output/kaiju_classif_summary.tsv Obtained_Counts_mock/          # from Kaiju
+cp Creating_mock_in_silico/true_abudances_of_DNAseq_mock.tsv Obtained_Counts_mock/
+
+
+
+# for Kraken (required to avoid overwriting the files, due to the same names)
+for c in 0.05 0.15 0.3 0.45 0.65 0.85 0.99
+do
+cp kraken_output/output_conf$c/mock*bracken_abund_Genus* Obtained_Counts_mock/
+mv Obtained_Counts_mock/mock_AGS_DNAseq_bracken_abund_Genus.tsv   Obtained_Counts_mock/mock_AGS_DNAseq_conf${c}bracken_abund_Genus.tsv
+mv Obtained_Counts_mock/mock_AGS_DNAseq_SILVA_bracken_abund_Genus.tsv  Obtained_Counts_mock/mock_AGS_DNAseq_conf${c}_SILVA_bracken_abund_Genus.tsv
+done
+
+# also the kraken on contigs ...
+cp kraken_output/output_contigs_conf0.15/mock_AGS_DNAseq_bracken_abund_Genus.tsv   Obtained_Counts_mock/
+mv Obtained_Counts_mock/mock_AGS_DNAseq_bracken_abund_Genus.tsv   Obtained_Counts_mock/mock_AGS_DNAseq_contigs_conf0.15_bracken_abund_Genus.tsv
+
+
+
+# for MEGAHIT-kMetashot (required to avoid overwriting the files, due to the same names)
+for c in 0.2 0.4
+do
+
+cp MAGs_output/mock_AGS_DNAseq_contigs_classif_default_conf$c/kMetaShot_classification_resume_a2r*0.csv Obtained_Counts_mock/kMetaShot_classif_contigs_default_conf$c
+cp MAGs_output/mock_AGS_DNAseq_contigs_classif_metalarge_conf$c/kMetaShot_classification_resume_a2r*0.csv Obtained_Counts_mock/kMetaShot_classif_contigs_metalarge_conf$c
+cp MAGs_output/mock_AGS_DNAseq_contigs_classif_custom_conf$c/kMetaShot_classification_resume_a2r*0.csv Obtained_Counts_mock/kMetaShot_classif_contigs_custom_conf$c
+
+cp MAGs_output/mock_AGS_DNAseq_MAGs_classif_default_conf$c/kMetaShot_classification_resume_a2r*0.csv Obtained_Counts_mock/kMetaShot_MAGs_classif_MAGs_default_conf$c
+cp MAGs_output/mock_AGS_DNAseq_MAGs_classif_metalarge_conf$c/kMetaShot_classification_resume_a2r*0.csv Obtained_Counts_mock/kMetaShot_MAGs_classif_MAGs_metalarge_conf$c
+cp MAGs_output/mock_AGS_DNAseq_MAGs_classif_custom_conf$c/kMetaShot_classification_resume_a2r*0.csv Obtained_Counts_mock/kMetaShot_MAGs_classif_MAGs_custom_conf$c
+# NB: the label "MAGs" in the copied file is repeated purposely for the subsequent script
+
+# the "Candidatus" species in the MAGs also requires the underscore (see below) but this will be done in the subsequent script, during the kMeta import
+
+done
+
+
+
+
+### Reformatting the Kaiju output
+sed "s/Candidatus /Candidatus_/g"   -i Obtained_Counts_mock/kaiju_classif_summary.tsv  
+sed "s/;$//g"   -i Obtained_Counts_mock/kaiju_classif_summary.tsv   # removing only the second ';' at the end of the lines
+sed -e "s#Kaiju_output/##g" -e "s/_output.txt//g" -e "s/_output_PLUS.txt/_plus/g" -i Obtained_Counts_mock/kaiju_classif_summary.tsv
+
+
+
+### Reformatting the Kraken2 output
+sed "s/uncultured //g"   -i Obtained_Counts_mock/*bracken_abund_Genus.tsv
+sed "s/Candidatus /Candidatus_/g"  -i Obtained_Counts_mock/*bracken_abund_Genus.tsv  
+
+
+
+
+#### Gathering also the results at species level
+
+mkdir Obtained_Counts_mock/Species_level   # work in progress
+cp kraken_output/output_conf0.15/mock*bracken_abund_Species*   Obtained_Counts_mock/Species_level/mock_AGS_DNAseq_bracken_abund_Species15.tsv
+cp kraken_output/output_conf0.99/mock*bracken_abund_Species*   Obtained_Counts_mock/Species_level/mock_AGS_DNAseq_bracken_abund_Species99.tsv
+cp Kaiju_output/kaiju_classif_summary_species_level.tsv   Obtained_Counts_mock/Species_level/
+cp MAGs_output/mock_AGS_DNAseq_contigs_classif_metalarge_conf0.2/kMetaShot_classification_resume.csv Obtained_Counts_mock/kMetaShot_classif_MAGs_metalarge_conf0.2.csv
+
+
+
+
+#### Counting the species in the mock ...
+cat Creating_mock_in_silico/Beasts_list.txt | sed "s/.*\.[0-9]_//g" | grep -v "^@" | cut -d _ -f 1,2,3  > Obtained_Counts_mock/True_mock_species_level.txt
+# these Moranbacteria does not look like having a species at all...
+sed -i "s/Moranbacteria_[0-9].*/Moranbacteria sp./g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/Accumulibacter_[0-9].*/Accumulibacter sp./g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/Competibacter_[0-9].*/Competibacter sp./g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/Solirubrobacterales_bacterium_[0-9].*/Solirubrobacterales_bacterium sp./g" Obtained_Counts_mock/True_mock_species_level.txt
+# nowon the strains and the codes will be cleaned
+sed -i "s/,//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_strain.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_isolate.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_genome.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_chromosome.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_mitochondrion.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_complete.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_unplaced.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_DSM.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_NBRC.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_B.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_58Eu.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_47L.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_LL02.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_T1-X7.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_ATCC.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_Nb.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_X14.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_K172.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_C91.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_SPH-1.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_is5.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_LE124.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+sed -i "s/_AAD.*//g" Obtained_Counts_mock/True_mock_species_level.txt
+
+
+R # opening R
+
+mock_species<- read.delim(file="Obtained_Counts_mock/True_mock_species_level.txt", sep=",", header = F)
+mock_species<- cbind.data.frame( "Abundance"=as.numeric(table(mock_species)) , "Bacterium"=names(table(mock_species)) )
+write.table(mock_species, file="Obtained_Counts_mock/Species_level/True_mock_species_level_counts.tsv", row.names = F, quote = F , sep="\t")
+q("no")
+
+
+rm Obtained_Counts_mock/True_mock_species_level.txt
+

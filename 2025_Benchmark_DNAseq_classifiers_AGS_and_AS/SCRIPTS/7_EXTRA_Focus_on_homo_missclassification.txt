@@ -1,0 +1,260 @@
+# required: Bowtie2, Kraken2, samtools, R
+
+Bowtie2db=/media/matteo/SSD4/reference/Bwt2_indexed_Human_GRCh38_noalt_as/GRCh38_noalt_as
+
+kraken_db='/media/matteo/SSD4/reference/kraken2_only_Homo_GRCh38/'
+
+mkdir EXTRA_Bowtie2_vs_Kraken2_Homo_contam
+
+threads=62
+
+
+
+################ EXTRA CHECK ON HUMAN WITH BOWTIE2 #######################
+
+bowtie2 -x $Bowtie2db -1 processed_FASTQ/mock_AGS_DNAseq_R1_001.CLEANED.fastq.gz  -2 processed_FASTQ/mock_AGS_DNAseq_R2_001.CLEANED.fastq.gz  -S EXTRA_Bowtie2_vs_Kraken2_Homo_contam/bowtie2_SAM_output__LOCAL.txt -q -p $threads  --very-sensitive-local  2> EXTRA_Bowtie2_vs_Kraken2_Homo_contam/percentuals_aligned_bowtie2__LOCAL.txt
+bowtie2 -x $Bowtie2db -1 processed_FASTQ/mock_AGS_DNAseq_R1_001.CLEANED.fastq.gz  -2 processed_FASTQ/mock_AGS_DNAseq_R2_001.CLEANED.fastq.gz  -S EXTRA_Bowtie2_vs_Kraken2_Homo_contam/bowtie2_SAM_output__END_to_END.txt -q -p $threads  --very-sensitive  2> EXTRA_Bowtie2_vs_Kraken2_Homo_contam/percentuals_aligned_bowtie2__END_to_END.txt
+bowtie2 -x $Bowtie2db -1 processed_FASTQ/mock_AGS_DNAseq_R1_001.CLEANED.fastq.gz  -2 processed_FASTQ/mock_AGS_DNAseq_R2_001.CLEANED.fastq.gz  -S EXTRA_Bowtie2_vs_Kraken2_Homo_contam/bowtie2_SAM_output__END_to_END_NOdiscord.txt -q -p $threads  --very-sensitive  --no-discordant  2> EXTRA_Bowtie2_vs_Kraken2_Homo_contam/percentuals_aligned_bowtie2__END_to_END_NOdiscord.txt
+
+
+# NB: looks like bowtie2 does not write the aligned reads in case of paired input... taking them from the sam output
+
+for x in  LOCAL  END_to_END  END_to_END_NOdiscord
+do
+
+samtools view -SF4 EXTRA_Bowtie2_vs_Kraken2_Homo_contam/bowtie2_SAM_output__${x}.txt > EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Classified_temp
+# -S means that the input is a SAM file, -F4 means to maintain only aligned reads
+
+grep "chr" EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Classified_temp > EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Classified_as_homo__${x}.txt
+
+echo -e "Classified correctly as Homo: $(grep 'Homo_s' EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Classified_as_homo__${x}.txt | wc -l) \nMissclassified as Homo: $(grep -v 'Homo_s' EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Classified_as_homo__${x}.txt | wc -l)" > EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Bowtie_Counts_true_false_Homo__${x}.txt
+
+rm   EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Classified_temp 
+
+done
+
+
+rm EXTRA_Bowtie2_vs_Kraken2_Homo_contam/bowtie2_SAM_output*   # these big files are no more required
+
+gzip EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Classified_as_homo*
+
+
+
+
+################ EXTRA CHECK ON HUMAN WITH KRAKEN2 #######################
+
+conda activate kraken2
+
+for c in 0.45 0.65 0.85 0.99  # main loop (kraken confidence levels)
+do
+
+kraken2 --threads $threads --db $kraken_db --output EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Homo_${c}_output.txt --report EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Homo_report_${c}.txt --confidence $c --paired processed_FASTQ/mock_AGS_DNAseq_R1_001.CLEANED.fastq.gz processed_FASTQ/mock_AGS_DNAseq_R2_001.CLEANED.fastq.gz
+
+cat EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Homo_${c}_output.txt | grep "Homo" | cut -f 2,3 > EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_classified_from_Homo_reads_conf$c.txt
+cat EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Homo_${c}_output.txt | grep -v "Homo" | cut -f 2,3 | grep -w "9606" > EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Not_Homo_classified_as_homo_conf$c.txt
+echo -e "Number of homo reads: $(cat EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_classified_from_Homo_reads_conf$c.txt | wc -l ) \nNumber of TRUE homo reads not recognised: $( grep -v "9606" EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_classified_from_Homo_reads_conf$c.txt | wc -l ) \nNumber of NON homo reads classified as such: $( cat EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Not_Homo_classified_as_homo_conf$c.txt | wc -l )" >  EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Counts_of_homo_false_and_true_positives_conf$c.txt
+
+done
+
+conda deactivate
+
+
+rm EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Kraken_Homo_report*
+rm EXTRA_Bowtie2_vs_Kraken2_Homo_contam/*_output.txt
+
+
+
+
+############## COUNT OF TRUE HOMO IN THE MOCK
+
+zcat processed_FASTQ/mock_AGS_DNAseq_R1_001.CLEANED.fastq.gz | grep "Homo" | wc -l > EXTRA_Bowtie2_vs_Kraken2_Homo_contam/0___Counting_true_homo_in_R1_after_bbduk.txt
+
+
+
+
+############## PLOTTING THESE TRUE AND FALSE COUNTS
+
+R   # opening R here
+
+library("reshape")
+library("ggplot2")
+library("ggh4x")
+
+
+# importing the number of homo reads in the mock after bbduk ...
+true_homo_number <- read.delim(file="EXTRA_Bowtie2_vs_Kraken2_Homo_contam/0___Counting_true_homo_in_R1_after_bbduk.txt", header = F)
+true_homo_number <- as.numeric(true_homo_number)
+
+
+table_human <- NULL
+
+
+### KRAKEN 2 on GRCH38  
+files_to_import<- dir("EXTRA_Bowtie2_vs_Kraken2_Homo_contam/", pattern = "Kraken_Counts_of_homo_false_and_true_positives_conf")
+for(x in files_to_import){
+  name <- paste0("Kraken2_GRCh38", gsub(".*_conf","_conf",x))
+  imported <- read.delim(file=paste0("EXTRA_Bowtie2_vs_Kraken2_Homo_contam/",x, sep=""), header = F)
+  total_homo <- gsub(".*homo reads: ","" , imported[1,1])
+  missed<- gsub(".*not recognised: ","" , imported[2,1])
+  true_class<- as.numeric( gsub(" ","" , total_homo ) )  -  as.numeric( gsub(" ","" , missed ) )
+   missclass<- gsub(".*as such: ","" , imported[3,1])
+  missclass<- as.numeric( gsub(" ","" , missclass ) )
+  total_missclassif <- missclass  # only Homo sequences in the db
+  new_piece <- rbind( true_class, missclass, total_missclassif) 
+  colnames(new_piece) <- gsub(".txt","", name, fixed=T)
+  table_human <- cbind(table_human, new_piece)
+}
+
+
+# ### KRAKEN 2 on nt core db
+# files_to_import<- dir("EXTRA_missclassif_kraken_mock/", pattern = "Counts_of_homo_false_and_true_positives_")
+# for(x in files_to_import){
+#   name <- paste0("Kraken2_nt_core", gsub(".*_conf","_conf",x))
+#   imported <- read.delim(file=paste0("EXTRA_missclassif_kraken_mock/",x, sep=""), header = F)
+#   total_homo <- gsub(".*homo reads: ","" , imported[1,1])
+#   missed<- gsub(".*not recognised: ","" , imported[2,1])
+#   true_class<- as.numeric( gsub(" ","" , total_homo ) )  -  as.numeric( gsub(" ","" , missed ) )
+#   missclass<- gsub(".*as such: ","" , imported[3,1])
+#   missclass<- as.numeric( gsub(" ","" , missclass ) )
+#   new_piece <- rbind( true_class, missclass) 
+#   colnames(new_piece) <- gsub(".txt","", name, fixed=T)
+#   table_human <- cbind(table_human, new_piece)
+#}
+
+
+### KRAKEN 2 on complete euka db
+files_to_import<- dir("EXTRA_missclassif_kraken_mock/WHAT_IF_EUKAR_DB/", pattern = "Counts_of_homo_false_and_true_positives_")
+for(x in files_to_import){
+  name <- paste0("Kraken2_eukaryotes", gsub(".*_conf","_conf",x))
+  imported <- read.delim(file=paste0("EXTRA_missclassif_kraken_mock/WHAT_IF_EUKAR_DB/",x, sep=""), header = F)
+  total_homo <- gsub(".*homo reads: ","" , imported[1,1])
+  missed<- gsub(".*not recognised: ","" , imported[2,1])
+  true_class<- as.numeric( gsub(" ","" , total_homo ) )  -  as.numeric( gsub(" ","" , missed ) )
+  missclass<- gsub(".*as such: ","" , imported[3,1])
+  missclass<- as.numeric( gsub(" ","" , missclass ) )
+  # importing also EVERY missclassification, not only H sapiens
+  #mock_AGS_DNAseq_euka_conf0.99_report.txt
+  conf <- gsub(".*_conf","conf",x)
+  conf <- gsub(".txt","",conf)
+  this_report <- dir("EXTRA_missclassif_kraken_mock/WHAT_IF_EUKAR_DB/", pattern = paste0(conf, "_report"))
+  report_table <- read.delim(file=paste0("EXTRA_missclassif_kraken_mock/WHAT_IF_EUKAR_DB/",this_report,  sep=""), header = F)
+  every_class <- as.numeric( report_table[2, 2] ) # Number of fragments covered by the clade rooted at "root" (eukaryotes + UniVectors)
+  total_missclassif <- every_class - true_class   # less the TRUE homo (few H. sequences are featured in the dataset)
+  new_piece <- rbind( true_class, missclass, total_missclassif) 
+  colnames(new_piece) <- gsub(".txt","", name, fixed=T)
+  table_human <- cbind(table_human, new_piece)
+}
+
+
+### BOWTIE2 on GRCh38
+# end to end
+imported <- read.delim(file=paste0("EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Bowtie_Counts_true_false_Homo__END_to_END.txt", sep=""), header = F)
+true_class<-gsub(".*correctly as Homo: ","" , imported[1,1])
+missclass<- gsub("Missclassified as Homo: ","" , imported[2,1])
+total_missclassif <- missclass  # only Homo sequences in the db
+new_piece <- rbind( as.numeric(gsub(" ","",true_class)) , as.numeric(missclass) ,  as.numeric(total_missclassif) )
+new_piece <- as.data.frame( round(new_piece/2,0) ) # bowtie2 counts EACH member of the pair --> accounting the paired nature
+colnames(new_piece) <- "Bowtie2_GRCh38_End_to_End"
+table_human <- cbind(table_human, new_piece)
+# local
+imported <- read.delim(file=paste0("EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Bowtie_Counts_true_false_Homo__LOCAL.txt", sep=""), header = F)
+true_class<-gsub(".*correctly as Homo: ","" , imported[1,1])
+missclass<- gsub("Missclassified as Homo: ","" , imported[2,1])
+total_missclassif <- missclass  # only Homo sequences in the db
+new_piece <- rbind( as.numeric(gsub(" ","",true_class)) , as.numeric(missclass) ,  as.numeric(total_missclassif) )
+new_piece <- as.data.frame( round(new_piece/2,0) ) # bowtie2 counts EACH member of the pair --> accounting the paired nature
+colnames(new_piece) <- "Bowtie2_GRCh38_Local"
+table_human <- cbind(table_human, new_piece)
+# "end to end" results equals to "end to end no discordant"
+
+
+# ### Removing lower Kraken2 conf
+# table_human<-table_human[ , ! colnames(table_human) %in% c("Kraken2_nt_core_conf0.05","Kraken2_nt_core_conf0.15",
+#                                                            "Kraken2_nt_core_conf0.3")
+#                           ]
+
+
+
+### Preparing the table for the plot
+table_human<- cbind(table_human, true_false = row.names(table_human))
+table_human <-  melt(table_human, id.vars = "true_false")
+only_h_db <- !grepl("eukaryotes",table_human$variable) & table_human$true_false=="total_missclassif"
+table_human <- table_human[ !only_h_db , ] # if the db features only human then makes no sense to have a "total missclassification" line 
+program_db<- sub("_","\n", table_human$variable)
+program_db<- gsub("_.*","",program_db)
+program_db<- gsub("Kraken2\nnt","Kraken2\nnt core",program_db, fixed=T)
+program_db<- gsub("Kraken2\neukaryotes","Kraken2\nAnellides\nChlorophyta\nHexapoda\nHomo s.\nMus musc.\nUnivec",program_db, fixed=T)
+settings <- gsub(".*_","", table_human$variable)
+settings <- gsub("End","End to end", settings)
+table_human <- cbind( table_human , program_db, settings)
+# adding the true number of homo reads
+true_row <- cbind.data.frame("Homo paired reads","True", true_homo_number, "Mock", "True Homo")
+colnames(true_row)<-colnames(table_human)
+table_human <- rbind( table_human , true_row)
+table_human$true_false <- gsub("true_class","Homo as Homo", table_human$true_false)
+table_human$true_false <- gsub("total_missclassif","Total missclassif", table_human$true_false)
+table_human$true_false <- gsub("^missclass","Microbes as Homo", table_human$true_false)
+#table_human$true_false <- gsub("missclass","microbes", table_human$true_false)
+
+
+### Plotting ...
+#colors_true_false<- c("missclas"="gray30", "correct"="white")
+colors_programs<- c("Kraken2\nGRCh38"="brown",
+                    "Kraken2\nnt core"="coral3",
+                    "Kraken2\nAnellides\nChlorophyta\nHexapoda\nHomo s.\nMus musc.\nUnivec"="coral2",
+                    "Bowtie2\nGRCh38"="darkblue", "Mock"="yellow2" 
+                    )
+ggplot( data=table_human, aes(y=true_false, x=value, 
+                              # color=true_false, 
+                              fill= program_db)) +
+  geom_bar(stat = "identity") +
+  facet_nested( program_db + settings ~ . , space="free", scales = "free",
+              switch = "y"  # grid on the left
+  ) +
+  #scale_color_manual( values =  colors_true_false ) +
+  scale_fill_manual( values =  colors_programs ) +
+  theme_classic() +
+  theme(
+    axis.text.y = element_text( size=5.4 ), 
+    axis.text.x = element_text( size=4.8 , angle = 30, vjust = 1, hjust=1), 
+    strip.placement = "outside", # then labels between grid and values
+    strip.text.y.left = element_text(angle = 0, size= 6),
+    plot.margin = margin(1,1,1,-12, "pt"),
+    panel.grid.minor.x = element_line(linewidth =0.105, color="gray"),
+    panel.grid.major.x = element_line(linewidth =0.15, color="gray")
+  ) +
+  guides(color="none", fill="none") +
+  labs(y="", x="Number of paired reads") +
+  scale_x_continuous( expand = c(0.001 ,0) ,
+                      breaks = seq(0, true_homo_number+ 10000, 10000),
+                      limits = c(0, true_homo_number+1000),
+                      ) 
+ggsave(filename = "EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Homo_true_or_microbes_missclassified.png", width = 5.5, height = 4, dpi=300)
+# again, but with a zoom on lower values
+ggplot( data=table_human, aes(y=true_false, x=value, 
+                              # color=true_false, 
+                              fill= program_db)) +
+  geom_bar(stat = "identity") +
+  facet_nested( program_db + settings ~ . , space="free", scales = "free",
+                switch = "y"  # grid on the left
+  ) +
+  #scale_color_manual( values =  colors_true_false ) +
+  scale_fill_manual( values =  colors_programs ) +
+  theme_classic() +
+  theme(
+    axis.text.y = element_text( size=5.4 ), 
+    axis.text.x = element_text( size=4.8 , angle = 40, vjust = 1, hjust=1), 
+    strip.placement = "outside", # then labels between grid and values
+    strip.text.y.left = element_text(angle = 0, size= 6),
+    plot.margin = margin(1,1,1,-12, "pt"),
+    #panel.grid.minor.x = element_line(linewidth =0.065, color="gray"),
+    panel.grid.major.x = element_line(linewidth =0.15, color="gray")
+  ) +
+  guides(color="none", fill="none") +
+  labs(y="", x="Number of paired reads ") +
+  scale_x_sqrt( expand = c(0.001 ,0) ,
+                breaks = c(200, 2000, 5000, seq(0, true_homo_number+ 10000, 10000)),
+                limits = c(0, true_homo_number+1000),
+  ) 
+ggsave(filename = "EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Homo_true_or_microbes_missclassified_ZOOM.png", width = 5.5, height = 4, dpi=300)
+

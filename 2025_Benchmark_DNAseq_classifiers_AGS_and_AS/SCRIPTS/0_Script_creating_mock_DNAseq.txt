@@ -1,0 +1,155 @@
+# required: bash, datasets (NCBI), InSilicoSeq v2 and R
+
+
+#alias datasets=~/Desktop/programs/datasets
+#alias dataformat=~/Desktop/programs/dataformat
+
+
+threads=60
+
+mkdir Creating_mock_in_silico
+cd Creating_mock_in_silico
+
+
+
+
+### GATHERING GENOMES ...
+
+## to download the "dataset" NCBI program
+#curl -o datasets 'https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets'   # to download the script
+#chmod +x datasets
+
+
+# downloading bacterial ref genomes
+for x in  327159  221279 Zoogloea Dechloromonas Propionivibrio Novosphingobium Tetrasphaera Azoarcus Thauera Nitrosomonas Nitrobacter Delftia  # chosen being frequently found in PHA, AS and AGS literature
+# 327159 is Candidatus Accumulibacter, 221279 is Candidatus Competibacter ... it is not possible to write them with their taxonomic name without incurring to errors in the loop
+do
+echo "Downloading $x reference genome"
+datasets download genome taxon $x --reference --include genome  --assembly-version latest --exclude-atypical --filename genome_ref_$x
+done
+
+# the Flavobacterium species and strains are too copious! Selecting just few of them according to our past DNA-seq results (NB: only the genus level will be used afterward in the analysis, hence the exact species should not be a issue)
+for x in 2602769  370979 1355330 # which corresponds to Flavobacterium alkalisoli, defluvii and faecale
+do
+echo "Downloading $x reference genome"
+datasets download genome taxon $x --reference --include genome  --assembly-version latest --exclude-atypical --filename genome_ref_$x
+done
+
+# adding also Halomonas (common hypersaline adapted bacterium, PHA producer, moreover I want to check if it is missclassified as ants by Kraken2 ...)
+datasets download genome taxon Halomonas --reference --assembly-version latest --exclude-atypical --assembly-source RefSeq --filename genome_ref_Halomonas
+
+# adding also some Moranbacteria genomes from GenBank (the most abundant bacteria in Tuscany 16S analysis based on SILVA database, yet without any reference in NCBI and therefore not found in Kraken...)
+datasets download genome accession GCA_002779725.1 --include genome --filename genome_ref_Moranbacteria_Species1
+datasets download genome accession GCA_000995125.1 --include genome --filename genome_ref_Moranbacteria_Species2
+datasets download genome accession GCA_001001525.1 --include genome --filename genome_ref_Moranbacteria_Species3
+
+# adding also the Solirubrobacter bacterium 67-14 from GenBank (which is just "67-14" genus according to SILVA, and has no genus name in NCBI), which is frequently seen in our 16S datasets
+datasets download genome accession GCA_001897355.1 --include genome --filename genome_ref_Solirubro
+
+# adding the only reference (refseq) of a T4 virus species, of Tequatrovirus genus (Caudovirales are frequent in WWTPs, see DOI:10.1186/s40168-023-01672-1 )
+datasets download genome accession GCF_000836945.1 --include genome --filename genome_ref_T4
+
+# adding a nematode (Diploscapter is featured in WWTPs, moreover I have reason to suspect it is missclassified as ant DNA by Kraken)
+datasets download genome taxon Diploscapter --reference --assembly-version latest --exclude-atypical --filename genome_ref_Diploscapter
+
+# adding a Ciliate (Paramecium is the only ciliate to have a reference genome nowdays)
+datasets download genome taxon Paramecium --reference --assembly-version latest --exclude-atypical --filename genome_ref_Paramecium
+
+# finally, also the reference for the Homo sapiens is added (as "contaminant" of a total DNA extraction)
+datasets download genome taxon "Homo" --reference --include genome --filename genome_ref_Homo_Sapiens
+
+
+
+for x in $(ls | grep "genome_" ) # one at time to avoid errors
+do
+echo extracting $x
+unzip -oq $x  # "overwrite and stay quite"
+done
+
+
+### gathering the genomes in an unique file
+rm  temp.fasta
+for y in $(ls ncbi_dataset/data/ | grep "GC" )
+do
+cat ncbi_dataset/data/$y/*.fna >> temp.fasta
+done
+
+# solving the return each 60 lines
+awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' temp.fasta | cut -f 1-4 -d " " > bacteria_AGS_genomes.fasta
+
+sed -e "s/MAG: //g" -e "s/ /_/g" -i bacteria_AGS_genomes.fasta
+rm md5sum.txt README.md temp.fasta genome_* -r
+
+sed "s/Nostocoides/Tetrasphaera/g" -i bacteria_AGS_genomes.fasta    # it is the name of Tetrasphaera in NCBI
+
+# grep -E "Moranbacteria|Accumulibacter|Competibacter|Zoogloea|Dechloromonas|Flavobacterium|Propionivibrio|Novosphingobium|Tetrasphaera" -A 1 --no-group-separator bacteria_AGS_genomes.fasta > cleaned.temp
+# mv cleaned.temp bacteria_AGS_genomes.fasta   # overwriting the original file, now cleaned.
+
+
+
+
+### SETTING THE ABUNDANCES ...
+
+# the simulator will act on EACH READ as a genome/bacteria, hence a total read abundance for each group of reads (each taxon) as to be defined to mirror real taxa abundances seen in AGS
+grep ">" bacteria_AGS_genomes.fasta > headers_names.txt
+
+R    # opening R here <--------
+
+headers<- read.table(file="headers_names.txt")
+headers$V1<-gsub(">","",headers$V1)
+headers$abund<-rep("temp")
+
+target_abund<- c("Accumulibacter"=0.15, "Competibacter"=0.15, "Thauera"=0.12, 
+                 "Flavobacterium"=0.08, "Moranbacteria"=0.08,
+                 "Dechloromonas"=0.05, "Nitrosomonas"=0.05, 
+                 "Zoogloea"=0.04, "Propionivibrio"=0.04, "Novosphingobium"=0.04,
+                 "Tetrasphaera"=0.04, "Azoarcus"=0.04, "Nitrobacter"=0.04 , "Delftia"=0.04,
+                 "Solirubrobacterales_bacterium"=0.01 , "Halomonas"=0.01 ,
+                 "phage_T4"=0.005,
+                 "Homo"=0.005 , "Diploscapter"=0.005, "Paramecium"=0.005
+                 )
+for( x in names(target_abund) ){
+  which_reads <- grepl( x , headers$V1 )  # reads/genomes of that bacteria
+  how_many_reads <- length(which(which_reads))
+  splitted_abund <- target_abund[[x]] / how_many_reads
+  headers$abund [ which_reads ] <- splitted_abund
+}
+# headers [ grepl("Moran", headers$V1) , ]  # just to check
+# headers [ grepl("Solirubro", headers$V1) , ]  # just to check
+# NB: the sum of the reads of a taxon is much higher than the number assigned to each row, and the number of reads is variable between taxa
+headers$abund <-  as.numeric(headers$abund)
+headers$abund <- headers$abund / sum(headers$abund)   # this ensures that the total is actually equal to 1
+
+if( sum(headers$abund) !=1 ) { stop ("WAIT! Something went wrong ...") } else {
+write.table(headers, file= "Chosen_abund.tsv", col.names=F, row.names=F, quote=F, sep="\t")
+}
+
+q("no")
+
+
+
+
+### GENERATING THE READS ...
+
+conda activate InSilicoSeq
+nohup iss generate --genomes bacteria_AGS_genomes.fasta --abundance_file Chosen_abund.tsv --model novaseq --cpu $threads --output mock_AGS_DNAseq --seed 1994  --compress --n_reads 100000000   &
+# (n reads is 50000000 x 2, because iss does counts the pairs as separate reads...)
+
+mv mock_AGS_DNAseq_R1.fastq.gz mock_AGS_DNAseq_R1_001.fastq.gz
+mv mock_AGS_DNAseq_R2.fastq.gz mock_AGS_DNAseq_R2_001.fastq.gz
+
+                
+                 
+# checking the produced abundances...
+rm true_abudances_of_mock.tsv
+for x in Candidatus_Accumulibacter Candidatus_Competibacter Thauera Flavobacterium Candidatus_Moranbacteria Dechloromonas Nitrosomonas Zoogloea Propionivibrio Novosphingobium Tetrasphaera Azoarcus Nitrobacter Delftia  Solirubrobacterales_bacterium  Halomonas  phage_T4  Homo  Diploscapter  Paramecium
+do echo $x $(zcat mock_AGS_DNAseq_R1_001.fastq.gz | grep $x -c)  >> true_abudances_of_DNAseq_mock.tsv
+done
+
+zcat mock_AGS_DNAseq_R1_001.fastq.gz | grep "^@" > Beasts_list.txt
+
+
+# cleaning
+rm headers_names.txt ncbi_dataset -r Chosen_abund.tsv 
+gzip bacteria_AGS_genomes.fasta
+

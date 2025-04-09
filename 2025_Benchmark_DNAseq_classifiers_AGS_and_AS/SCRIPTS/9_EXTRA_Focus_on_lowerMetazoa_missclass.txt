@@ -1,0 +1,93 @@
+#################### EukDetect ######################
+# NB: this programs runs by modifying its config file each time for each sample...
+
+# copying the config file in the current directory
+cp /home/matteo/Desktop/programs/EukDetect/your_configfile.yml   EukDetect_Benchmark_configfile.yml
+
+threads= 32
+mkdir EukDetect_output
+
+
+# set sample names (see https://github.com/allind/EukDetect/issues/47)
+sed -i "s/output_dir.*/output_dir: 'EukDetect_output'/g" EukDetect_Benchmark_configfile.yml
+sed -i "s#fq_dir.*#fq_dir: '$PWD/Creating_mock_in_silico'#g" EukDetect_Benchmark_configfile.yml
+sed -i "s/sample1/mock_AGS_DNAseq/g"  EukDetect_Benchmark_configfile.yml
+sed -i "s/sample2/mock_AGS_DNAseq/g"  EukDetect_Benchmark_configfile.yml
+sed -i "s/_R1.fastq.gz/_R1_001.fastq.gz/g" EukDetect_Benchmark_configfile.yml
+sed -i "s/_R2.fastq.gz/_R2_001.fastq.gz/g" EukDetect_Benchmark_configfile.yml
+
+
+### launching eukdetect
+eukdetect --mode runall --configfile EukDetect_Benchmark_configfile.yml --cores $threads
+
+# Only few Diploscapter reads were classified, 13 as D. pachys and 11 as D. coronatus (one Diploscapter read removed from the read)
+
+cat EukDetect_output/aln/mock_AGS_DNAseq_aln_q30_lenfilter.sorted.bam | samtools view EukDetect_output/aln/mock_AGS_DNAseq_aln_q30_lenfilter.sorted.bam -o EukDetect_output/aln/mock.sam
+
+
+### using the pattern "_Diplo" which distingueshes the Diplo read names
+grep "_Diploscapter" EukDetect_output/aln/mock.sam | wc -l
+# --> 25 Diploscaper original reads in this output... which is correct
+### now the opposite: which reads not belonging to Diplo have been aligned?
+grep -v "_Diploscapter" EukDetect_output/aln/mock.sam | wc -l
+# --> 380 reads of Novopshingobium aureum classified as "fungi-Wolfiporia_cocos" ... however, these were removed by the EukDetect filter step.
+
+
+rm .snakemake/ -r
+rm EukDetect_output/aln/ -r
+rm EukDetect_output/filtering/ -r
+
+
+
+
+############# ANOTHER RUN WITH KAIJU (ONLY LOWER METAZOA DB) #################
+
+
+mkdir Kaiju_metazoa_output
+
+### WHERE IS KAIJU
+alias kaiju="/home/matteo/Desktop/programs/kaiju_v1_10_1/bin/kaiju"
+alias kaiju2table="/home/matteo/Desktop/programs/kaiju_v1_10_1/bin/kaiju2table"
+
+### KAIJU DATABASE
+Kaiju_DB=/media/matteo/SSD4/reference/Kaiju_lower_metazoa_UniRef100_mar2025
+
+
+for m in 25 40
+do
+
+echo -e "\n\n\n\n *** Processing the mock with Kaiju metazoa db (m ${m}) ... *** \n"
+kaiju -t $Kaiju_DB/nodes.dmp -f $Kaiju_DB/*.fmi  -E 0.001 -m $m -i processed_FASTQ/mock_AGS_DNAseq_R1_001.CLEANED.fastq.gz -j processed_FASTQ/mock_AGS_DNAseq_R2_001.CLEANED.fastq.gz -o Kaiju_metazoa_output/EXTRA_mock_AGS_DNAseq_metazoa_E.0001_m${m}_output.txt  -z $threads  -x -v
+
+# Counting top misclassifications
+echo -e "Homo sapiens misclassified: $(grep 'Homo' Kaiju_metazoa_output/EXTRA_mock_AGS_DNAseq_metazoa_E.0001_m${m}_output.txt | grep "^C" | wc -l ) \nDiploscapter NOT classified: $(grep 'Diploscapter' Kaiju_metazoa_output/EXTRA_mock_AGS_DNAseq_metazoa_E.0001_m${m}_output.txt | grep -v "^C" | wc -l ) \nNumber of bacteria misclassified as metaz: $(grep -v 'Diplosc' Kaiju_metazoa_output/EXTRA_mock_AGS_DNAseq_metazoa_E.0001_m${m}_output.txt | grep -v 'Homo' | grep -v 'phage' | grep -v 'Paramecium' | grep "^C" | wc -l )" > Kaiju_metazoa_output/kaiju_m${m}_misclassification_counts.txt
+
+# Focus on Homo misclassifications
+grep 'Homo' Kaiju_metazoa_output/EXTRA_mock_AGS_DNAseq_metazoa_E.0001_m${m}_output.txt | grep "^C" | cut -f 2,3,5  > Kaiju_metazoa_output/Homo_misclassifications_${m}_list.txt
+
+# Who is that frequent misclassification?
+grep "34507" Kaiju_metazoa_output/EXTRA_mock_AGS_DNAseq_metazoa_E.0001_m${m}_output.txt | cut -f 2,3,5 > Kaiju_metazoa_output/Misclassifications_in_Steinernema${m}_list.txt
+
+done
+
+
+# Gathering the results ...
+output_names=$(ls Kaiju_metazoa_output | grep "output.txt" | sed 's#^#Kaiju_metazoa_output/#g')  # this is the list of inputs for the row below
+kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r genus -l genus -o Kaiju_metazoa_output/kaiju_classif_summary.tsv $output_names
+
+
+
+
+############ CHECKING MISCLASSIFICATIONS WITH COMPLETE KAIJU DB (nr euk+) ########
+
+
+### KAIJU DATABASE
+Kaiju_DB=/media/matteo/SSD4/reference/Kaiju_complete_nr_2024
+
+kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r genus -p -o EXTRA_missclassif_kaiju_mock/kaiju_summary_complete_paths.tsv Kaiju_output/mock_AGS_DNAseq_Evalue0.00001_m42_output_PLUS.txt
+
+
+
+# Kaiju big output files now no more required ...
+rm Kaiju_output/*_output*
+rm Kaiju_metazoa_output/*output* 
