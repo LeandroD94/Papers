@@ -6,7 +6,7 @@ kraken_db='/media/matteo/SSD4/reference/kraken2_only_Homo_GRCh38/'
 
 mkdir EXTRA_Bowtie2_vs_Kraken2_Homo_contam
 
-threads=62
+threads=60
 
 
 
@@ -226,10 +226,11 @@ ggplot( data=table_human, aes(y=true_false, x=value,
   guides(color="none", fill="none") +
   labs(y="", x="Number of paired reads") +
   scale_x_continuous( expand = c(0.001 ,0) ,
-                      breaks = seq(0, true_homo_number+ 10000, 10000),
-                      limits = c(0, true_homo_number+1000),
+                      breaks = seq(0, true_homo_number+ 150000, 10000),
+                      limits = c(0, true_homo_number+15000),
                       ) 
 ggsave(filename = "EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Homo_true_or_microbes_missclassified.png", width = 5.5, height = 4, dpi=300)
+
 # again, but with a zoom on lower values
 ggplot( data=table_human, aes(y=true_false, x=value, 
                               # color=true_false, 
@@ -253,8 +254,8 @@ ggplot( data=table_human, aes(y=true_false, x=value,
   guides(color="none", fill="none") +
   labs(y="", x="Number of paired reads ") +
   scale_x_sqrt( expand = c(0.001 ,0) ,
-                breaks = c(200, 2000, 5000, seq(0, true_homo_number+ 10000, 10000)),
-                limits = c(0, true_homo_number+1000),
+                breaks = c(200, 2000, 5000, seq(0, true_homo_number+ 15000, 10000)),
+                limits = c(0, true_homo_number+15000),
   ) 
 ggsave(filename = "EXTRA_Bowtie2_vs_Kraken2_Homo_contam/Homo_true_or_microbes_missclassified_ZOOM.png", width = 5.5, height = 4, dpi=300)
 
