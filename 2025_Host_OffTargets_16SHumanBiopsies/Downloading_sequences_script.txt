@@ -1,0 +1,40 @@
+# this script is to execute on bash, requires NCBI SRA prefetch tools and downloads every SRA code in the first column of "SRR_Acc_List.txt" files of each project. See the scripts comments for further details.
+
+ 
+
+##### DOWNLOAD
+
+mkdir raw_FASTQ_dir
+cd raw_FASTQ_dir
+
+for x in or x in $(ls ../Ricerche_lavori_papabili_FASTQ | grep ^PRJ ) ;  # folders with the same name as the accession code
+do prefetch --option-file  ../Ricerche_lavori_papabili_FASTQ/$x/SRR_Acc_List.txt  ;  
+# it is a txt file with one column (no colum name) listing the SRA accessions
+done
+
+# NB: prefetch does not work with wild cards (e.g. PRJ*/ )... then using this loop
+
+
+
+###### CONVERTING TO FASTQ
+
+for x in $(ls */ | sed "s#/:##g" )   # listing each folder name (=SRR codes)
+do 
+fasterq-dump --split-files $x/${x}.sra
+rm $x -r # this removes the folders (sra) but not the files (fastq)
+gzip $x_*.fastq
+done
+
+
+##### PREPARING FOR QIIME2 (it requires a certain sintax to work properly)
+
+for x in $(ls | grep ".gz"); do mv $x ${x/_/_L001_R} ; done   # adding _L001_R prefix to let QIIME2 recognize them
+for x in $(ls | grep ".gz"); do mv $x ${x/\.fastq/_001\.fastq} ; done   # it needs also 001 before the .fastq.gz
+
+
+
+#### ... MANUALLY ADDING ALSO THE BIOPSY AT T0 ("FAS" PAPER)
+
+
+#### FINALLY, EACH PROJECT HAVE TO BE PUT IN AN OWN FOLDER, WHICH IS NAMED AS THE PROJECT ID
+mkdir ../raw_FASTQ_collection_in_folders 

@@ -1,0 +1,792 @@
+#!/usr/bin/env
+
+# version 13/01/2025
+
+# NB: this script is to execute AFTER processing the samples with QIIME AND BOWTIE2 (see the related script), and requires both BASH and R
+
+
+
+############## PREPARING THE ENVIRONMENT ###################
+
+### TO USE THIS SCRIPT AS A "PROGRAM"
+shopt -s expand_aliases
+source ~/miniconda3/etc/profile.d/conda.sh
+
+
+# Names of the projects
+targets=$(ls raw_FASTQ_collection_in_folders/ )
+# it is a folder with sub-folders, each sub-folder is named as a project ID
+
+
+# Scripts folder (required the 'contam_count.pl' and the 'FASgrep.pl' scripts)
+PATH_SCRIPT=/home/matteo/Desktop/Tool_box/Scripts/Scripts_Rama
+export PATH=$PATH:$PATH_SCRIPT
+
+chmod +x $PATH_SCRIPT/*
+# remember to add '#!/usr/bin/perl' at the first line of each script!
+
+
+
+
+###### PREPARING THE FEATURE TABLES AND THE REQUIRED FILES ##########
+
+
+conda activate qiime2-amplicon-2024.2
+
+mkdir Counting_Off_targets_origin
+
+
+for x in $targets
+do
+
+mkdir Counting_Off_targets_origin/${x}_offT_result
+
+qiime tools export --input-path QIIME/table_$x.qza  --output-path Counting_Off_targets_origin
+
+biom convert -i Counting_Off_targets_origin/feature-table.biom -o Counting_Off_targets_origin/counts_OTU_temp.txt --to-tsv
+
+grep -v 'Constructed from biom file' Counting_Off_targets_origin/counts_OTU_temp.txt | sed "s/#//g" > Counting_Off_targets_origin/counts_OTU_$x.txt
+
+rm Counting_Off_targets_origin/counts_OTU_temp.txt
+
+### Extracting position on genome and chromosomes
+samtools view -F 4 QIIME/rep_seqs_decontam/bowtie2_SAM_${x}.txt | cut -f 1,3,4 > Counting_Off_targets_origin/${x}_offT_result/${x}_chr_position.txt
+
+### Counting occurrences
+# this script requires the ASV fasta (of contaminant sequences) and the feature table (as tsv)
+contam_count.pl QIIME/rep_seqs_decontam/eucar_contaminant_ASV_${x}.fasta Counting_Off_targets_origin/counts_OTU_$x.txt > Counting_Off_targets_origin/${x}_offT_result/${x}_Reads_counts.txt
+
+sort Counting_Off_targets_origin/${x}_offT_result/${x}_Reads_counts.txt -k2 -n -r > Counting_Off_targets_origin/${x}_offT_result/${x}_Reads_counts_sorted.txt
+
+
+done
+
+
+
+### Extracting the most abundant off-targets reads
+
+for x in $targets   # main loop
+do
+
+rm -f Counting_Off_targets_origin/${x}_offT_result/${x}_most_abundant_off_targets.fasta   # if the loop has been already launched before
+
+
+# NB: nested loop
+for most in $(head -n 250 Counting_Off_targets_origin/${x}_offT_result/${x}_Reads_counts_sorted.txt | cut -f1)   # NB: nested loop on each of the 250 most abund contam ASV
+do
+
+FASgrep.pl $most QIIME/rep_seqs_decontam/eucar_contaminant_ASV_${x}.fasta >> Counting_Off_targets_origin/${x}_offT_result/${x}_most_abundant_off_targets.fasta
+
+done   # end of nested loop
+
+
+done            # end of the main loop
+
+
+conda deactivate
+
+
+
+
+######### PLOTTING THE POSITION ON CHRs #############
+
+R
+
+options(scipen=100)
+
+library("ggplot2")
+
+dir.create("Counting_Off_targets_origin/Zoom_on_main_positions")
+
+Every_chr_pos<-NULL
+Every_sum_each_chromosome<-NULL
+targets<- dir("raw_FASTQ_collection_in_folders/")  
+# it is a folder with sub-folders, each sub-folder is named as a project ID
+
+for (x in targets) {
+
+  suppressWarnings( chr_pos<-read.table(paste0("Counting_Off_targets_origin/",x,"_offT_result/",x,"_chr_position.txt"), sep="\t",row.names = NULL) )
+  colnames(chr_pos)<- c("ASV","chrom","position")
+  chr_pos$chrom<- gsub("chr","",chr_pos$chrom)
+  right_order<- c(seq(1:22),"X","Y","M")
+  
+  chr_pos$chrom <- factor( chr_pos$chrom, levels = c( right_order , unique(chr_pos$chrom)[! unique(chr_pos$chrom) %in% right_order ] ) )  # NB: this line was written as such because anomalous entries, as "Un_GL000220v1", are featured among the Chr
+  
+  chr_pos$position <- as.numeric(chr_pos$position)
+
+  # to multiply each off target ASV by the actual count of that ASV in every sample ...
+  count<-read.table(file=paste0("Counting_Off_targets_origin/counts_OTU_",x,".txt") , sep = "\t", header = T)
+  row.names(count)<-count$OTU.ID
+  count$OTU.ID<-NULL
+  count<-count[chr_pos$ASV, ] # same order
+  # NB: only the off-targets ones --> less ASV than before!
+  count_total_sample<-as.numeric(rowSums(count))
+
+  chr_pos<-cbind(chr_pos, Project=rep(x), Count= count_total_sample )
+  Every_chr_pos<- rbind(Every_chr_pos, chr_pos )
+
+  sum_each_chromosome<-aggregate(chr_pos$Count, list(chr_pos$chrom), FUN=sum)
+  Every_sum_each_chromosome<-rbind.data.frame(Every_sum_each_chromosome,
+                                              cbind.data.frame(sum_each_chromosome, Project=rep(x) )
+  )
+
+}
+
+colnames(Every_sum_each_chromosome)<-c("chrom","count","Project")
+
+
+
+### Positions on 17
+chr_target<-Every_chr_pos[Every_chr_pos$chrom=="17", ]
+
+ggplot( data= chr_target , aes(x= position, y= Count, fill=Project ) ) +
+  facet_grid(Project ~ ., scale="free") +
+  geom_bar(stat="identity", width = 0.3) +
+  # geom_histogram( alpha= 0.9, bins = 1000 ) +
+  theme_bw( ) +
+  # scale_x_continuous(
+  #   expand = c(0.02,1),
+  #   limits = c(min(chr_target$position), max(chr_target$position) ),
+  #   breaks = seq(min(chr_target$position), max(chr_target$position), 5000000)
+  # ) +
+  scale_x_binned( n.breaks = 55 ,
+                  expand = c(0.001,1),
+                  limits = c(min(chr_target$position), max(chr_target$position) )
+  ) +
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 7, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=2)) +
+  labs(title="Distribution of off target from Chr17",
+       x="Position on the chr", y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Distribution of off target from Chr17.png", dpi = 300, width = 6, height = 7.5)
+
+
+# zoom
+low<-22500000
+#high<-24000000
+#extra_low <- 80000000 # to address the unusual position of the the 7th work
+extra_high <- 81000000 # to address the unusual position of the the 7th work
+#zoom<- chr_target[chr_target$position> low & chr_target$position< high , ]
+#zoom<- rbind(zoom, chr_target[chr_target$position> extra_low & chr_target$position< extra_high , ] )
+zoom<- chr_target[chr_target$position> low & chr_target$position< extra_high , ]
+ggplot( data= zoom , aes(x= position, y= Count, fill=Project ) ) +
+  facet_grid(Project ~ ., scale="free") +
+  geom_bar(stat="identity", width = 0.3) +
+  theme_bw( ) +
+  scale_x_binned( n.breaks = 50 ,
+                  expand = c(0.001,1),
+                  limits = c(low, extra_high ) ) + 
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 6.8, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=1)) +
+  labs(title="Distribution of off target from Chr17 (magnification)",
+       x="Position on the chr (magnification)",
+	y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Zoom_on_main_positions/Distribution of off target from Chr17_ ZOOM.png", dpi = 300, width = 6, height = 7.5)
+write.csv(zoom, file="Counting_Off_targets_origin/Zoom_on_main_positions/Magnification of interest area_Distribution of off target from Chr17.csv", row.names = F)
+
+
+
+### Positions on 5
+chr_target<-Every_chr_pos[Every_chr_pos$chrom=="5", ]
+
+ggplot( data= chr_target , aes(x= position, y= Count, fill=Project ) ) +
+  facet_grid(Project ~ ., scale="free") +
+  geom_bar(stat="identity", width = 0.3) +
+  theme_bw( ) +
+  scale_x_binned( n.breaks = 48 ,
+                  expand = c(0,1),
+                  limits = c(min(chr_target$position), max(chr_target$position) )
+  ) +
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 6.7, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=2)) +
+  labs(title="Distribution of off target from Chr5",
+       x="Position on the chr",y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Distribution of off target from Chr5.png", dpi = 300, width = 6, height = 7.5)
+
+# zoom
+low<-80000000
+high<-85000000
+zoom<- chr_target[chr_target$position> low & chr_target$position< high , ]
+ggplot( data= zoom , aes(x= position, y= Count, fill=Project ) ) +
+  facet_grid(Project ~ ., scale="free") +
+  geom_bar(stat="identity", width = 0.3) +
+  theme_bw( ) +
+  scale_x_binned( n.breaks = 50 ,
+                  expand = c(0.001,1),
+                  limits = c(low, high )
+  ) +
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 6.8, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=1)) +
+  labs(title="Distribution of off target from Chr5 (magnification)",
+       x="Position on the chr (magnification)", y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Zoom_on_main_positions/Distribution of off target from Chr5_ ZOOM.png", dpi = 300, width = 6, height = 7.5 )
+write.csv(zoom, file="Counting_Off_targets_origin/Zoom_on_main_positions/Magnification of interest area_Distribution of off target from Chr5.csv", row.names = F)
+
+
+
+
+### Positions on 11
+chr_target<-Every_chr_pos[Every_chr_pos$chrom=="11", ]
+
+ggplot( data= chr_target , aes(x= position, y= Count, fill=Project ) ) +
+  facet_grid(Project ~ ., scale="free") +
+  geom_bar(stat="identity", width = 0.3) +
+  theme_bw( ) +
+  scale_x_binned( n.breaks = 48 ,
+                  expand = c(0,1),
+                  limits = c(min(chr_target$position), max(chr_target$position) )
+  ) +
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 6.7, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=2)) +
+  labs(title="Distribution of off target from Chr11",
+       x="Position on the chr",y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Distribution of off target from Chr11.png", dpi = 300, width = 6, height = 7.5)
+
+# zoom
+low<-10000000
+high<-12000000
+zoom<- chr_target[chr_target$position> low & chr_target$position< high , ]
+ggplot( data= zoom , aes(x= position, y= Count, fill=Project ) ) +
+  facet_grid(Project ~ ., scale="free") +
+  geom_bar(stat="identity", width = 0.3) +
+  theme_bw( ) +
+  scale_x_binned( n.breaks = 45 ,
+                  expand = c(0.001,1),
+                  limits = c(low, high )
+  ) +
+  scale_y_sqrt( ) +
+  theme(axis.text.x = element_text(angle=40, size= 6.9, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=1)) +
+  labs(title="Distribution of off target from Chr11 (magnification)",
+       x="Position on the chr (magnification)",y="Reads count",
+	fill="")
+
+ggsave(file="Counting_Off_targets_origin/Zoom_on_main_positions/Distribution of off target from Chr11_ ZOOM.png", dpi = 300, width = 6, height = 7.5)
+write.csv(zoom, file="Counting_Off_targets_origin/Zoom_on_main_positions/Magnification of interest area_Distribution of off target from Chr11.csv", row.names = F)
+
+
+
+#### Total count for each chr in each work
+
+pdf("Counting_Off_targets_origin/Report_chr_conteggio_per_lavoro.pdf", width = 7.5, height = 6.5)
+targets<- dir("raw_FASTQ_collection_in_folders/")  
+# it is a folder with sub-folders, each sub-folder is named as a project ID
+for (x in targets) {
+  chr_count<-Every_sum_each_chromosome[Every_sum_each_chromosome$Project==x, ]
+  chr_count$chrom<-as.character(chr_count$chrom) # required to reformat the levels of this factor
+  right_order<- c(seq(1:22),"X","Y","M")
+  chr_count$chrom <- factor( chr_count$chrom,
+                             levels = c( right_order , unique(chr_count$chrom)[! unique(chr_count$chrom) %in% right_order ] ) )  # NB: it has been written in this way because there are anomalous entries as ""Un_GL000220v1" among the Chr
+  chr_count <- chr_count[ ! is.na(chr_count$count) , ]
+  chr_count$count <- as.numeric(chr_count$count)
+
+  plot<-ggplot( data= chr_count , aes(x=chrom, y= count ) ) +
+    geom_bar(stat="identity", fill= "deepskyblue") +
+    theme_bw( ) +
+    theme(axis.text.x = element_text(angle=28, size= 7.2, hjust=1),
+          axis.text.y = element_text(size= 6.5) ) +
+    labs(title=paste(x),
+         x="Chromosome")
+  ggsave(plot = plot, file=paste0("Counting_Off_targets_origin/",x,"_offT_result/",x,"_ASV_chrom_count.png"), dpi = 300, width = 7, height = 4.5)
+  print(plot)
+}
+dev.off()
+
+
+
+# again, but unique plot 
+
+require(ggpubr)
+
+list_plots<-list()
+for (x in 1:length(targets) ) {
+  selected<- targets[x]
+  chr_count<-Every_sum_each_chromosome[Every_sum_each_chromosome$Project==selected, ]
+  chr_count$chrom<-as.character(chr_count$chrom) # required to reformat the levels of this factor
+  right_order<- c(seq(1:22),"X","Y","M")
+  chr_count$chrom <- factor( chr_count$chrom,
+                             levels = c( right_order , unique(chr_count$chrom)[! unique(chr_count$chrom) %in% right_order ] ) )  # NB: it has been written in this way because there are anomalous entries as ""Un_GL000220v1" among the Chr
+  chr_count <- chr_count[ ! is.na(chr_count$count) , ]
+  
+  # adding missing chromosomes to the plot where the related count is zero
+  for ( y in right_order){
+    if(! y %in% chr_count$chrom ){ chr_count <- rbind.data.frame(chr_count, c(y,0,selected) )}
+  }
+  
+  chr_count$count <- as.numeric(chr_count$count)
+  
+  plot_new<-ggplot( data= chr_count , aes(x=chrom, y= count ) ) +
+    geom_bar(stat="identity", fill= "deepskyblue") +
+    theme_bw( base_size = 7.5 ) +
+    theme(axis.text.x = element_text(angle=90, size= 5.5, hjust=1, vjust= 0.3),
+          axis.text.y = element_text(size= 4.5, angle= 45, hjust = 1),
+          axis.title.y = element_blank(),
+          axis.title.x = element_blank(),
+          title=element_text(size= 7)
+          ) +
+    scale_y_continuous(limits = c(0, max(chr_count$count)+max(chr_count$count)/100 )) +
+    labs(title=paste(selected)
+         #x="Chromosome"
+         )
+  list_plots[[x]]<- plot_new
+}
+general_plot<-ggarrange(plotlist = list_plots, nrow = 2, ncol = 5)
+annotate_figure(general_plot, left = "Read count", bottom = "Chromosome")
+general_plot
+ggsave(file="Counting_Off_targets_origin/Every_BioProject_ASV_chrom_count.png", dpi = 300, width = 7.6, height = 5, bg = "white")
+dev.off()
+
+
+
+quit(save="no")
+
+
+
+
+######## EXTRACTING THE MOST ABUNDANT OFF TARGETS SEQUENCES ON 5, 11 and 17 #########
+
+
+### gathering the most abundant off targets ASV from each work
+
+rm Counting_Off_targets_origin/Most_abundant_offT_from_each_work.txt   -f
+
+for x in $targets      # BEGINNING OF THE LOOP
+do
+
+# Every ASV sequence
+cat Counting_Off_targets_origin/${x}_offT_result/${x}_most_abundant_off_targets.fasta | sed "s/>/>work$x:/g" >> Counting_Off_targets_origin/Most_abundant_offT_from_each_work.txt
+
+done
+
+
+
+
+### only the most abundant ASV of 5, 11 and 17
+
+R
+
+ASV_list<-NULL
+
+# 17...
+table_position<-read.table(file="Counting_Off_targets_origin/Zoom_on_main_positions/Magnification of interest area_Distribution of off target from Chr17.csv", sep=",", header = T)
+ASV_list<-rbind.data.frame(ASV_list, table_position)
+
+# +11...
+table_position<-read.table(file="Counting_Off_targets_origin/Zoom_on_main_positions/Magnification of interest area_Distribution of off target from Chr11.csv", sep=",", header = T)
+ASV_list<-rbind.data.frame(ASV_list, table_position)
+# write.table(ASV_list, file="Counting_Off_targets_origin/Most_abundant_ASVcode_11_17_same_position.txt", quote = F, col.names = F , row.names = F)
+
+# now also 5 ...
+table_position<-read.table(file="Counting_Off_targets_origin/Zoom_on_main_positions/Magnification of interest area_Distribution of off target from Chr5.csv", sep=",", header = T)
+ASV_list2<-rbind.data.frame(ASV_list, table_position)
+
+# summing among projects...
+ASV_list2$position<- round(ASV_list2$position , digits=-1) 
+# differences consisting in a singular base are noise here --> rounding
+ASV_list3<-ASV_list2[ ,c("chrom","position","Count")]
+total_count<-aggregate( ASV_list3, Count ~ chrom+position , FUN=sum )
+# avoiding the off-targets of certain positions featured only in traces...
+total_count<-total_count[ total_count$Count>100 , ]
+total_count<-total_count[order(total_count$Count, decreasing=T ),]
+write.table(total_count, file="Counting_Off_targets_origin/Most_abundant_ASVcode_5_11_17_COUNTING_same_position_among_prjs.txt", quote = F, col.names = F , row.names = F)
+
+ASV_list2<-ASV_list2[ASV_list2$position %in% total_count$position[1:3] , ]# the top 3
+write.table(ASV_list2, file="Counting_Off_targets_origin/Top3_Most_abundant_ASVcode_5_11_17_same_position.txt", quote = F, col.names = F , row.names = F)
+
+quit(save="no")
+
+
+
+# extracting ...
+
+cut -f 1 -d ' ' Counting_Off_targets_origin/Top3_Most_abundant_ASVcode_5_11_17_same_position.txt > target_ASVs.txt
+
+#grep -f target_ASVs.txt  Counting_Off_targets_origin/Most_abundant_offT_from_each_work.txt -A1 --no-group-separator > Counting_Off_targets_origin/Main_sequences_from_chr11_17_same_position_without_primers.txt
+
+grep -f target_ASVs.txt  Counting_Off_targets_origin/Most_abundant_offT_from_each_work.txt -A1 --no-group-separator > Counting_Off_targets_origin/Main_sequences_from_chr_5_11_17_same_position_without_primers.txt
+
+rm target_ASVs.txt
+
+# rm Counting_Off_targets_origin/Most_abundant_ASVcode_11_17_same_position.txt Counting_Off_targets_origin/Top3_Most_abundant_ASVcode_5_11_17_same_position.txt
+
+
+
+
+######## NOW SEARCHING FOR A CONSENSUS ########
+
+R
+
+#BiocManager::install("DECIPHER")
+#BiocManager::install("msa")
+#install.packages("ggseqlogo")
+require("ggplot2")
+require("ggseqlogo")
+library("DECIPHER")
+library("msa")
+
+
+
+### Function to cut one nucleotide sequence (target) right after a certain number (cut_before_n_occurrence) of degenerations or gaps, returning a vector named "sequence_cut"...
+
+cut_on_degen_or_iupac<-function(target, cut_before_n_occurrence){
+  splitted<-unlist( strsplit(target, split="") )
+  iupac_or_gap <- grepl("N",splitted) | grepl("W",splitted) | grepl("M",splitted) | grepl("S",splitted) | grepl("D",splitted) | grepl("R",splitted) | grepl("K",splitted) | grepl("Y",splitted) | grepl("-",splitted)
+  cut_after<-which(iupac_or_gap) [ cut_before_n_occurrence ] # this transforms the logical vector in numeric indexes --> select the defined index
+  cut_after<- cut_after-1 # because the string should be cut BEFORE the degeneration
+  if(cut_after==0){ 
+    cat ("The first denegeration (or gap) is on the first position!")
+    sequence_cut <<- target
+    }
+  if(is.na(cut_after)){ 
+    cat ("No gaps or denegerations found") 
+    sequence_cut <<- target
+    }
+  splitted<-splitted[ 1:cut_after ]
+  sequence_cut<<- paste(splitted, collapse="")
+}
+
+
+
+Most_abund_offT<-read.table(file = "Counting_Off_targets_origin/Main_sequences_from_chr_5_11_17_same_position_without_primers.txt")
+Most_abund_offT<-Most_abund_offT[!grepl(">",Most_abund_offT$V1), ]
+
+# Most_abund_offT2 <- Most_abund_offT[ grepl("^.GAA", Most_abund_offT) | grepl("^GAA", Most_abund_offT) ] # these are from the unusual position of the work PRJNA99... which is featured also in other works (in traces)
+Most_abund_offT <- Most_abund_offT[ ! Most_abund_offT %in% Most_abund_offT2 ]
+
+# the beginning of many of these sequences appears similar...
+Most_abund_offT_cut<-substring(Most_abund_offT, first=0, last=50)
+
+Sequences<-DNAStringSet(Most_abund_offT)
+Sequences_cut<-DNAStringSet(Most_abund_offT_cut)
+
+
+# Seaching for a Consensus
+cons<-ConsensusSequence(Sequences, threshold = 0.0000001)
+cons<-as.character(cons)
+
+cut_on_degen_or_iupac(cons, 1) # then 0 degen allowed
+no_degen<- sequence_cut 
+
+cut_on_degen_or_iupac(cons, 2) # then 1 degen allowed
+cons1<- sequence_cut  # this object returns from the function
+
+#two degen allowed
+cut_on_degen_or_iupac(cons, 3) # then 2 degen allowed
+cons2<- sequence_cut
+
+#3 degen allowed
+cut_on_degen_or_iupac(cons, 4) # then 3 degen allowed
+cons3<- sequence_cut
+
+#4 degen allowed
+cut_on_degen_or_iupac(cons, 5) # then 4 degen allowed
+cons4<- sequence_cut
+
+
+results<- data.frame( "Shorter_common_seq" = no_degen ,
+                      "Shorter_common_with_1_degen" = cons1,
+                      "Length_consensus_1degen" = nchar(cons1),
+                      "___" = "___", # to make space
+                      "Shorter_common_with_2_degen" = cons2,
+                      "Shorter_common_with_3_degen" = cons3,
+                      "Shorter_common_with_4_degen" = cons4,
+                      "___" = "___", # to make space
+                      "PrimerF_used" = "CCTACGGGNGGCWGCAG",
+                      "Shorter_common_1degen_and_primerF" = paste0("CCTACGGGNGGCWGCAG",cons1) )
+                      
+results<- as.data.frame( t(results) )
+row.names(results)<-gsub("X_","_",row.names(results))
+write.table(results, file="Consensus_found.tsv", sep = "\t", col.names=F, row.names = T, quote=F)
+
+# Consensus logo
+same_length<-substring(Sequences, first=0, last=nchar(cons4))
+ggseqlogo( same_length , method= "probability" )
+ggsave(filename = "Consensus_found_begin_of_top3_offTarget_ASVs.png", width= 7, height = 2, dpi=300)
+
+
+quit(save="no")
+
+
+
+
+################## CHECKING THE START OF THE REVERSE OF THE CONS ####################
+
+mkdir Counting_Off_targets_origin/Searching_reverse_cons
+
+rm Counting_Off_targets_origin/Searching_reverse_cons/Reverse_seqs_matching_R1_with_cons.fasta
+
+for x in $(ls raw_FASTQ_collection_in_folders/*/* | grep "_R1_" )
+do
+
+echo "Working on ${x/'raw_FASTQ_collection_in_folders/'/}..."
+
+# "GCAG" is the 3'end of the primer F, while the remaining sequence is the consensus delined at the 5' of the deriving ASVs...
+zcat $x | grep "GCAGTGATAAACCTTTAGCAA" -B1 --no-group-separator | grep "@" | sed "s/ .*/ /g" > search_temp.txt
+# this contains the headers, purposely maintaining the ending space to improve the matching between R1 and R2
+
+zcat ${x/"_R1"/"_R2"} | grep -f search_temp.txt -A1 --no-group-separator >> Counting_Off_targets_origin/Searching_reverse_cons/Reverse_seqs_matching_R1_with_cons.fasta
+
+done
+
+rm search_temp.txt
+
+sed "s/@/>/g" -i Counting_Off_targets_origin/Searching_reverse_cons/Reverse_seqs_matching_R1_with_cons.fasta
+
+# gzip -d Counting_Off_targets_origin/Searching_reverse_cons/Reverse_seqs_matching_R1_with_cons.fasta.gz
+
+
+
+Bowtie2db=/media/matteo/SSD1/reference/Bwt2_indexed_Human_chm13_v2/chm13v2.0
+
+bowtie2 -x $Bowtie2db -U Counting_Off_targets_origin/Searching_reverse_cons/Reverse_seqs_matching_R1_with_cons.fasta --al Counting_Off_targets_origin/Searching_reverse_cons/identified_as_human.fasta -S Counting_Off_targets_origin/Searching_reverse_cons/bowtie2_SAM_R2.txt -f -p 60 2> Counting_Off_targets_origin/Searching_reverse_cons/percentuals_aligned_bowtie2_R2_vs_human.txt
+
+
+### Extracting position on genome and chromosomes
+samtools view -F 4 Counting_Off_targets_origin/Searching_reverse_cons/bowtie2_SAM_R2.txt | cut -f 1,3,4 > Counting_Off_targets_origin/Searching_reverse_cons/Chr_position.txt
+
+
+
+### Counting occurrences
+R
+
+options(scipen=100)
+library("ggplot2")
+require("ggseqlogo")
+
+
+Chr_original<-read.delim(file="Counting_Off_targets_origin/Searching_reverse_cons/Chr_position.txt", header=F, sep="\t")
+colnames(Chr_original)<-c("Read","chrom","position")
+
+Chr_original$chrom<- gsub("chr","",Chr_original$chrom)
+right_order<- c(seq(1:22),"X","Y","M")
+
+Chr_original$chrom <- factor( Chr_original$chrom, levels = c( right_order , unique(Chr_original$chrom)[! unique(Chr_original$chrom) %in% right_order ] ) )  # NB: this line was written as such because anomalous entries, as "Un_GL000220v1", are featured among the Chr
+
+Chr_original$position <- as.numeric(Chr_original$position)
+Chr_original$position <- round ( Chr_original$position, digits= -1) # difference of less than 10 bases equals to "noise" here
+
+Chr<- Chr_original
+Chr$value <- rep(1)
+Chr<-aggregate( value ~ chrom+position , Chr, FUN= sum )
+Chr<- Chr[order(Chr$value, decreasing=T), ]
+write.csv(Chr, file="Counting_Off_targets_origin/Searching_reverse_cons/Counting_of_positions_bowtie_vs_R2.csv", row.names=F)
+
+
+### Positions on 17
+chr_target<-Chr[Chr$chrom=="17", ]
+
+ggplot( data= chr_target , aes(x= position, y= value ) ) +
+  geom_bar(stat="identity", width = 0.3) +
+  scale_x_binned( n.breaks = 55 ,
+                  expand = c(0.001,1),
+                  limits = c(min(chr_target$position), max(chr_target$position) )
+  ) +
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 7, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=2)) +
+  labs(title="Distribution of reverse corresponding to cons, Chr17",
+       x="Position on the chr", y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Searching_reverse_cons/Distribution_offtarget_R2_from Chr17.png", dpi = 300, width = 6, height = 7.5)
+
+
+C17 <- Chr_original[Chr_original$position %in% chr_target$position, "Read"]
+
+
+
+### Positions on 5
+chr_target<-Chr[Chr$chrom=="5", ]
+
+ggplot( data= chr_target , aes(x= position, y= value ) ) +
+  geom_bar(stat="identity", width = 0.3) +
+  scale_x_binned( n.breaks = 55 ,
+                  expand = c(0.001,1),
+                  limits = c(min(chr_target$position), max(chr_target$position) )
+  ) +
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 7, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=2)) +
+  labs(title="Distribution of reverse corresponding to cons, Chr5",
+       x="Position on the chr", y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Searching_reverse_cons/Distribution_offtarget_R2_from Chr5.png", dpi = 300, width = 6, height = 7.5)
+
+
+C5 <- Chr_original[Chr_original$position %in% chr_target$position, "Read"]
+
+
+
+### Positions on 11
+chr_target<-Chr[Chr$chrom=="11", ]
+
+ggplot( data= chr_target , aes(x= position, y= value ) ) +
+  geom_bar(stat="identity", width = 0.3) +
+  scale_x_binned( n.breaks = 55 ,
+                  expand = c(0.001,1),
+                  limits = c(min(chr_target$position), max(chr_target$position) )
+  ) +
+  scale_y_sqrt() +
+  theme(axis.text.x = element_text(angle=40, size= 7, hjust=1),
+        axis.text.y = element_text(size= 6),
+        axis.ticks.y = element_blank(),
+	strip.text = element_text(size= 5.5),
+        title = element_text(size=10),
+        legend.text = element_text(size=9),
+        legend.key.height = unit(0.2, "cm"),
+        legend.key.width = unit(0.1, "cm"),
+        legend.margin = margin(c(-1,22,1,1)),
+        legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=2)) +
+  labs(title="Distribution of reverse corresponding to cons, Chr11",
+       x="Position on the chr", y="Reads count",
+	fill="")
+ggsave(file="Counting_Off_targets_origin/Searching_reverse_cons/Distribution_offtarget_R2_from Chr11.png", dpi = 300, width = 6, height = 7.5)
+
+
+C11 <- Chr_original[Chr_original$position %in% chr_target$position, "Read"]
+
+
+
+################# SEARCHING A CONSENSUNS ON 5, 11 and 17 REVERSES ############
+
+# still in R ...
+
+#library("ggplot2")
+#require("ggseqlogo")
+
+fasta<-read.delim(file="Counting_Off_targets_origin/Searching_reverse_cons/Reverse_seqs_matching_R1_with_cons.fasta", header=F)
+
+headers<-fasta[ grepl(">", fasta$V1), ]
+# to match the headers with the other object...
+headers<-gsub(">","",headers)
+headers<-gsub(" .*","",headers)
+seqs<-fasta[ ! grepl(">", fasta$V1), ]
+# the consensus is searched in the first 50 bases of the reverses(including the primer R)
+seqs <-substring(seqs, first = 0, last=50)
+head_seqs<-cbind.data.frame(headers,seqs)
+head_seqs <-head_seqs[!grepl("N",head_seqs$seqs), ] # raw R2 --> bad qualities --> discarding reads with N
+head_seqs <-head_seqs[nchar(head_seqs$seqs)==50, ] # raw R2 --> discarding short bad reads
+
+seqs_17<- head_seqs[ head_seqs$headers %in% C17 , "seqs" ]
+seqs_11<- head_seqs[ head_seqs$headers %in% C11 , "seqs" ]
+seqs_5<- head_seqs[ head_seqs$headers %in% C5 , "seqs" ]
+
+ggseqlogo( seqs_17 , method= "probability" ) +
+	labs(title="Chr17 R_Primer R included (GACTACNVGGGTWTCTAATCC)" ) 
+ggsave(filename = "Counting_Off_targets_origin/Searching_reverse_cons/Consensus_most_abb_17_R2_offTarget.png", width= 10, height = 2, dpi=300, background="white")
+
+ggseqlogo( seqs_11 , method= "probability" ) +
+	labs(title="Chr11 R_Primer R included (GACTACNVGGGTWTCTAATCC)" ) 
+ggsave(filename = "Counting_Off_targets_origin/Searching_reverse_cons/Consensus_most_abb_11_R2_offTarget.png", width= 10, height = 2, dpi=300, background="white")
+
+ggseqlogo( seqs_5 , method= "probability" ) +
+	labs(title="Chr5 R_Primer R included (GACTACNVGGGTWTCTAATCC)" ) 
+ggsave(filename = "Counting_Off_targets_origin/Searching_reverse_cons/Consensus_most_abb_5_R2_offTarget.png", width= 10, height = 2, dpi=300, background="white")
+
+ggseqlogo( head_seqs$seqs , method= "probability" ) +
+	labs(title="Chr5+11+17 R_Primer R included (GACTACNVGGGTWTCTAATCC)" )
+ggsave(filename = "Counting_Off_targets_origin/Searching_reverse_cons/Consensus_most_abb_5_11_17_REVERSE_offTarget.png", width= 10, height = 2, dpi=300, background="white")
+
+
+
+q("no")   # closing R
+
+
+# cleaning
+gzip Counting_Off_targets_origin/Searching_reverse_cons/Reverse_seqs_matching_R1_with_cons.fasta
+rm   Counting_Off_targets_origin/Searching_reverse_cons/bowtie2_SAM_R2.txt   
+rm   Counting_Off_targets_origin/Searching_reverse_cons/Chr_position.txt   
+rm   Counting_Off_targets_origin/Searching_reverse_cons/identified_as_human.fasta
+
+
+###### END
