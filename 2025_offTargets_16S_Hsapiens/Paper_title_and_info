@@ -1,0 +1,13 @@
+Title: "HUMAN DNA HIJACKING YOUR MICROBIOTA STUDY SURVEYS: CAUSES AND CONSEQUENCES IN COLON RELATED 16S AMPLICON SEQUENCING"
+Authors:
+DOI:
+
+Abstract: 
+The efficiency of Polymerase Chain Reaction (PCR) decreases under suboptimal conditions, such as low template concentration combined with high concentrations of similar sequences.
+Under these circumstances, mis-priming can occur, leading to the generation of erroneous copies.
+Specifically, in 16S amplicon sequencing of human intestinal biopsy samples, host off-target sequences are frequently generated and subsequently sequenced, particularly when the commonly used V3-V4 primers are employed.
+This issue not only introduces errors in data interpretation but results in the unnecessary consumption of sequencing depth.
+In response to this challenge, we analyzed over 1,300 publicly available V3-V4 amplicon sequences related to the human colon, profiling the colonic microbiota while elucidating the biases introduced by host off-targets.
+Briefly, our findings reveal that unaddressed host DNA contamination can lead to false bacterial identifications and to obscure significant differences in microbiota composition.
+Furthermore, we identified human sequences on chromosomes 5, 11 and 17 as the main contributors to the majority of off-target sequences.
+Finally, we suggest practical approaches to mitigate this issue without altering the original design, therefore retaining the widely used V3-V4 primers.
