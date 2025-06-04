@@ -86,6 +86,9 @@ cat EXTRA_missclassif_kaiju_mock/db_default/Homo_reads_missclassified_as_bacteri
 # Extra check on Diploscapter misclassified as bacteria (not featured in this db)
 cat Kaiju_output/mock_AGS_DNAseq_Evalue${c}_m${m}_output.txt | grep "Diploscapter" | grep -vw "0" | cut -f 2,3 > EXTRA_missclassif_kaiju_mock/db_default/Diploscapter_reads_as_bacteriaconf${c}_m${m}.txt
 
+# Extra check on T4
+cat Kaiju_output/mock_AGS_DNAseq_Evalue${c}_m${m}_output.txt | grep "phage_T4" | cut -f 2,3 > EXTRA_missclassif_kaiju_mock/db_default/Taxa_classified_from_T4_reads_conf${c}_m${m}.txt
+echo -e "Number of TRUE T4 reads properly recognised: $( grep -Ew "10663|10664|10665|10666|45406|1206560|1914203|2697537|2508179|2795221|2844198|1002725|2025823|2081604|2844192|2681597|2681598|2846680|2844252|2716729|1054834|2052932|2865790|2060721|1141141|2851032|2890957|2681598|2950777|66711|2724310|857277|1495285|2836118|69613|2589644|2894741" EXTRA_missclassif_kaiju_mock/db_plus/Taxa_classified_from_T4_reads_conf${c}_m${m}.txt | wc -l )" >  EXTRA_missclassif_kaiju_mock/db_default/Counts_of_T4_true_positives_conf${c}_m${m}.txt
 
 done   # end of the nested nested loop (m, pre-indexed db)
 
@@ -115,6 +118,12 @@ cat Kaiju_output/mock_AGS_DNAseq_Evalue${c}_m${m}_output_PLUS.txt | grep "Diplos
 cat Kaiju_output/mock_AGS_DNAseq_Evalue${c}_m${m}_output_PLUS.txt  | grep -v "Diploscapter" | cut -f 2,3 | grep -Ew "55799|288516|1182519|367193|2018661|2621930|55800" > EXTRA_missclassif_kaiju_mock/db_plus/Not_Diploscapter_classified_as_Diploscapter_conf$c_m${m}.txt
 
 echo -e "Number of Diploscapter reads: $(cat EXTRA_missclassif_kaiju_mock/db_plus/Taxa_classified_from_Diploscapter_reads_conf${c}_m${m}.txt | wc -l ) \nNumber of NON Diploscapter reads classified as such: $( cat EXTRA_missclassif_kaiju_mock/db_plus/Not_Diploscapter_classified_as_Diploscapter_conf$c_m${m}.txt | wc -l ) \nNumber of TRUE Diploscapter reads properly recognised: $( grep -Ew "55799|288516|1182519|367193|2018661|2621930|55800" EXTRA_missclassif_kaiju_mock/db_plus/Taxa_classified_from_Diploscapter_reads_conf${c}_m${m}.txt | wc -l ) \nNumber of reads classified as "nematodes" (LCA): $( grep -w "6231" EXTRA_missclassif_kaiju_mock/db_plus/Taxa_classified_from_Diploscapter_reads_conf${c}_m${m}.txt | wc -l ) " >  EXTRA_missclassif_kaiju_mock/db_plus/Counts_of_Diploscapter_false_and_true_positives_conf${c}_m${m}.txt
+
+
+# Extra check on T4
+cat Kaiju_output/mock_AGS_DNAseq_Evalue${c}_m${m}_output_PLUS.txt | grep "phage_T4" | cut -f 2,3 > EXTRA_missclassif_kaiju_mock/db_plus/Taxa_classified_from_T4_reads_conf${c}_m${m}.txt
+echo -e "Number of TRUE T4 reads properly recognised: $( grep -Ew "10663|10664|10665|10666|45406|1206560|1914203|2697537|2508179|2795221|2844198|1002725|2025823|2081604|2844192|2681597|2681598|2846680|2844252|2716729|1054834|2052932|2865790|2060721|1141141|2851032|2890957|2681598|2950777|66711|2724310|857277|1495285|2836118|69613|2589644|2894741" EXTRA_missclassif_kaiju_mock/db_plus/Taxa_classified_from_T4_reads_conf${c}_m${m}.txt | wc -l )" >  EXTRA_missclassif_kaiju_mock/db_plus/Counts_of_T4_true_positives_conf${c}_m${m}.txt
+
 
 
 done   # end of the nested nested loop 2 (m, custom db)
