@@ -1148,6 +1148,7 @@ Kaiju_s$Bacterium <- gsub("[","", Kaiju_s$Bacterium , fixed = T)
 Kaiju_s$Bacterium <- gsub("]","", Kaiju_s$Bacterium , fixed = T)
 Kaiju_s <- Kaiju_s[ ! Kaiju_s$Bacterium %in% c("unclassified","cannot_be_assigned_to_a_(non-viral)_sp.") , ]
 Kaiju_s$Bacterium <-  gsub("Nostocoides","Tetrasphaera", Kaiju_s$Bacterium)
+Kaiju_s$Bacterium <- gsub("Tequatrovirus_.*","Enterobacteria_phage_T4", Kaiju_s$Bacterium )
 
 Kaiju_sp$Bacterium <- gsub("Candidatus_Moranbacteria_bacterium.*","Candidatus_Moranbacteria_sp.", Kaiju_sp$Bacterium )
 Kaiju_sp$Bacterium <- gsub("Solirubrobacterales_bacterium_67-14.*","Solirubrobacterales_bacterium_sp.", Kaiju_sp$Bacterium )
@@ -1156,6 +1157,7 @@ Kaiju_sp$Bacterium <- gsub("[","", Kaiju_sp$Bacterium , fixed = T)
 Kaiju_sp$Bacterium <- gsub("]","", Kaiju_sp$Bacterium , fixed = T)
 Kaiju_sp <- Kaiju_sp[ ! Kaiju_sp$Bacterium %in% c("unclassified","cannot_be_assigned_to_a_(non-viral)_sp.") , ]
 Kaiju_sp$Bacterium <-  gsub("Nostocoides","Tetrasphaera", Kaiju_sp$Bacterium)
+Kaiju_sp$Bacterium <- gsub("Tequatrovirus_.*","Enterobacteria_phage_T4", Kaiju_sp$Bacterium )
 
 
 # kMeta_s$Bacterium[ ! kMeta_s$Bacterium %in% mock_species$Bacterium]
