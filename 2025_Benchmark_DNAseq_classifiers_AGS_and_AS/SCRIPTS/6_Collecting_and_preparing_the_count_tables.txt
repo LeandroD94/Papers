@@ -23,7 +23,7 @@ kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r genus -l genus -e -
 # -e Expand viruses, which are always shown as full taxon path and read counts are not summarized in higher taxonomic levels
 
 # Few entries are missing because they lack of the genus level in NCBI (but not in SILVA)! Taking these rows from the species level.
-kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r species -l species -o Kaiju_output/kaiju_classif_summary_species_level_2023.tsv $output_names
+kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r species -l species -e -o Kaiju_output/kaiju_classif_summary_species_level_2023.tsv $output_names
 
 grep "Moranbacteria bacterium" Kaiju_output/kaiju_classif_summary_species_level_2023.tsv  > missing_genus_to_add_from_species.txt
 # NB: Moranii is Moranbacteria in Kaiju db, differently from Kraken2 nt_core 
@@ -53,7 +53,7 @@ Kaiju_DB=/media/matteo/SSD4/reference/Kaiju_complete_nr_2024
 
 output_names=$(ls Kaiju_output | grep -E "output_PLUS.txt" | sed 's#^#Kaiju_output/#g')  # this is the list of inputs for the row below
 kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r genus -l genus -e -o Kaiju_output/kaiju_classif_summary_2024.tsv $output_names
-kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r species -l species -o Kaiju_output/kaiju_classif_summary_species_level_2024.tsv $output_names
+kaiju2table -t $Kaiju_DB/nodes.dmp -n $Kaiju_DB/names.dmp -r species -l species -e -o Kaiju_output/kaiju_classif_summary_species_level_2024.tsv $output_names
 
 grep "Moranbacteria bacterium" Kaiju_output/kaiju_classif_summary_species_level_2024.tsv  > missing_genus_to_add_from_species.txt
 # NB: Moranii is Moranbacteria in Kaiju db, differently from Kraken2 nt_core 
