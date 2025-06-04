@@ -546,7 +546,7 @@ ggplot(data=table, aes(x=Settings, y=value, fill=Genus)) +
   strip.text = element_text(size=5.25),
   legend.key.height = unit(0.2, "cm"),
   legend.key.width = unit(0.38, "cm"),
-  legend.text = element_text ( size = 7.5 ),
+  legend.text = element_text ( size = 7.5 , face="italic"),
   legend.position="bottom",
   legend.margin = margin(-20 ,5, 2 ,-20),
   plot.margin = margin(0.5,1,2,0.5)) +
@@ -584,7 +584,7 @@ ggplot(data=table2, aes(x=Settings, y=value, fill=Genus)) +
   strip.text = element_text(size=5.4),
   legend.key.height = unit(0.15, "cm"),
   legend.key.width = unit(0.4, "cm"),
-  legend.text = element_text ( size = 7.5 ),
+  legend.text = element_text ( size = 7.5 , face="italic"),
   legend.position="bottom",
   legend.margin = margin(-25 ,5, 2 ,-20),
   plot.margin = margin(0.1,1,1,0.1)) +
@@ -665,7 +665,7 @@ ggplot(data=table, aes(x=Settings, y=value, fill=Genus)) +
   strip.text = element_text(size=6.5),
   legend.key.height = unit(0.2, "cm"),
   legend.key.width = unit(0.38, "cm"),
-  legend.text = element_text ( size = 7.05 ),
+  legend.text = element_text ( size = 7.05 , face="italic" ),
   legend.position="bottom",
   legend.margin = margin(-15 ,5, 1 ,-30),
   plot.margin = margin(2,1,2,10)) +
@@ -802,7 +802,7 @@ ggplot(data=table, aes(x=Settings, y=value, fill=Genus)) +
   axis.title =element_text(size=10),
   strip.text = element_text(size=8),
   legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.35, "cm"),
-  legend.text = element_text ( size = 7.5 ),
+  legend.text = element_text ( size = 7.5 , face="italic" ),
   legend.position="bottom",
   legend.margin = margin(-8 ,5, 1 ,-30),
   plot.margin = margin(2,1,2,5)) +
@@ -827,9 +827,9 @@ write.csv2(feature_table[mis_k_plus, grepl("_plus", colnames(mis_k_plus))], file
 
 ##################### PCoA ##################### 
 
-colors_sub_program <- c("Kaiju_nr euk"="darkgreen", "Kaiju_nr euk+"="chartreuse3", "Kaiju_contigs"="chartreuse",  "Kraken2_nt core"="red3", "Kraken2_contigs"="coral3",  "Kraken2_SILVA"="coral", 
+colors_sub_program <- c("Kaiju_nr euk"="darkgreen", "Kaiju_nr euk+"="chartreuse3", "Kaiju_contigs"="lightgreen",  "Kraken2_nt core"="red3", "Kraken2_contigs"="coral3",  "Kraken2_SILVA"="coral", 
                         "kMetaShot_contigs"="violet", "kMetaShot_MAGs"="darkviolet",
-                        "RiboFrame_full"="blue2", "RiboFrame_V3V4"="deepskyblue", "Mock_true_abundances"="yellow2")
+                        "RiboFrame_full"="deepskyblue3", "RiboFrame_V3V4"="lightblue2", "Mock_true_abundances"="yellow2")
 colors_sub_program2 <- colors_sub_program
 names(colors_sub_program2) <- gsub( "_" ," ", names(colors_sub_program) )
 
@@ -920,6 +920,42 @@ ggplot( data= pcoa$points, aes( x= PC1, y=PC2 , color= meta_pcoa$Program_sub )) 
 ggsave(file="Results_Mock/PCoA_Hellinger_mock_BETTER_PIPELINES.png", dpi=300, width = 5, height = 4.6)
 
 
+# again, but with less labels
+meta_pcoa$Settings2<-meta_pcoa$Settings
+meta_pcoa$Settings2[ meta_pcoa$Program_sub =="Kaiju nr euk" & meta_pcoa$Settings2== "E0.01_m30" ] <- " nr euk\nand nr euk +"
+# meta_pcoa$Settings2[ meta_pcoa$Program_sub =="Kaiju nr euk+" & meta_pcoa$Settings2== "E0.01_m11" ] <- "nr euk+"
+meta_pcoa$Settings2[ meta_pcoa$Settings2 %in% c("c0.65","c0.85",
+                                                "default_no_conf", "default_c0.4", 
+                                                "custom_c0.2","default_c0.2", # "large_c0.2",
+                                                "E0.00001_m11","E0.00001_m30","E0.00001_m42",
+                                                "E0.0001_m42",
+                                                "E0.01_m30","E0.01_m11", "E0.01_m42"
+                                                )] <- ""     # hence they will be empty
+meta_pcoa$Settings2[ meta_pcoa$Settings2 == "metalarge_no_conf" ] <- "large_no_conf"
+
+ggplot( data= pcoa$points, aes( x= PC1, y=PC2 , color= meta_pcoa$Program_sub )) +
+  theme_classic() +
+  xlim( c(-7.1, 4.2) ) + # to include the whole labels
+  scale_color_manual( values = colors_sub_program2[ unique(meta_pcoa$Program_sub ) ] ) +
+  geom_point(size= 3.5, alpha= 0.55 ) +
+  geom_point(size= 0.75, alpha= 0.8 ) +
+  geom_text( label= gsub("_SILVA","",meta_pcoa$Settings2) ,
+             show.legend = F , size= 3 , color="black",
+             lineheight= 0.5) +
+  theme( legend.text = element_text(size=7.25 ),
+         legend.margin = margin( 1,-2,1, -6),
+         legend.spacing.x = unit(0,"pt")
+  )+
+  labs(color=NULL, 
+       # title= "PCoA on processed mock (Hellinger, top pipelines)",
+       x=paste( "PC1 (", round( pcoa$eig[1]/sum(pcoa$eig)*100,2), "%)"),
+       y=paste( "PC2 (", round(pcoa$eig[2]/sum(pcoa$eig)*100,2), "%)")
+  )
+ggsave(file="Results_Mock/PCoA_Hellinger_mock_BETTER_PIPELINES2.png", dpi=300, width = 5, height = 4.6)
+
+
+
+
 ### Bray-Curtis
 #this <- t(feature_table)
 this <- t(subset_table)  # only most effective methods
@@ -940,22 +976,38 @@ meta_pcoa$Program_sub <- gsub("Kaiju_nr_euk+","Kaiju_nr euk+", meta_pcoa$Program
 meta_pcoa$Program_sub<-gsub("_"," ",meta_pcoa$Program_sub)
 meta_pcoa$Settings <- gsub("_nr_euk.*","", meta_pcoa$Settings)
 pcoa$points <- as.data.frame(pcoa$points)
+
+meta_pcoa$Settings2<-meta_pcoa$Settings
+meta_pcoa$Settings2[ meta_pcoa$Program_sub =="Kaiju nr euk" & meta_pcoa$Settings2== "E0.01_m30" ] <- "nr euk\nand nr euk +"
+# meta_pcoa$Settings2[ meta_pcoa$Program_sub =="Kaiju nr euk+" & meta_pcoa$Settings2== "E0.01_m11" ] <- "nr euk+"
+meta_pcoa$Settings2[ meta_pcoa$Settings2 %in% c("c0.65","c0.85",
+                                                "default_no_conf", "default_c0.4", 
+                                                "custom_c0.2","default_c0.2", # "large_c0.2",
+                                                "E0.00001_m11","E0.00001_m30","E0.00001_m42",
+                                                "E0.01_m30","E0.01_m11", "E0.01_m42"
+                                                )] <- ""     # hence they will be empty
+meta_pcoa$Settings2[ meta_pcoa$Settings2 == "metalarge_no_conf" ] <- "large_no_conf"
+
 ggplot( data= pcoa$points, aes( x= PC1, y=PC2 , color= meta_pcoa$Program_sub )) +
-  xlim( c(-0.55, 0.42) ) + # to include the whole labels
   theme_classic() +
-  scale_color_manual( values = colors_sub_program2 ) +
-  geom_point(size= 3.65, alpha= 0.55 ) +
-  geom_text( label= gsub("_SILVA","",meta_pcoa$Settings) ,
-             show.legend = F , size= 2 , color="black") +
-  theme( legend.text = element_text(size=6.5 ),
-         legend.margin = margin( 1,1,1, 1) 
+  xlim( c(-0.55, 0.42) ) + # to include the whole labels
+  scale_color_manual( values = colors_sub_program2[ unique(meta_pcoa$Program_sub ) ] ) +
+  geom_point(size= 3.5, alpha= 0.55 ) +
+  geom_point(size= 0.5, alpha= 0.8 ) +
+  geom_text( label= gsub("_SILVA","",meta_pcoa$Settings2) ,
+             show.legend = F , size= 3 , color="black",
+             lineheight= 0.5) +
+  theme( legend.text = element_text(size=7 ),
+         legend.margin = margin( 1,-2,1, -6),
+         legend.spacing.x = unit(0,"pt")
   )+
   labs(color=NULL, 
-       # title= "PCoA on processed mock (Bray-Curtis)",
+       # title= "PCoA on processed mock (Hellinger, top pipelines)",
        x=paste( "PC1 (", round( pcoa$eig[1]/sum(pcoa$eig)*100,2), "%)"),
        y=paste( "PC2 (", round(pcoa$eig[2]/sum(pcoa$eig)*100,2), "%)")
   )
 ggsave(file="Results_Mock/PCoA_Bray_mock_BETTER_PIPELINES.png", dpi=300, width = 5.2, height = 4.6)
+
 
 
 # ### Bray again, but magnifying the most effective methods (Kaiju only)
@@ -1150,6 +1202,7 @@ Kaiju_s <- Kaiju_s[ ! Kaiju_s$Bacterium %in% c("unclassified","cannot_be_assigne
 Kaiju_s$Bacterium <-  gsub("Nostocoides","Tetrasphaera", Kaiju_s$Bacterium)
 Kaiju_s$Bacterium <- gsub("Tequatrovirus_.*","Enterobacteria_phage_T4", Kaiju_s$Bacterium )
 
+
 Kaiju_sp$Bacterium <- gsub("Candidatus_Moranbacteria_bacterium.*","Candidatus_Moranbacteria_sp.", Kaiju_sp$Bacterium )
 Kaiju_sp$Bacterium <- gsub("Solirubrobacterales_bacterium_67-14.*","Solirubrobacterales_bacterium_sp.", Kaiju_sp$Bacterium )
 Kaiju_sp$Bacterium <- gsub("_sp..*","_sp.", Kaiju_sp$Bacterium )
@@ -1313,7 +1366,7 @@ ggplot(data=table, aes(x=variable, y=value, fill=Bacterium)) +
   strip.text = element_text(size=7),
   legend.key.height = unit(0.25, "cm"),
   legend.key.width = unit(0.21, "cm"),
-  legend.text = element_text ( size = 6.8 ),
+  legend.text = element_text ( size = 6.8 , face="italic"),
   legend.position="bottom",
   legend.margin = margin(-13 ,5, 1 ,-33),
   plot.margin = margin(1,1,2,10)) +
@@ -1385,7 +1438,7 @@ ggplot(data=table, aes(x=variable, y=value, fill=Bacterium)) +
   strip.text = element_text(size=5.7),
   legend.key.height = unit(0.2, "cm"),
   legend.key.width = unit(0.3, "cm"),
-  legend.text = element_text ( size = 6.9 ),
+  legend.text = element_text ( size = 6.9 , face="italic"),
   legend.position="bottom",
   legend.margin = margin(-16 ,5, 1 ,-32),
   plot.margin = margin(2,1,2,10)) +
