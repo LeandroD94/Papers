@@ -1,4 +1,4 @@
-#06/05/2024
+#25/05/2024
 
 
 
@@ -15,11 +15,13 @@
   library("vegan")
   library("ggpubr")
   library("DESeq2")
+  library("ALDEx2")
   # utilities
   library("reshape")
   library("stringr")
   library("xlsx")  
   library("qiime2R")
+  library("compositions")
 }
 
 { 
@@ -198,7 +200,26 @@ dev.off()
 
 write.csv2(tabella, file="Data_check/Off-targetPercentages.csv", row.names = F, quote = F)
 
-rm(tabella, tabella2, also_this, only_off, data_contam_modified, temp, table_temp, host_prject, prok_prject, sum_project , x )
+
+# extra: checking each sample
+data_contam_modified2 <- data_contam_modified
+tax_table(data_contam_modified2)[,"Kingdom"] <-"OVERWRITTEN"
+data_contam_modified2 <- tax_glom(data_contam_modified2, taxrank = "Phylum", NArm = F)
+proportion_H_on_P_row <- as.numeric(otu_table(subset_taxa(data_contam_modified2, Phylum =="Host derived"))) / as.numeric(otu_table(subset_taxa(data_contam_modified2, Phylum !="Host derived")))
+write.csv2( rbind(
+                  cbind(
+                        otu_table(data_contam_modified2),
+                        tax_table(data_contam_modified2)[,"Phylum"]
+                        ),
+                  c( round(proportion_H_on_P_row,2) ,"proportion_H_on_P"),
+                  c( sample_data(data_contam_modified2)$Work_symbol , "Project_ID")
+                  ),
+           file="Data_check/OffTargetCountsForEachSample.csv",
+           row.names = F, quote = F
+           )
+
+
+rm(tabella, tabella2, also_this, only_off, data_contam_modified, data_contam_modified2, temp, table_temp, host_prject, prok_prject, sum_project , x )
 
 
 
@@ -806,9 +827,9 @@ rm(taxa_temp)
 
 
 ### unfilt and contam object
-if(! "data_contam_G_prop" %in% ls( )) {  # to avoid losing time due to how much big is this object!
-  data_contam_G_prop<-tax_glom(data_contam, taxrank = "Genus", NArm=F)
-  data_contam_G_prop<-transform_sample_counts(data_contam_G_prop, function(x) (x/sum(x))*100)
+if(! "data_contam_G" %in% ls( )) {  # to avoid losing time due to how much big is this object!
+  data_contam_G<-tax_glom(data_contam, taxrank = "Genus", NArm=F)
+  data_contam_G_prop<-transform_sample_counts(data_contam_G, function(x) (x/sum(x))*100)
 }
 
 
@@ -939,7 +960,7 @@ tabella$Genus<-factor(tabella$Genus,
                                  "Ruminococcus_torques","Others"
                       ))
 }
-tabella$Sample_Type<-gsub("_","\n",tabella$Sample_Type)    # if it is needed to rename
+tabella$Sample_Type<-gsub("_","\n",tabella$Sample_Type)
 ggplot(data=tabella, aes(x=Sample, y=Abundance, fill=Genus)) +
   facet_grid2( Sample_Type ~ . , scales = "free", independent = T) + 
   geom_bar(stat="identity", position="stack") +
@@ -980,6 +1001,30 @@ write.xlsx(file = "Results/Abundances/TOP_genera_Average_abundances.xlsx", row.n
 
 suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabella_others, top, others, to_save))
 
+
+
+# again, but geometric means (required by the reviewer 1)
+count_no_proportions <- as(otu_table(data.genus),"matrix")
+count_no_proportions <- count_no_proportions+0.5   # to solve the zeros, otherwise every log will be infinite and the ratio 0!
+#geom_means <- geometricmeanRow( count_no_proportions )
+# each geometric mean is equal to the these of the contaminated obj, as the geom is computed on the row itself without intereference from other rows
+count_no_proportions <- clr(t(count_no_proportions))  # NB: translating, as the functions expect the obs to be columns (see the example data of the compositional package)
+clr_means <- colMeans(count_no_proportions)
+clr_means_no_contam <- round( as.numeric(clr_means[top]),3 )  # "top" sorts and selects the most abundant genera abund
+# now on the contaminated obj
+count_no_proportions <- as(otu_table(data_contam_G),"matrix")
+count_no_proportions <- count_no_proportions+0.5   # to solve the zeros, otherwise every log will be infinite and the ratio 0!
+count_no_proportions <- clr(t(count_no_proportions))  # NB: translating, as the functions expect the obs to be columns (see the example data of the compositional package)
+clr_means <- colMeans(count_no_proportions)
+clr_means_with_contam <- round( as.numeric(clr_means[top]),3 )  # "top" sorts and selects the most abundant genera abund
+to_save<- cbind.data.frame( "Family"= as.data.frame(tax_table(prune.dat_top))[["Family"]] , 
+                            "Genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]] ,
+                            "AverageCLR"= clr_means_no_contam,
+                            "AverageCLR with contaminants"= clr_means_with_contam 
+                            )
+to_save<-to_save[order(to_save$AverageCLR, decreasing=T), ]
+
+write.xlsx(file = "Results/Abundances/TOP_genera_Average_with_CLR.xlsx", row.names = F, to_save)
 
 
 
@@ -1572,6 +1617,344 @@ for( t in c("Genus","Family","Class","Order","Phylum") ){
 #View(Res_tot)
 write.csv(Res_tot, file="Results/NO_DA_taxa_according_to_DESeq2_WITH_HumanASVs.csv", row.names = F)
 # write.xlsx(Res_tot, file="Results/DA_DESeq2/Every_result_DESeq2.xlsx", showNA = F, col.names = T)
+
+
+
+
+######### DA WITH ALDEx2 (CRC vs Healthy Tissue, no human reads) #####################
+
+suppressWarnings(rm(data_pruned, data.genus_pruned))
+data_pruned<- prune_taxa(taxa_sums(data_sub) > 10, data_sub) 
+sample_data(data_pruned)[["Sample_Type"]]<-factor(sample_data(data_pruned)[["Sample_Type"]], levels = c("Healthy_tissue","CRC"))
+# Healthy_tissue will be the base level --> Denominator of fold change
+
+# removing eventual not duplicated samples
+paired_samples <- sample_data(data_sub)[,"Original_Sample_name", drop=T]
+paired_samples <- paired_samples$Original_Sample_name
+paired_samples<-paired_samples[duplicated(paired_samples)]
+data_pruned <- subset_samples(data_pruned, Original_Sample_name %in% paired_samples)
+
+BiocParallel::register(BiocParallel::MulticoreParam(58))   # threads to use (requires BiocParallel package to be installed)
+# NB: specify the package from which take these functions is required in our machine!
+
+Table_tot<-NULL
+Res_tot<-NULL
+### Starting the analysis on each taxon level
+for( t in c("Genus","Family","Order") ){
+  cat("\nWorking on",t,"level...\n")
+  suppressWarnings(rm(list=c("d", "d.prop", "Taxa.d", "res","DE", "target", "r", "r_level")))
+  d <- tax_glom(data_pruned, taxrank = t, NArm = F)
+  d.prop<- transform_sample_counts(d, function(x) x/sum(x)*100)
+  
+  # using the "manual" pipeline of Aldex2 to better specify the design ...
+  mm <- model.matrix(~ Sample_Type + Pair_ID , as(sample_data(d),"data.frame") ) # name of the sample data for last
+  set.seed(1994)
+  aldx <- aldex.clr(otu_table(d),  mm,
+                    mc.samples=128,   #"DMC"
+                    # according to ALDEx2 vignette, the number of samples in the smallest group multiplied by the number of DMC be equal at least to 1000
+                    # length(which(sample_data(data)[["Sample_Type"]]=="CRC"))
+                    denom="all", # every feature as denominator
+                    verbose=T,
+                    useMC = T
+  )
+  # aldx@reads # the original counts _ NB: added 0.5 to every number
+  
+  aldx2 <- aldex.glm(aldx, verbose = T)
+  
+  #### THEN, the summary of the results
+  aldx3 <- aldex.glm.effect(aldx, # calculates the effect size for every binary variable in the mm
+                            useMC = T,
+                            CI = F # confidence interval of the effect size
+  ) 
+  aldx_final <- data.frame(aldx2,aldx3) 
+  
+  p_val<-aldx_final$Sample_TypeCRC.pval
+  # p_adj<-p.adjust(p_val, method="holm")
+  p_adj<-p.adjust(p_val, method="BH")
+  
+  #### Moreover, the vignette suggests an effect size cutoff of 1 or greater be used when analyzing HTS 
+  # eff_size<-aldx_final$Sample_TypeCRC.effect 
+  # Enough_eff_size <- eff_size>1
+  res2<-aldx_final
+  res2$p_adj_BH<-p_adj
+  res2<-res2[res2$p_adj_BH<0.05 , ]
+  # res2<-res2[res2$p_adj_BH<0.05 & Enough_eff_size, ]
+  results<-row.names(res2)
+  if(length(res2[,1])>0){ # if there are results...
+    cat(paste( length(length(res2[,1])) ,"results for the",t,"level\n"))
+    Sys.sleep(1)
+    r<-as.data.frame(res2)
+    Taxa.d<-as.data.frame(tax_table(d))
+    Taxa.d$Tax_ID<-row.names(Taxa.d)
+    r<- cbind.data.frame(Taxa.d[row.names(r), ] , r )
+    r<-r[ r[,t] !="none", ] # removing the taxa labeled "none", they are artifact from glomming, composed of different taxa with no name for that level in NCBI
+    if( length(r[,1])>0 ){ # if there are still results after removing the "none"
+      # assign(paste(t,"results",sep="_"), r)
+      r_level<-r
+      r_level[, "Taxon"]<- rep(t)
+      r_level <- r_level[r_level[,t] != "none" , ]
+      Res_tot<-rbind.data.frame(Res_tot,r_level)
+      ### single box plots
+      target<-r[[t]]
+      colnames(tax_table(d.prop))[colnames(tax_table(d.prop))==t]<-"Aimed_taxa"
+      target<-subset_taxa(d.prop, Aimed_taxa %in% target) # cannot use t %in% target in this function, then it's scripted in this way
+      Table_DE<-psmelt(target)
+      colnames(Table_DE)[colnames(Table_DE)=="Aimed_taxa"]<-t # restored the original name
+      # assign(paste("Table_DE_plot",t,sep="_"), Table_DE)
+      ### appending to a unique box plot ...
+      index<- which(colnames(Table_DE)=="Kingdom") : which(colnames(Table_DE)==t) # from : to
+      index<- index[-length(index)] # removing the last index, regarding the taxa of interest
+      Table_DE[,index]<-NULL
+      Table_DE$Taxa<-t
+      colnames(Table_DE)[colnames(Table_DE)==t]<-"Bacteria"
+      Table_tot<-rbind.data.frame(Table_tot, Table_DE)
+    } # closing the nested "if r > 0" (after the "none" removal)
+  } else {  # closing the initial "if r > 0"
+    cat("Any results for the",t,"level\n")
+    Sys.sleep(1)
+  }
+}
+
+columns_to_remove<- grepl("Intercept",colnames(Res_tot)) | grepl("Pair_ID",colnames(Res_tot)) | grepl("pval.holm",colnames(Res_tot)) 
+colnames(Res_tot)<-gsub("Sample_TypeCRC","Sample_Type_CRC",colnames(Res_tot))
+Res_tot<-Res_tot[ , !columns_to_remove ]
+#View(Res_tot)
+write.csv(Res_tot, file="Results/Every_DA_CRC_vs_H_PAIRED_according_to_Aldex2.csv", row.names = F)
+
+
+# plot
+ggplot(Table_tot, aes(x= Bacteria, y=Abundance, fill=Sample_Type)) + 
+  facet_grid(~factor(Taxa,levels = c("Phylum","Class","Order","Family","Genus","Species")), scales = "free_x", space="free") +
+  geom_boxplot(width=0.8) + theme_bw(base_size = 15) +
+  theme(strip.text.x=element_text(size=14,colour="black")) + 
+  scale_fill_manual(values=c("CRC"="coral","Healthy_tissue"="deepskyblue")) +
+  guides( fill=guide_legend(nrow=1) ) +
+  theme(legend.margin=margin(-25, 0, 0, 0), legend.position="bottom", 
+        legend.key.size=unit(0.8,"cm"), legend.text=element_text(size=15),
+        axis.text.x = element_text(angle = 40, vjust=1, hjust=1, size=12), 
+        axis.text.y = element_text(size=12), plot.title= element_text(size=18),
+        panel.grid.minor.y= element_blank() ) +   
+  scale_x_discrete(expand=c(-0.2, 1)) +
+  scale_y_sqrt(breaks=c(0.1, 0.5, 1, seq(2,max(Table_tot$Abundance+3),1))) +
+  labs(title= "Differently abundant taxa", y="Proportional Abundance", 
+       fill="Sample_Type", x="")
+#ggsave(filename = "Results/DA_Aldex2/DA_Sample_Type_every_result.png", width = 8, height = 7, dpi=300)
+dev.off()
+
+# removing redundant results
+Table_tot2<-subset(Table_tot, ! Bacteria %in% c("uncultured","Fusobacteriaceae","Tannerellaceae","Leptotrichiaceae","Campylobacteraceae","Fusobacteriales","Erysipelotrichales") )
+Table_tot2<-subset(Table_tot2, ! is.na(Table_tot2$Bacteria) )
+Table_tot2$Sample_Type <- factor(Table_tot2$Sample_Type, levels = c("CRC","Healthy_tissue") )
+Table_tot2$Bacteria<-gsub("[Eubacterium]_hallii_group","Eubacterium_hallii", Table_tot2$Bacteria, fixed = T)
+DE_plot<-ggplot(Table_tot2, aes(x= Bacteria, y=Abundance, fill=Sample_Type)) + 
+  facet_grid(~factor(Taxa,levels = c("Phylum","Class","Order","Family","Genus","Species")), scales = "free_x", space="free") +
+  geom_boxplot(width=0.9, linewidth= 0.4, alpha= 0.15, 
+               outlier.alpha = 0) +
+  geom_point(position = position_jitterdodge(seed = 1994, dodge.width = 0.9, jitter.width = 0.4),
+             aes(color=Sample_Type), size= 0.02, alpha= 0.3) +
+  scale_fill_manual(values=c("CRC"="coral","Healthy_tissue"="deepskyblue")) +
+  scale_color_manual(values=c("CRC"="coral","Healthy_tissue"="deepskyblue2")) +
+  guides( fill=guide_legend(nrow=1) ) +
+  theme_classic(base_size = 10) +
+  theme(strip.text.x=element_text(size=11,colour="black"),
+        legend.margin=margin(-15, 0, 0, 0),
+        legend.position="bottom", 
+        legend.key.size=unit(0.8,"cm"),
+        legend.text=element_text(size=10.5),
+        axis.text.x = element_text(angle = 35,
+                                   vjust=1, hjust=1,
+                                   size=7.4), 
+        axis.text.y = element_text(size=7), 
+        plot.title= element_text(size=12),
+        panel.grid.major.y = element_line(size=0.1, color="gray"),
+        plot.margin =  margin(t=10,r=5,b=5, l=10)
+  ) + 
+  scale_x_discrete(expand=c(-0.2, 1)) +
+  # scale_y_sqrt(breaks=c(0.1, 0.5, 1,seq(2,6,2), seq(10,max(Table_tot$Abundance)+5,5))) +
+  scale_y_sqrt(breaks=c(0.1, 0.5, 1,seq(2,6,2), seq(10, 65, 5), seq(75, max(Table_tot$Abundance)+5,10) )) +
+  labs(y="Percent abundance", 
+       fill="Condition", color="Condition",
+       x="")
+
+DE_plot
+ggsave(filename = "Results/DA_CRC_vs_H_PAIRED_according_to_Aldex2.png", width = 6.5, height = 4.2, dpi=300)
+dev.off()
+
+# to avoid re-performing the analysis just to plot it again (Aldex2 takes a whole day!)
+write.csv(Table_tot2, file="Results/DA_CRC_vs_H_PAIRED_according_to_Aldex2_TABLE_TO_PLOT.csv", row.names = F)
+
+# system(" echo 'According to many papers (e.g. PMID: 33986544  or  https://doi.org/10.1186/s12859-021-04212-6  or  https://doi.org/10.1186/s12864-022-08803-2 ) many low abundance taxa (e.g. about 0.1%) are potentially false positives (bad calls)! ' > Results/DA_Aldex2/WATCH_OUT_FOR_LOW_ABUNDANCES.txt ")
+
+
+
+
+######### DA WITH ALDEx2 (CRC vs Healthy Tissue, WITH OFFTARGETS) #####################
+
+suppressWarnings(rm(data_pruned, data.genus_pruned))
+data_contam_sub<-subset_samples(data_contam, BioProject %in% c("PRJNA507548", "PRJEB57580","PRJNA743150","PRJNA995580", "PRJNA325650") )
+data_contam_sub<-subset_samples(data_contam_sub, ! Pair_ID %in% "no_pair" ) 
+data_contam_sub<-subset_samples(data_contam_sub, ! Sample_name %in% pairs_unsaturated ) # the pairs of these sample were unsaturated and then removed
+data_pruned<- prune_taxa(taxa_sums(data_contam_sub) > 10, data_contam_sub) 
+sample_data(data_pruned)[["Sample_Type"]]<-factor(sample_data(data_pruned)[["Sample_Type"]], levels = c("Healthy_tissue","CRC"))
+# Healthy_tissue will be the base level --> Denominator of fold change
+
+# removing eventual not duplicated samples
+paired_samples <- sample_data(data_contam_sub)[,"Original_Sample_name", drop=T]
+paired_samples <- paired_samples$Original_Sample_name
+paired_samples<-paired_samples[duplicated(paired_samples)]
+data_pruned <- subset_samples(data_pruned, Original_Sample_name %in% paired_samples)
+
+BiocParallel::register(BiocParallel::MulticoreParam(58))   # threads to use (requires BiocParallel package to be installed)
+# NB: specify the package from which take these functions is required in our machine!
+
+Table_tot<-NULL
+Res_tot<-NULL
+### Starting the analysis on each taxon level
+for( t in c("Genus","Family","Order") ){
+  cat("\nWorking on",t,"level...\n")
+  suppressWarnings(rm(list=c("d", "d.prop", "Taxa.d", "res","DE", "target", "r", "r_level")))
+  d <- tax_glom(data_pruned, taxrank = t, NArm = F)
+  d.prop<- transform_sample_counts(d, function(x) x/sum(x)*100)
+  
+  # using the "manual" pipeline of Aldex2 to better specify the design ...
+  mm <- model.matrix(~ Sample_Type + Pair_ID , as(sample_data(d),"data.frame") ) # name of the sample data for last
+  set.seed(1994)
+  aldx <- aldex.clr(otu_table(d),  mm,
+                    mc.samples=128,   #"DMC"
+                    # according to ALDEx2 vignette, the number of samples in the smallest group multiplied by the number of DMC be equal at least to 1000
+                    # length(which(sample_data(data)[["Sample_Type"]]=="CRC"))
+                    denom="all", # every feature as denominator
+                    verbose=T,
+                    useMC = T
+  )
+  # aldx@reads # the original counts _ NB: added 0.5 to every number
+  
+  aldx2 <- aldex.glm(aldx, verbose = T)
+  
+  #### THEN, the summary of the results
+  aldx3 <- aldex.glm.effect(aldx, # calculates the effect size for every binary variable in the mm
+                            useMC = T,
+                            CI = F # confidence interval of the effect size
+  ) 
+  aldx_final <- data.frame(aldx2,aldx3) 
+  
+  p_val<-aldx_final$Sample_TypeCRC.pval
+  # p_adj<-p.adjust(p_val, method="holm")
+  p_adj<-p.adjust(p_val, method="BH")
+  
+  #### Moreover, the vignette suggests an effect size cutoff of 1 or greater be used when analyzing HTS 
+  # eff_size<-aldx_final$Sample_TypeCRC.effect 
+  # Enough_eff_size <- eff_size>1
+  res2<-aldx_final
+  res2$p_adj_BH<-p_adj
+  res2<-res2[res2$p_adj_BH<0.05 , ]
+  # res2<-res2[res2$p_adj_BH<0.05 & Enough_eff_size, ]
+  results<-row.names(res2)
+  if(length(res2[,1])>0){ # if there are results...
+    cat(paste( length(length(res2[,1])) ,"results for the",t,"level\n"))
+    Sys.sleep(1)
+    r<-as.data.frame(res2)
+    Taxa.d<-as.data.frame(tax_table(d))
+    Taxa.d$Tax_ID<-row.names(Taxa.d)
+    r<- cbind.data.frame(Taxa.d[row.names(r), ] , r )
+    r<-r[ r[,t] !="none", ] # removing the taxa labeled "none", they are artifact from glomming, composed of different taxa with no name for that level in NCBI
+    if( length(r[,1])>0 ){ # if there are still results after removing the "none"
+      # assign(paste(t,"results",sep="_"), r)
+      r_level<-r
+      r_level[, "Taxon"]<- rep(t)
+      r_level <- r_level[r_level[,t] != "none" , ]
+      Res_tot<-rbind.data.frame(Res_tot,r_level)
+      ### single box plots
+      target<-r[[t]]
+      colnames(tax_table(d.prop))[colnames(tax_table(d.prop))==t]<-"Aimed_taxa"
+      target<-subset_taxa(d.prop, Aimed_taxa %in% target) # cannot use t %in% target in this function, then it's scripted in this way
+      Table_DE<-psmelt(target)
+      colnames(Table_DE)[colnames(Table_DE)=="Aimed_taxa"]<-t # restored the original name
+      # assign(paste("Table_DE_plot",t,sep="_"), Table_DE)
+      ### appending to a unique box plot ...
+      index<- which(colnames(Table_DE)=="Kingdom") : which(colnames(Table_DE)==t) # from : to
+      index<- index[-length(index)] # removing the last index, regarding the taxa of interest
+      Table_DE[,index]<-NULL
+      Table_DE$Taxa<-t
+      colnames(Table_DE)[colnames(Table_DE)==t]<-"Bacteria"
+      Table_tot<-rbind.data.frame(Table_tot, Table_DE)
+    } # closing the nested "if r > 0" (after the "none" removal)
+  } else {  # closing the initial "if r > 0"
+    cat("Any results for the",t,"level\n")
+    Sys.sleep(1)
+  }
+}
+
+columns_to_remove<- grepl("Intercept",colnames(Res_tot)) | grepl("Pair_ID",colnames(Res_tot)) | grepl("pval.holm",colnames(Res_tot)) 
+colnames(Res_tot)<-gsub("Sample_TypeCRC","Sample_Type_CRC",colnames(Res_tot))
+Res_tot<-Res_tot[ , !columns_to_remove ]
+#View(Res_tot)
+write.csv(Res_tot, file="Results/Every_DA_CRC_vs_H_PAIRED_according_to_Aldex2_WITH_OFFT.csv", row.names = F)
+
+
+# plot
+ggplot(Table_tot, aes(x= Bacteria, y=Abundance, fill=Sample_Type)) + 
+  facet_grid(~factor(Taxa,levels = c("Phylum","Class","Order","Family","Genus","Species")), scales = "free_x", space="free") +
+  geom_boxplot(width=0.8) + theme_bw(base_size = 15) +
+  theme(strip.text.x=element_text(size=14,colour="black")) + 
+  scale_fill_manual(values=c("CRC"="coral","Healthy_tissue"="deepskyblue")) +
+  guides( fill=guide_legend(nrow=1) ) +
+  theme(legend.margin=margin(-25, 0, 0, 0), legend.position="bottom", 
+        legend.key.size=unit(0.8,"cm"), legend.text=element_text(size=15),
+        axis.text.x = element_text(angle = 40, vjust=1, hjust=1, size=12), 
+        axis.text.y = element_text(size=12), plot.title= element_text(size=18),
+        panel.grid.minor.y= element_blank() ) +   
+  scale_x_discrete(expand=c(-0.2, 1)) +
+  scale_y_sqrt(breaks=c(0.1, 0.5, 1, seq(2,max(Table_tot$Abundance+3),1))) +
+  labs(title= "Differently abundant taxa", y="Proportional Abundance", 
+       fill="Sample_Type", x="")
+#ggsave(filename = "Results/DA_Aldex2/DA_Sample_Type_every_result.png", width = 8, height = 7, dpi=300)
+dev.off()
+
+# removing redundant results
+Table_tot2<-subset(Table_tot, ! Bacteria %in% c("uncultured","Fusobacteriaceae","Tannerellaceae","Leptotrichiaceae","Campylobacteraceae","Fusobacteriales","Erysipelotrichales") )
+Table_tot2<-subset(Table_tot2, ! is.na(Table_tot2$Bacteria) )
+Table_tot2$Sample_Type <- factor(Table_tot2$Sample_Type, levels = c("CRC","Healthy_tissue") )
+Table_tot2$Bacteria<-gsub("[Eubacterium]_hallii_group","Eubacterium_hallii", Table_tot2$Bacteria, fixed = T)
+DE_plot<-ggplot(Table_tot2, aes(x= Bacteria, y=Abundance, fill=Sample_Type)) + 
+  facet_grid(~factor(Taxa,levels = c("Phylum","Class","Order","Family","Genus","Species")), scales = "free_x", space="free") +
+  geom_boxplot(width=0.9, linewidth= 0.4, alpha= 0.15, 
+               outlier.alpha = 0) +
+  geom_point(position = position_jitterdodge(seed = 1994, dodge.width = 0.9, jitter.width = 0.4),
+             aes(color=Sample_Type), size= 0.02, alpha= 0.3) +
+  scale_fill_manual(values=c("CRC"="coral","Healthy_tissue"="deepskyblue")) +
+  scale_color_manual(values=c("CRC"="coral","Healthy_tissue"="deepskyblue2")) +
+  guides( fill=guide_legend(nrow=1) ) +
+  theme_classic(base_size = 10) +
+  theme(strip.text.x=element_text(size=11,colour="black"),
+        legend.margin=margin(-15, 0, 0, 0),
+        legend.position="bottom", 
+        legend.key.size=unit(0.8,"cm"),
+        legend.text=element_text(size=10.5),
+        axis.text.x = element_text(angle = 35,
+                                   vjust=1, hjust=1,
+                                   size=7.4), 
+        axis.text.y = element_text(size=7), 
+        plot.title= element_text(size=12),
+        panel.grid.major.y = element_line(size=0.1, color="gray"),
+        plot.margin =  margin(t=10,r=5,b=5, l=10)
+  ) + 
+  scale_x_discrete(expand=c(-0.2, 1)) +
+  # scale_y_sqrt(breaks=c(0.1, 0.5, 1,seq(2,6,2), seq(10,max(Table_tot$Abundance)+5,5))) +
+  scale_y_sqrt(breaks=c(0.1, 0.5, 1,seq(2,6,2), seq(10, 65, 5), seq(75, max(Table_tot$Abundance)+5,10) )) +
+  labs(y="Percent abundance", 
+       fill="Condition", color="Condition",
+       x="")
+
+DE_plot
+ggsave(filename = "Results/DA_CRC_vs_H_PAIRED_according_to_Aldex2_WITH_OFFT.png", width = 6.5, height = 4.2, dpi=300)
+dev.off()
+
+# to avoid re-performing the analysis just to plot it again (Aldex2 takes a whole day!)
+write.csv(Table_tot2, file="Results/DA_CRC_vs_H_PAIRED_according_to_Aldex2_TABLE_WITH_OFFT.csv", row.names = F)
+
+# system(" echo 'According to many papers (e.g. PMID: 33986544  or  https://doi.org/10.1186/s12859-021-04212-6  or  https://doi.org/10.1186/s12864-022-08803-2 ) many low abundance taxa (e.g. about 0.1%) are potentially false positives (bad calls)! ' > Results/DA_Aldex2/WATCH_OUT_FOR_LOW_ABUNDANCES.txt ")
+
 
 
 
