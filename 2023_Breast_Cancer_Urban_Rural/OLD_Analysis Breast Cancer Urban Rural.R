@@ -1,3 +1,7 @@
+# DEPRECATED
+# This script has been updated by dott. Sara Bertorello, see the updated file
+
+
 ##################### PREPARING THE ENVIRONMENT #################
 
 { 
