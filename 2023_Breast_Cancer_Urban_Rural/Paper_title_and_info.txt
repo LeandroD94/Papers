@@ -1,4 +1,16 @@
-Title: Urban-Rural Disparities in Algerian Breast Cancer Mammary Microbiota
-Journal: International Journal of Hygiene and Environmental Health
+Title: 
+Compositional and functional disparities in the breast oncobiome between patients living in urban or rural areas
+Journal: 
+Microbial Genetics and Genomics (Genes, MDPI)
 
-Authors: Fazia Ait Zenati, MSc; Simone Baldi, Ph.D.; Leandro Di Gloria, MSc; Ferhat Djoudi, Associate Professor; Sara Bertorello, MSc; Matteo Ramazzotti, Associate Professor; Elena Niccolai, PhD ; Amedeo Amedei, Professor .
+Authors: 
+Fazia Ait Zenati, MSc; Simone Baldi, Ph.D.; Leandro Di Gloria, Ph.D; Ferhat Djoudi, Associate Professor; Sara Bertorello, MSc; Matteo Ramazzotti, Associate Professor; Elena Niccolai, PhD ; Amedeo Amedei, Professor .
+
+Raw FASTQ GEO link:
+GSE243440
+
+Abstract: 
+* Background/Objectives: Breast cancer (BC) is the leading cause of cancer incidence and mortality among women and the recent identification of a resident mammary microbiota has highlighted its potential role in breast carcinogenesis. Given that environmental and socioeconomic factors influence both BC prevalence and tumor-associated bacterial compposition, this study aimed to evaluate the compositional and functional features of the mammary microbiota in cancerous (oncobiome) and adjacent healthy BC tissues from patients living in urban and rural areas. 
+* Methods: Microbiota composition in both the oncobiome and adjacent healthy BC tissues was analyzed using 16S rRNA sequencing. 
+* Results: Significant variations in breast oncobiome composition were observed among BC patients from urban and rural areas. A statistically significant β dispersion among breast oncobiome of patients from urban or rural areas was highlighted. Specifically, the genera Selenomonas, Centipeda, Leptotrichia, Neisseria and Porphyromonas were found exclusively in BC tissues of patients from rural areas. Additionally, bacteria from the Neisseriaceae, Porphyromonadaceae, and Selenomonadaceae families, as well as the Selenomonas genus, were significantly enriched in the oncobiome of rural BC patients. Furthermore, the results of the PICRUSt2 (phylogenetic investigation of communities by reconstruction of unobserved states) revealed a significant increase in phospholipid biosynthesis pathways in breast oncobiome of patients from rural areas compared to those from urban areas. 
+* Conclusions: This study provides evidence of distinct compositional and functional differences in the breast oncobiome between BC patients from rural and urban areas. These findings suggest that environmental factors influence local microbiome composition, potentially contributing to BC development and/or progression.
