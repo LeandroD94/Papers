@@ -4,7 +4,7 @@ JOURNAL: Cambridge Gut Microbiome
 
 AUTHORS: Leandro Di Gloria, Lorenzo Casbarra, Marta Bastiani, Gabriele Memoli, Matteo Ramazzotti
 
-DOI:
+DOI: 10.1017/gmb.2025.10012
 
 
 
