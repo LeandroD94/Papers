@@ -192,7 +192,7 @@ plot_ordination(data.sqrt_prop, ordBC , color="AGS", shape="Reactor_scale") +
        #caption="The labels on the points are the project numbers",
        x=paste("PC1: ",eigval[1],"% variation"), y=paste("PC2: ",eigval[2],"% variation")
        )
-ggsave(file=paste0("Results/Comparison_with_particular_AGS/PCoA_Hellinger_prokaryota_genera.png"), width = 5, height = 3.8, dpi=300)
+aggsave(file=paste0("Results/Comparison_with_particular_AGS/PCoA_Hellinger_prokaryota_genera.png"), width = 5, height = 3.8, dpi=300)
 
 
 
