@@ -1,12 +1,12 @@
 TTTLE: "HUMAN DNA HIJACKING MICROBIOTA SURVEY: CAUSES AND CONSEQUENCES IN COLON RELATED 16S rRNA AMPLICON SEQUENCING"
 
-JOURNAL: Cambridge Gut Microbiome
+JOURNAL: Cambridge University Press - Gut Microbiome
 
 AUTHORS: Leandro Di Gloria, Lorenzo Casbarra, Marta Bastiani, Gabriele Memoli, Matteo Ramazzotti
 
 DOI: 10.1017/gmb.2025.10012
 
-
+LINK PAPER: https://www.cambridge.org/core/journals/gut-microbiome/article/human-dna-hijacking-microbiota-surveys-causes-and-consequences-in-colon-related-16s-rrna-amplicon-sequencing/C3D55A8C01356A060366B8056292487B
 
 ABSTRACT:
 The efficiency of Polymerase Chain Reaction (PCR) decreases under suboptimal conditions, such as low template concentration combined with high concentrations of similar sequences.
