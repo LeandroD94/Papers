@@ -1,3 +1,27 @@
-Title: From Aerobic Granular Sludge to Partial Nitritation Granular Sludge (provvisory)
+Title: From Aerobic Granular Sludge to Partial Nitritation Granular Sludge
 
-... work in progress...
+Authors: Jan Pietro Czellnik, Leandro Di Gloria, Matteo Ramazzotti, Tommaso Lotti, Julio Perez
+
+This study investigates innovative strategies for the rapid startup of Partial Nitritation
+(PN) systems for mainstream application in municipal wastewater treatment plants
+(WWTPs). Utilizing wasted Aerobic Granular Sludge (AGS) as inoculum and
+implementing a Sequencing Batch Reactor (SBR), the investigation adopts a strategy
+based on leveraging the pre-existing granular structure and applying precise Dissolved
+Oxygen (DO) control to selectively enrich ammonium-oxidizing Bacteria (AOB) without
+relying on chemical inhibition by Free Ammonia (FA) or Free Nitrous Acid (FNA) as
+conducted in many studies. This operational approach enabled the effective
+conversion of mature biomass into Partial Nitritation Granular Sludge (PN-GS) by
+initially cultivating heterogeneous AGS and subsequently replacing the feeding to
+promote the transition to an autotrophic PN system. The goal was enriching the sludge
+with AOB, maintaining the granule characteristics and achieving an appropriate
+biomass concentration. During the transition, a significant biomass decay was
+observed (from 7.9 to 1.8 gVSS·L-1), but granular structure was preserved, ensuring
+excellent settling properties (SVI30=54±3 mL·g-1TSS). Under mainstream conditions,
+with an influent ammonium concentration of 50 mg N·L-1 and an average temperature
+of 19.6°C, the system achieved a specific Ammonium Oxidation Rate (sAOR) of
+107±11.8 mgNH4-N·g-1VSS·d-1 and a Nitrite Accumulation Efficiency (NAE) of
+90±4%. Microbiota analysis revealed significant enrichment of Nitrosomonas (>20%
+relative abundance vs ≈1% in the inoculum) and the suppression of Nitrospira (≈1%).
+These findings establish a solid foundation for integrating mainstream PN-GS systems
+into sustainable wastewater treatment practices, supporting the overall transition
+toward energy-neutral WWTPs.
