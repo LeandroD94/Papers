@@ -1,7 +1,10 @@
-Title: From Aerobic Granular Sludge to Partial Nitritation Granular Sludge
+Title: 
+From Aerobic Granular Sludge to Partial Nitritation Granular Sludge
 
-Authors: Jan Pietro Czellnik, Leandro Di Gloria, Matteo Ramazzotti, Tommaso Lotti, Julio Perez
+Authors: 
+Jan Pietro Czellnik, Leandro Di Gloria, Matteo Ramazzotti, Tommaso Lotti, Julio Perez
 
+Abstract:
 This study investigates innovative strategies for the rapid startup of Partial Nitritation
 (PN) systems for mainstream application in municipal wastewater treatment plants
 (WWTPs). Utilizing wasted Aerobic Granular Sludge (AGS) as inoculum and
@@ -25,3 +28,7 @@ relative abundance vs ≈1% in the inoculum) and the suppression of Nitrospira (
 These findings establish a solid foundation for integrating mainstream PN-GS systems
 into sustainable wastewater treatment practices, supporting the overall transition
 toward energy-neutral WWTPs.
+
+Data Availability:
+The raw 16S amplicon sequences are available on the GEO (Gene Expression Omnibus) database
+under the accession code GSE288505. The data will remain private until January 2026.
