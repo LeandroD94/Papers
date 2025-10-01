@@ -1,8 +1,3 @@
-# 26/07/2025
-
-### Script part 2: main analysis
-
-
 
 ############################# IMPORTING THE OBJ ##################################
 
@@ -366,11 +361,90 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabel
 
 
 
+##### AGAIN, BUT FOCUSING ON FULL SCALES ONLY (Genera) ...
+
+suppressWarnings(rm(top, others, tabella, unass_data))
+data_temp<- subset_taxa(data.genus.prop, Genus!="unclassified")
+data_temp<- subset_samples(data_temp, Reactor_scale %in% c("Full", "Pilot") )
+data_temp<- transform_sample_counts(data_temp, fun= function(x) x/sum(x)*100 )
+{ top_data <- subset_taxa(data_temp)
+  top <- names(sort(taxa_sums(top_data), decreasing=TRUE))[1:24]
+  prune.dat_top <- prune_taxa(top,top_data)
+  others<-taxa_names(top_data)
+  others<-others[!(others %in% top)]
+  prune.data.others<-prune_taxa(others,top_data)
+  tabella_top<-psmelt(prune.dat_top)
+  # for(i in 1:length(tabella_top$Genus)){ # to mark the fungal taxa
+  #   tabella_top$Genus[i]<-paste0(tabella_top$Genus[i],"_",tabella_top$Domain[i])
+  # }
+  tabella_others<-psmelt(prune.data.others)
+  tabella_others$Genus<-"Others"
+  tabella<-rbind.data.frame(tabella_top,tabella_others)
+  # the aggregation below solves a graphical glitch with ggplot2 ... and also re-orders in alphabetic order the species
+  tabella<-aggregate(.~Genus+Euk_clade+Reactor_scale+Influent+Project_number+Sample_name, tabella[ , c("Reactor_scale","Project_number","Euk_clade","Influent","Sample_name","Abundance","Genus")], FUN=sum)
+  tabella$Genus<-gsub ("Candidatus_","Ca.", tabella$Genus)
+  tabella$Genus<-gsub ("bacterium_","", tabella$Genus)
+  tabella$Genus<-paste0(tabella$Euk_clade,": ",tabella$Genus)
+  tabella$Genus<-gsub("No_euk","Prokaryota", tabella$Genus)
+  tabella$Genus<-gsub(".*Others","Others", tabella$Genus)
+  tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[! unique(tabella$Genus) %in% "Others"],"Others"))
+}
+fill_color_25_BIS <- fill_color_25
+fill_color_25_BIS[fill_color_25=="yellow3"]<-"darkcyan"
+to_plot <- ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Genus)) +
+  geom_bar(stat="identity", position="stack") +
+  theme_classic(base_size =8.5) +
+  #scale_fill_manual(values=fill_color_30_BIS) +
+  scale_fill_manual(values=fill_color_25_BIS) +
+  scale_y_continuous(expand=c(0,1) ) +
+  theme(axis.text.x=element_text(angle=40,
+                                 vjust=1,
+                                 hjust=1,
+                                 size= 6
+  ),
+  axis.title =element_text(size=10),
+  axis.title.x = element_text(vjust=2.5),
+  # strip.text = element_text(size=6.7),
+  legend.key.height = unit(0.2, "cm"),
+  legend.key.width = unit(0.55, "cm"),
+  legend.text = element_text ( size = 8.5 , face="italic"),
+  legend.position="bottom",
+  legend.margin = margin(-15,15,0,0),
+  legend.spacing.y  = unit(0.1, "cm"),
+  legend.spacing.x  = unit(3, "cm"),
+  panel.spacing.x = unit(1.45,"pt"),
+  scale_x_discrete(expand=c(-0.1,1)),
+  plot.margin = margin(2,2,2,2)
+  ) +
+  guides(fill=guide_legend(nrow=9)) +
+  labs(x="", y="Percentual abundance of clades", 
+       fill="")
+# ID
+to_plot + 
+  facet_nested(~ Reactor_scale + Project_number, scales = "free_x", space = "free_x") +
+  theme(strip.text = element_text(size=9))
+ggsave(file="Results/Abundances/TOP_microbial_Genus_ONLY_FULL_SCALES_ID.png",width=6,height=4.5, dpi=300)
+dev.off()
+
+# means
+to_save<- cbind.data.frame("Overall_average"=as.numeric(apply(otu_table(prune.dat_top),1,mean)), 
+                           "Averages_Pilot_scales"=as.numeric(apply (otu_table(subset_samples(prune.dat_top, Reactor_scale=="Pilot")),1,mean)),
+                           "Averages_Full_scales"=as.numeric(apply (otu_table(subset_samples(prune.dat_top, Reactor_scale=="Full")),1,mean)),
+                           #"Averages_Lab_scales"=as.numeric(apply (otu_table(subset_samples(prune.dat_top, Reactor_scale=="Lab")),1,mean)),
+                           "Genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]],
+                           "Domain"= as.data.frame(tax_table(prune.dat_top))[["Domain"]]
+)
+to_save <- to_save[order(to_save$Overall_average, decreasing=T) , ]
+write.csv(to_save, file = "Results/Abundances/TOP_Genus_Average_abundances_no_unclassified_FULLscales.csv", row.names = F, quote=F)
+
+
+
+
 ##### AGAIN, BUT FOCUSING ON FULL SCALES ONLY (SPECIES) ...
 
 suppressWarnings(rm(top, others, tabella, unass_data))
 data_temp<- subset_taxa(data.prop, Genus!="unclassified")
-data_temp<- subset_samples(data_temp, Reactor_scale=="Full")
+data_temp<- subset_samples(data_temp, Reactor_scale %in% c("Full", "Pilot") )
 data_temp<- transform_sample_counts(data_temp, fun= function(x) x/sum(x)*100 )
 { top_data <- subset_taxa(data_temp)
   top <- names(sort(taxa_sums(top_data), decreasing=TRUE))[1:24]
@@ -398,7 +472,7 @@ to_plot <- ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Species)) +
   #scale_fill_manual(values=fill_color_30_BIS) +
   scale_fill_manual(values=fill_color_25) +
   scale_y_continuous(expand=c(0,1) ) +
-  theme(axis.text.x=element_text(angle=30,
+  theme(axis.text.x=element_text(angle=29,
                                  vjust=1,
                                  hjust=1,
                                  size= 6.5
@@ -407,11 +481,11 @@ to_plot <- ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Species)) +
   # axis.title.x = element_text(vjust=2.5),
   strip.text = element_text(size=11),
   # legend.spacing.x  = unit(3, "cm"),
-  legend.key.height = unit(0.15, "cm"),
-  legend.key.width = unit(0.4, "cm"),
+  legend.key.height = unit(0.125, "cm"),
+  legend.key.width = unit(0.37, "cm"),
   legend.text = element_text ( size = 8.6 , face="italic"),
   legend.position="bottom",
-  legend.margin = margin(-12,25,0,0),
+  legend.margin = margin(-13,30,0,0),
   legend.spacing.y  = unit(0.1, "cm"),
   legend.spacing.x  = unit(3, "cm"),
   panel.spacing.x = unit(1.45,"pt"),
@@ -422,19 +496,22 @@ to_plot <- ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Species)) +
        fill="")
 # ID
 to_plot + 
-  facet_nested(~ Reactor_scale + Project_number, scales = "free_x", space = "free_x")
+  facet_nested(~ Reactor_scale + Project_number, scales = "free_x", space = "free_x") +
+  theme(strip.text = element_text(size=9.5))
 ggsave(file="Results/Abundances/TOP_microbial_Species_ONLY_FULL_SCALES_ID.png",width=6,height=4.5, dpi=300)
 dev.off()
 
 # means
 to_save<- cbind.data.frame("Overall_average"=as.numeric(apply(otu_table(prune.dat_top),1,mean)), 
-                           #"Averages_Pilot_scales"=as.numeric(apply (otu_table(subset_samples(prune.dat_top, Reactor_scale=="Pilot")),1,mean)),
+                           "Averages_Pilot_scales"=as.numeric(apply (otu_table(subset_samples(prune.dat_top, Reactor_scale=="Pilot")),1,mean)),
                            "Averages_Full_scales"=as.numeric(apply (otu_table(subset_samples(prune.dat_top, Reactor_scale=="Full")),1,mean)),
                            #"Averages_Lab_scales"=as.numeric(apply (otu_table(subset_samples(prune.dat_top, Reactor_scale=="Lab")),1,mean)),
                            "Species"= as.data.frame(tax_table(prune.dat_top))[["Species"]],
                            "Domain"= as.data.frame(tax_table(prune.dat_top))[["Domain"]]
 )
+to_save <- to_save[order(to_save$Averages_Full_scales, decreasing=T), ]
 write.csv(to_save, file = "Results/Abundances/TOP_Species_Average_abundances_no_unclassified_FULLscales.csv", row.names = F, quote=F)
+
 
 
 
@@ -473,19 +550,19 @@ tax_table(data.genus.temp)[  easy_subset %in% AOB_list ,"Group_Function"] <- "AO
 tax_table(data.genus.temp)[  easy_subset %in% NOB_list ,"Group_Function"] <- "NOO"
 tax_table(data.genus.temp)[  easy_subset %in% PAO_list ,"Group_Function"] <- "PAO"
 tax_table(data.genus.temp)[  easy_subset %in% GAO_list ,"Group_Function"] <- "GAO"
-tax_table(data.genus.temp)[  easy_subset %in% table_PHA[,1] ,"Group_Function"] <- "Others PHA"
+tax_table(data.genus.temp)[  easy_subset %in% table_PHA[,1] ,"Group_Function"] <- "Other PHA"
 data.genus.temp<- prune_taxa(taxa_sums(data.genus.temp)>0, data.genus.temp)
 
 # Obj to plot
 tabella <- psmelt(data.genus.temp)
-tabella$GroupFunction<-factor(tabella$Group_Function, levels=c("PAO","GAO","AOO","NOO","Others PHA"))
-# extra focus on Accumuli and Competi for the plots ...
+tabella$GroupFunction<-factor(tabella$Group_Function, levels=c("PAO","GAO","AOO","NOO","Other PHA"))
+# extra focus on Accumuli, Competi and Propionivibrio for the plots ...
 tabella$GroupFunction2<- as.character(tabella$GroupFunction) # extra line to allow a quick repeating of this section if needed...
-tabella$GroupFunction2[ tabella$Genus %in% c("Candidatus Accumulibacter","Candidatus Competibacter","Accumulibacter","Competibacter") ] <- tabella$Genus [tabella$Genus %in% c("Candidatus Accumulibacter","Candidatus Competibacter","Accumulibacter","Competibacter") ]
-tabella$GroupFunction2[ ! tabella$Genus %in% c("Candidatus Accumulibacter") &  tabella$Genus %in% PAO_list ] <- "Other PAOs"
-tabella$GroupFunction2[ ! tabella$Genus %in% c("Candidatus Competibacter") &  tabella$Genus %in% GAO_list ] <- "Other GAOs"
+tabella$GroupFunction2[ tabella$Genus %in% c("Candidatus Accumulibacter","Candidatus Competibacter","Accumulibacter","Competibacter","Propionivibrio") ] <- tabella$Genus [tabella$Genus %in% c("Candidatus Accumulibacter","Candidatus Competibacter","Accumulibacter","Competibacter","Propionivibrio") ]
+tabella$GroupFunction2[ ! tabella$Genus %in% c("Candidatus Accumulibacter","Accumulibacter") &  tabella$Genus %in% PAO_list ] <- "Other PAOs"
+tabella$GroupFunction2[ ! tabella$Genus %in% c("Candidatus Competibacter","Competibacter","Propionivibrio") &  tabella$Genus %in% GAO_list ] <- "Other GAOs"
 tabella$GroupFunction2<- gsub("Candidatus ","Ca. ", tabella$GroupFunction2)
-tabella$GroupFunction2<- factor( tabella$GroupFunction2 , levels= c("Ca. Accumulibacter", "Other PAOs", "Ca. Competibacter", "Other GAOs","AOO","NOO","Others PHA") )
+tabella$GroupFunction2<- factor( tabella$GroupFunction2 , levels= c("Ca. Accumulibacter", "Other PAOs", "Ca. Competibacter", "Propionivibrio", "Other GAOs", "Other PHA", "AOO","NOO") )
 
 # PLOTTING ...
 ggplot(data=tabella, aes( x=Sample_name, y=Abundance, fill=GroupFunction2)) +
@@ -493,10 +570,12 @@ ggplot(data=tabella, aes( x=Sample_name, y=Abundance, fill=GroupFunction2)) +
   geom_bar(stat="identity", position="stack", width = 0.7, alpha= 1) +
   theme_classic(base_size =8.5) +
   facet_nested(~ Reactor_scale + Project_number , scales = "free_x", space = "free_x") +  
-  scale_fill_manual(values=c("Ca. Accumulibacter"="coral", "Ca. Competibacter"="chartreuse2",
-                             "Other PAOs"="red2","Other GAOs"="chartreuse4",
+  scale_fill_manual(values=c("Ca. Accumulibacter"="coral", 
+                             "Ca. Competibacter"="chartreuse3",
+                             "Propionivibrio"="green",
+                             "Other PAOs"="red2","Other GAOs"="darkgreen",
                              "AOO"="deepskyblue","NOO"="blue3",
-                             "Others PHA"="darkred"
+                             "Other PHA"="darkred"
   )
   ) +
   theme(axis.text.x=element_text(angle=43, hjust=1,vjust=1, size=6),
@@ -504,7 +583,7 @@ ggplot(data=tabella, aes( x=Sample_name, y=Abundance, fill=GroupFunction2)) +
         axis.text.y = element_text(size=8), 
         strip.text.x = element_text(size=11.2), 
         legend.key.height = unit(0.17, "cm"),
-        legend.key.width = unit(0.55, "cm"),
+        legend.key.width = unit(0.6, "cm"),
         legend.text = element_text ( size = 12.5 ),
         panel.grid.major.y =  element_line(linewidth=0.25, color = "gray"),
         panel.grid.minor.y =  element_line(linewidth=0.05, color = "gray"),
@@ -582,6 +661,9 @@ ggplot(data=tabella, aes( x=Sample_name, y=Abundance, fill=Genus)) +
 ggsave(file="Results/Abundances/FOCUS_ON_SESSILIDA.png",width=6.5,height=4.5,dpi=300)
 dev.off()  
 
+
+# data.genus.temp <- subset_samples(data.genus.temp , Reactor_scale!="Lab")
+# cbind(rowMeans(otu_table(data.genus.temp)),tax_table(data.genus.temp))
 
 
 

@@ -161,7 +161,8 @@ TARGETS=$(ls $FOLDER_INPUT | grep $i)
 FOR=$(echo "$TARGETS" | grep "_1" )
 REV=$(echo "$TARGETS" | grep "_2" )
 
-m=30      # min length threshold  (NB: few bioprojects are about 100 bp!)
+m=30      # min length threshold  
+# this parameter has been chosen because a project with 100bp read length was included, as 30x3=90 < 100
 
 echo -e "\n\n\n\n *** Processing the sample $i with Kaiju custom db,  m= $m ... *** \n"
 
