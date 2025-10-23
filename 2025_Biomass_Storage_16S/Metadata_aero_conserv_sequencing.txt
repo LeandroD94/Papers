@@ -1,0 +1,70 @@
+FASTQ_ID	Seq_batch	Rack_position	Sample_name	Sample_order	Reactor	Biomass	Sample_code	Reactor_ID	Storage	Glycerol	Collection_data	Time_before_extr	Time_before_extr2	Season	Collection_mean_T	Note
+1607801	4	none	L6	59	Pilot_AGS	AGS	L9	Pilot_AGS_3	-80C_noGly	noGly	21/11/2023	6month	6m	Autumn	/	
+1607831	4	none	L8	61	Pilot_AGS	AGS	L39	Pilot_AGS_4	-80C_noGly	noGly	22/03/2024	1month	1m	Spring	/	
+1607832	4	none	L10	63	Pilot_AGS	AGS	L40	Pilot_AGS_5	-80C_noGly	noGly	27/03/2024	1month	1m	Spring	/	
+1607837	4	none	L5	58	Pilot_AGS	AGS	LD9	Pilot_AGS_3	Direct	 	21/11/2023	None	 	Autumn	/	
+1607838	4	none	L7	60	Pilot_AGS	AGS	LD39	Pilot_AGS_4	Direct	 	22/03/2024	None	 	Spring	/	
+1607839	4	none	L9	62	Pilot_AGS	AGS	LD40	Pilot_AGS_5	Direct	 	27/03/2024	None	 	Spring	/	
+1607856	3	none	PG4	51	PN_AGS	AGS	PG1	PN_AGS_1	-20C_noGly	noGly	24/01/2024	3month	6m	Winter	/	Original name _ P8
+1607858	3	none	PG5	52	PN_AGS	AGS	PG2	PN_AGS_2	-20C_noGly	noGly	30/03/2024	3month	6m	Spring	/	Original name _ P10
+1607860	3	none	PG6	53	PN_AGS	AGS	PG3	PN_AGS_3	-20C_noGly	noGly	02/05/2024	3month	6m	Spring	/	Original name _ P12
+1744943	2	A11	PG1	48	PN_AGS	AGS	PG1_gly	PN_AGS_1	-20C	Gly	24/01/2024	3month	6m	Winter	/	Comparison 20 vs 20gly AGS
+1744944	2	A12	PG2	49	PN_AGS	AGS	PG2_gly	PN_AGS_2	-20C	Gly	30/03/2024	3month	6m	Spring	/	/
+1744949	2	B05	PG3	50	PN_AGS	AGS	PG3_gly	PN_AGS_3	-20C	Gly	02/05/2024	3month	6m	Spring	/	/
+1778909	5	none	PGB3	66	PN_AGS2	AGS	PG4_F1m	PN_AGS_4	4C	 	16/07/2025	1month	1m	Summer	/	Yes, it is the third one of its series but is numbered anomausly
+1778910	5	none	PGB4	67	PN_AGS2	AGS	PG4B20_1	PN_AGS_4	-20C_noGly	noGly	16/07/2025	1month	1m	Summer	/	
+1778911	5	none	PGB5	68	PN_AGS2	AGS	PG4B20_1gly	PN_AGS_4	-20C	Gly	16/07/2025	1month	1m	Summer	/	
+1778912	5	none	PGB6	69	PN_AGS2	AGS	PG4B80_1	PN_AGS_4	-80C_noGly	noGly	16/07/2025	1month	1m	Summer	/	
+1778913	5	none	PGB7	70	PN_AGS2	AGS	PG4B80_1gly	PN_AGS_4	-80C	Gly	16/07/2025	1month	1m	Summer	/	
+1778914	5	none	PGB1	64	PN_AGS2	AGS	PG4	PN_AGS_4	Direct	 	16/07/2025	None	 	Summer	/	Yes, it is the first one of its series but is numbered anomausly
+1778915	5	none	PGB2	65	PN_AGS2	AGS	PG4_F1w	PN_AGS_4	4C	 	16/07/2025	1weak	1w	Summer	/	Yes, it is the second one, and it was extracted by Ramazzotti
+1778916	5	none	PGB8	71	PN_AGS2	AGS	PG4_F2m	PN_AGS_4	4C	 	16/07/2025	3month	3m	Summer	/	
+1778917	5	none	PGB9	72	PN_AGS2	AGS	PG4B20_2	PN_AGS_4	-20C_noGly	noGly	16/07/2025	3month	3m	Summer	/	
+1778918	5	none	PGB10	73	PN_AGS2	AGS	PG4B20_2gly	PN_AGS_4	-20C	Gly	16/07/2025	3month	3m	Summer	/	
+1778919	5	none	PGB11	74	PN_AGS2	AGS	PG4B80_2	PN_AGS_4	-80C_noGly	noGly	16/07/2025	3month	3m	Summer	/	
+1778920	5	none	PGB12	75	PN_AGS2	AGS	PG4B80_2gly	PN_AGS_4	-80C	Gly	16/07/2025	3month	3m	Summer	/	
+1408525	1	none	A1	1	CuoioDepur_Aero	Flocs	A72D	A 07/22	Direct	 	21/07/2022	None	 	Autumn	25	The older one, in this period the temperature reached 35C
+1408526	1	none	A2	2	CuoioDepur_Aero	Flocs	AO2D	A 04/10/22	Direct	 	04/10/2022	None	 	Autumn	18	
+1408527	1	none	A3	3	CuoioDepur_Aero	Flocs	A72B3	A 07/22	-20C	Gly	21/07/2022	3month	3m	Autumn	25	
+1408528	1	none	A4	4	CuoioDepur_Aero	Flocs	2AO2D	A 14/10/22	Direct	 	14/10/2022	None	 	Autumn	17	Muddy
+1408529	1	none	A5	7	CuoioDepur_Aero	Flocs	A72F6	A 07/22	No_storage	 	21/07/2022	6month	6m	Autumn	25	It smells a lot now
+1408530	1	none	A6	6	CuoioDepur_Aero	Flocs	AD2D	A 12/22	Direct	 	07/12/2022	None	 	Autumn	13	
+1408531	1	none	A7	5	CuoioDepur_Aero	Flocs	A72F3	A 07/22	No_storage	 	21/07/2022	3month	3m	Autumn	25	The smell changed... It seems anaerobic now
+1408532	1	none	A8	8	CuoioDepur_Aero	Flocs	A13D	A 01/23	Direct	 	27/01/2023	None	 	Winter	9	Some precipitation in this period before the collection day
+1607797	4	none	L1	54	Pilot_AGS	Flocs	L5	Pilot_AGS_1	-80C_noGly	noGly	02/11/2023	6month	6m	Autumn	/	Comparison direct extraction vs 80
+1607798	4	none	L3	56	Pilot_AGS	Flocs	L6	Pilot_AGS_2	-80C_noGly	noGly	07/11/2023	6month	6m	Autumn	/	
+1607835	4	none	L2	55	Pilot_AGS	Flocs	LD5	Pilot_AGS_1	Direct	 	02/11/2023	None	 	Autumn	/	
+1607836	4	none	L4	57	Pilot_AGS	Flocs	LD6	Pilot_AGS_2	Direct	 	07/11/2023	None	 	Autumn	/	
+1744973	2	D05	A10	10	CuoioDepur_Aero	Flocs	A72B9	A 07/22	-20C	Gly	21/07/2022	6month	6m	Autumn	25	
+1744974	2	D06	A11	11	CuoioDepur_Aero	Flocs	AO2B6	A 04/10/22	-20C	Gly	04/10/2022	6month	6m	Autumn	18	
+1744975	2	D07	A12	12	CuoioDepur_Aero	Flocs	2AO2B6	A 14/10/22	-20C	Gly	14/10/2022	6month	6m	Autumn	17	
+1744976	2	D08	A13	13	CuoioDepur_Aero	Flocs	A13B3	A 01/23	-20C	Gly	27/01/2023	3month	3m	Winter	9	
+1744977	2	D09	A14	14	CuoioDepur_Aero	Flocs	A53D	A 02/05/23	Direct	 	02/05/2023	None	 	Spring	15	Some precipitation in this period before the collection day
+1744978	2	D10	A15	15	CuoioDepur_Aero	Flocs	2A53D	A 31/05/23	Direct	 	31/05/2023	None	 	Spring	20	This has been a month with many precipitation but lately the sun and the hot are returned
+1744979	2	D11	A16	16	CuoioDepur_Aero	Flocs	AD2B6	A 12/22	-20C	Gly	07/12/2022	6month	6m	Autumn	13	
+1744980	2	D12	A17	17	CuoioDepur_Aero	Flocs	A72B1year	A 07/22	-20C	Gly	21/07/2022	1year	1y	Autumn	25	
+1744985	2	E05	A18	18	CuoioDepur_Aero	Flocs	A83D	A 08/23	Direct	 	01/08/2023	None	 	Summer	25	Mean_T=25oC, Max_T=29oC, the sample has waited 24h at 4oC before being extracted
+1744986	2	E06	A19	19	CuoioDepur_Aero	Flocs	AO2B1year	A 04/10/22	-20C	Gly	04/10/2022	1year	1y	Autumn	18	Not exactly 1 year but almost
+1744987	2	E07	A20	20	CuoioDepur_Aero	Flocs	2A53B3	A 31/05/23	-20C	Gly	31/05/2023	3month	3m	Spring	20	This has been a month with many precipitation but lately the sun and the hot are returned
+1744988	2	E08	A21	21	CuoioDepur_Aero	Flocs	A63B3	A 06/23	-20C	Gly	16/06/2023	3month	3m	Spring	22	This sample is the one regarding the RNA extracted the same day, there is NOT a direct extraction for this one
+1744989	2	E09	A22	22	CuoioDepur_Aero	Flocs	A83B3	A 08/23	-20C	Gly	01/08/2023	3month	3m	Summer	25	Mean_T=25oC, Max_T=29oC, the sample has waited 24h at 4oC before being extracted
+1744990	2	E10	A23	23	CuoioDepur_Aero	Flocs	A53B6	A 02/05/23	-20C	Gly	02/05/2023	6month	6m	Spring	15	Some precipitation in this period before the collection day
+1744991	2	E11	A24	24	CuoioDepur_Aero	Flocs	2A53B6	A 31/05/23	-20C	Gly	31/05/2023	6month	6m	Spring	20	This has been a month with many precipitation but lately the sun and the hot are returned
+1744992	2	E12	A25	25	CuoioDepur_Aero	Flocs	AN3D	A 11/23	Direct	 	13/11/2023	None	 	Autumn	13	Today has been a rainy day, and also a rainy period
+1744999	2	F07	A28	28	CuoioDepur_Aero	Flocs	AN3F1m	A 11/23	4C	noGly	13/11/2023	1month	1m	Autumn	13	
+1745000	2	F08	A29	29	CuoioDepur_Aero	Flocs	AN3B20_1	A 11/23	-20C_noGly	noGly	13/11/2023	1month	1m	Autumn	13	
+1745002	2	F10	A31	31	CuoioDepur_Aero	Flocs	AN3B80_1	A 11/23	-80C_noGly	noGly	13/11/2023	1month	1m	Autumn	13	
+1745003	2	F11	A32	32	CuoioDepur_Aero	Flocs	AN3B80_1gly	A 11/23	-80C	Gly	13/11/2023	1month	1m	Autumn	13	
+1745012	2	G08	A37	37	CuoioDepur_Aero	Flocs	A14D	A 01/24	Direct	 	11/01/2024	None	 	Winter	6	
+1745013	2	G09	A38	38	CuoioDepur_Aero	Flocs	AN3B20_3	A 11/23	-20C_noGly	noGly	13/11/2023	3month	3m	Autumn	13	
+1745014	2	G10	A39	39	CuoioDepur_Aero	Flocs	AN3B20_3gly	A 11/23	-20C	Gly	13/11/2023	3month	3m	Autumn	13	
+1745015	2	G11	A40	40	CuoioDepur_Aero	Flocs	AN3B80_3	A 11/23	-80C_noGly	noGly	13/11/2023	3month	3m	Autumn	13	
+1745016	2	G12	A41	41	CuoioDepur_Aero	Flocs	AN3B80_3gly	A 11/23	-80C	Gly	13/11/2023	3month	3m	Autumn	13	
+1745021	2	H05	A42	42	CuoioDepur_Aero	Flocs	A24D	A 02/24	Direct	 	09/02/2024	None	 	Winter	16	
+1745022	2	H06	A43	43	CuoioDepur_Aero	Flocs	A83B6	A 08/23	-20C	Gly	01/08/2023	6month	6m	Summer	25	Mean_T=25oC, Max_T=29oC, the sample has waited 24h at 4oC before being extracted
+1745023	2	H07	A44	44	CuoioDepur_Aero	Flocs	A53B1year	A 02/05/23	-20C	Gly	02/05/2023	1year	1y	Spring	15	
+1745024	2	H08	A45	45	CuoioDepur_Aero	Flocs	A14B3	A 01/24	-20C	Gly	11/01/2024	3month	3m	Winter	6	
+1745025	2	H09	A46	46	CuoioDepur_Aero	Flocs	A24B3	A 02/24	-20C	Gly	09/02/2024	3month	3m	Winter	16	
+1745026	2	H10	A47	47	CuoioDepur_Aero	Flocs	A11B6	A 01/24	-20C	Gly	11/01/2024	6month	6m	Winter	6	the biomass has been thaw and re-frozen due to a blackout of 3 days
+1778905	5	none	A30	30	CuoioDepur_Aero	Flocs	AN3B20_1gly	A 11/23	-20C	Gly	13/11/2023	1month	1m	Autumn	13	
+1778921	5	none	A61	82	CuoioDepur_Aero	Flocs	A72B3year	A 07/22	-20C	Gly	21/07/2022	3year	3y	Autumn	25	

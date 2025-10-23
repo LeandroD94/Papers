@@ -1,0 +1,81 @@
+#!/usr/bin/env
+
+# Operative System: Debian GNU/Linux 11 (bullseye)
+# programs and envs required: conda, qiime2-amplicon-2024.2
+
+SILVA_trained_db=/media/matteo/SSD4/reference/SILVA_138_V3V4_BayesClassifier.qza
+
+threads=50
+
+
+
+### FASTQ CHECKSUM
+
+md5sum raw_FASTQ_dir*/* | sed 's+raw_FASTQ_dir.*/++g' | sed 's/  / \t/' > checksum_FASTQ.tsv
+
+dir raw_FASTQ_dir*/ | sed '/R2_001/d' >R1.txt
+cat R1.txt | sed 's/R1_001/R2_001/' >R2.txt
+paste R1.txt R2.txt --delimiters='\t' > FASTQ_pairs.tsv
+rm R1.txt R2.txt
+
+
+
+#### LOOP TO PROCESS EVERY SEQUENCING BATCH INDEPENDENTLY
+
+mkdir QIIME
+chmod +rwx QIIME
+
+conda activate qiime2-amplicon-2024.2
+
+cd QIIME
+
+
+# BEGIN OF THE LOOP
+for x in batch1 batch2 batch3
+do
+
+echo -e "\n\n Now working on the $x ... \n"
+
+qiime tools import --type 'SampleData[PairedEndSequencesWithQuality]' --input-path ../raw_FASTQ_dir_$x --input-format CasavaOneEightSingleLanePerSampleDirFmt --output-path demux-paired-end_$x.qza
+
+# PRIMER TRIMMING
+qiime cutadapt trim-paired --i-demultiplexed-sequences demux-paired-end_$x.qza --p-front-f CCTACGGGNBGCWSCAG --p-front-r GACTACNVGGGTWTCTAATCC --p-cores $threads --o-trimmed-sequences trimmed-seqs_$x.qza --p-discard-untrimmed --p-minimum-length 100 --verbose >Log_di_cutadapt_$x.txt
+grep -i "Pairs written (passing filters)" Log_di_cutadapt_$x.txt >Log_reads_with_primers_$x.txt
+cat Log_reads_with_primers_$x.txt
+
+# DENOISING, QUALITY LENGTH TRIMMING and MERGING
+#qiime demux summarize --i-data trimmed-seqs_$x.qza --o-visualization demux_$x.qzv # of total pool!
+#qiime tools view demux_$x.qzv
+
+echo -e "\n\n ... DADA: $x ... \n"
+
+if [ $x = 'batch1' ] ; then F=276 ; R=195 ; fi
+if [ $x = 'batch2' ] ; then F=275 ; R=220 ; fi
+if [ $x = 'batch3' ] ; then F=275 ; R=220 ; fi
+qiime dada2 denoise-paired --i-demultiplexed-seqs trimmed-seqs_$x.qza --p-trim-left-f 0 --p-trim-left-r 0 --p-trunc-len-f $F --p-trunc-len-r $R --o-table table_$x.qza --o-representative-sequences rep-seqs_$x.qza --o-denoising-stats denoising-stats_$x.qza --p-n-threads $threads
+
+qiime tools export --input-path denoising-stats_$x.qza --output-path ./      ### to export and create the table of absolute and relative read abundances
+cat stats.tsv | grep -v "q2:types" > DADA2_Initial_and_processed_reads_$x.tsv
+# cat DADA2_Initial_and_processed_reads_$x.tsv | sed 's/age of input /_/g'| sed 's/passed filter/filtered/' | cut -f 1,2,4,7,9
+chmod +rwx stats.tsv
+
+# TAXONOMIC CLASSIFICATION
+qiime feature-classifier classify-sklearn --i-classifier $SILVA_trained_db --i-reads rep-seqs_$x.qza --o-classification taxonomy_SILVA_$x.qza
+qiime metadata tabulate --m-input-file taxonomy_SILVA_$x.qza --o-visualization confidence_taxonomy_SILVA_$x.qzv
+
+# EXPORTING ORIGINAL NUMBER OF READS
+qiime demux summarize --i-data demux-paired-end_$x.qza --o-visualization original_reads_$x.qzv
+qiime tools export --input-path original_reads_$x.qzv  --output-path Raw_Reads_Info_$x
+mv Raw_Reads_Info/per-sample-fastq-counts_$x.tsv   Original_number_of_reads_for_sample_$x.tsv
+chmod +rw Original_number_of_reads_for_sample_$x.tsv
+chmod +rw Raw_Reads_Info_$x -R
+rm Raw_Reads_Info_$x -R
+
+done
+
+
+
+############# CLEANING THE FOLDER FROM QIIME TEMP FILES #####################
+
+rm denoising-stats* trimmed-seqs* demux-paired-end* stats.tsv original_reads*.qzv
+
