@@ -1,0 +1,15 @@
+Sample_name	Group	Experiment_Date	Experiment_Day	FASTQ_ID	Type	Time_point	Notes
+S5	R1	12/03/2024	1	1607870	Control	5	Dovrebbe essere uguale a F5
+F5	R2	12/03/2024	1	1607871	Microaerophilic	5	Dovrebbe essere uguale a S5
+S6	R1	26/03/2024	8	1607872	Control	6	
+F6	R2	26/03/2024	8	1607873	Microaerophilic	6	
+S7	R1	04/04/2024	17	1607874	Control	7	
+F7	R2	04/04/2024	17	1607875	Microaerophilic	7	
+S8	R1	23/04/2024	36	1607876	Control	8	
+F8	R2	23/04/2024	36	1607877	Microaerophilic	8	
+S9	R1	16/05/2024	65	1745020	Control	9	
+F9	R2	16/05/2024	65	1744984	Microaerophilic	9	
+S10	R1	01/06/2024	81	1745008	Control	10	
+F10	R2	01/06/2024	81	1744972	Microaerophilic	10	
+S11	R1	07/07/2024	117	1744996	Control	11	
+F11	R2	07/07/2024	117	1744960	Microaerophilic	11	
