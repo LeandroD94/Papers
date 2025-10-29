@@ -1,7 +1,25 @@
-Paper Title: MICROAEROPHILIC ENRICHMENT AS A STRATEGY TO ENHANCE POLYHYDROXYALKANOATES ACCUMULATION  
+Paper Title: 
+MICROAEROPHILIC ENRICHMENT AS A STRATEGY TO ENHANCE POLYHYDROXYALKANOATES ACCUMULATION  
 
+Authors:
 Serena Falcioni1, Alessio Castagnoli2, Elia Biagini1, Leandro Di Gloria3, Matteo Ramazzotti3, María Eugenia Suárez-Ojeda4, David Gabriel4, Giulio Munz1
 1University of Florence, Department of Civil and Environmental Engineering, Florence, Italy
 2University of Pisa, Department of Energy, Systems Territory and Construction Engineering, Pisa, Italy
 3University of Florence, Department of Clinical and Experimental Biomedical Sciences, Florence, Italy
 4Universitat Autònoma de Barcelona, @GENOCOV Research Group, Department of Chemical, Biological and Environmental Engineering, School of Engineering, Bellaterra (Barcelona), Spain
+
+Microbiota related methods:
+The mixed liquors of the reactors were sampled during the enrichment phase on the experiment days 1, 8, 17, 36, 65, 81 and 117. 
+DNA was extracted from the samples using DNeasy PowerSoil Pro kit (Qiagen, Germany). 
+Subsequently, the V3-V4 region of the 16S rRNA gene was amplified using the primers pair Pro341FB (CCTACGGGNBGCWSCAG) and 805R (GACTACNVGGGTWTCTAATCC) for all samples to profile the prokaryotic fraction of the community. 
+The amplicons were sequenced using Illumina MiSeq at BMR Genomics Srl (Padua, Italy). 
+The demultiplexed sequences were processed using QIIME2-2024.2. 
+Briefly, the primers and the reads without primer were discarded using Cutadapt and DADA2 was used to cluster the reads in Amplicon Sequence Variants (ASVs). 
+Then, the ASVs taxonomic identification was performed using the Scikit-learn multinomial naive Bayes classifier re-trained on SILVA SSU 138.1 database. 
+In addition, the total DNA was sequenced using Illumina NovaSeq X in case of the samples collected on the experiment days 81 and 117 to obtain further insight into the entire microbial community. 
+In the case of total DNA sequencing, reads pre-processing and taxonomic classification were performed using BBDuk and Kaiju, respectively. 
+The data was analysed using R and packages as phyloseq, ggplot2 and vegan. 
+Genera capable of accumulating PHA were recognised according to the literature. 
+Principal Coordinate Analysis (PCoA) was computed using the Hellinger distance on genera percent abundances.
+
+Significant differences in genus abundances between reactors were assessed using DESeq2.
