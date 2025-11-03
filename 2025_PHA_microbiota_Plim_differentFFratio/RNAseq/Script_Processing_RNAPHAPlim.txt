@@ -1,0 +1,287 @@
+# Operative System: Ubuntu (Linux)
+# required: bbmap (bbduk.sh), bowtie2, samtools, diamond, R 4.3, custom databases (see below)
+
+# script version 03/11/2025
+
+
+
+
+####### SETTING VARIABLES
+
+
+# TO USE THIS SCRIPT AS A "PROGRAM"
+shopt -s expand_aliases
+source ~/miniconda3/etc/profile.d/conda.sh
+# these rows loads the environment variable "into the script"
+alias diamond=~/Desktop/programs/diamond
+
+# BBDUK ADAPTERS FILE
+ADAPTERS_FILE=/home/matteo/Desktop/programs/bbmap_v39/resources/adapters.fa
+
+# rRNA DATABASES
+database_rRNA_SSU="/media/matteo/SSD4/reference/SILVA_138.2_SSURef_NR99_tax_silva.fasta.gz"
+database_rRNA_LSU="/media/matteo/SSD4/reference/SILVA_138.2_LSURef_NR99_tax_silva.fasta.gz"
+bowtie2_rRNA_db="/media/matteo/SSD4/reference/Bwt2_SILVA138_2_RNA_both_SSU_LLU/SILVA"
+bowtie2_ncRNA_db="/media/matteo/SSD4/reference/prokaryotes_ncRNA/Bowtie2_ncRNA_scfbio/ncRNA_proka"
+
+# DIAMOND DATABASE
+diamond_db="/media/matteo/SSD4/reference/UniRef100_Diamond_microbialAGS"
+# in the same folder is stored also the references file used from the R parsing script
+
+# SETTING HOW THE FASTQ ARE NAMED
+alias extract_name="sed 's/_R[1-2].*//g' | uniq"    # e.g. "sample_R1_001.fastq"
+# this command is used to modify and then to grep the unique file names from paired end files during the loops
+
+# THREADS TO USE
+threads=45
+# nproc # to check the PC availability
+
+
+
+
+####### PREPARING THE DIRECTORIES #######
+
+mkdir processed_FASTQ
+mkdir FASTQ_check
+mkdir FASTQ_check/fastqc_raw_reads
+mkdir FASTQ_check/BBDuk
+mkdir FASTQ_check/BBDuk/Discarded
+mkdir FASTQ_check/BBDuk/rRNA
+mkdir FASTQ_check/BBDuk/ncRNA_alignments
+mkdir FASTQ_check/Diamond_mapping_percentages
+mkdir Diamond_output
+
+
+
+
+####### INITIAL QUALITY CONTROL #######
+
+# for i in ./raw_FASTQ_dir/*gz ; do fastqc $i -o FASTQ_check/fastqc_raw_reads/ --threads $threads;  echo -e "\n"  ; done
+
+# multiqc FASTQ_check/fastqc_raw_reads/ -o FASTQ_check/fastqc_raw_reads
+
+##open FASTQ_check/fastqc_raw_reads/multiqc_report.html
+#cat FASTQ_check/fastqc_raw_reads/multiqc_data/multiqc_general_stats.txt | cut -f 1,3,4,5,7,9 | sed 's/FastQC_mqc-generalstats-fastqc-//g' > FASTQ_check/fastqc_raw_reads/General_info_Sequences_recap.txt
+
+#cat FASTQ_check/fastqc_raw_reads/General_info_Sequences_recap.txt
+
+#rm FASTQ_check/fastqc_raw_reads/*fastqc.zip
+
+
+
+
+####### REMOVING THE BAD SEQUENCES WITH BBDUK #######
+
+FOLDER_INPUT="raw_FASTQ_dir"
+SAMPLE_LIST=$(ls $FOLDER_INPUT | grep ".fastq" | extract_name )
+
+
+for i in $SAMPLE_LIST    ### beginning of the loop
+do
+
+echo -e "\n\n\n\n *** Preprocessing the sample $i with bbduk... *** \n"
+
+### declaring the inputs and outputs for this cicle
+TARGETS=$(ls $FOLDER_INPUT | grep $i)
+FOR=$(echo "$TARGETS" | grep "_R1" )
+REV=$(echo "$TARGETS" | grep "_R2" )
+OUT_FOR=${FOR/.fastq/.CLEANED.fastq}
+OUT_REV=${REV/.fastq/.CLEANED.fastq}
+
+### Using bbduk for filtering reads right portion with quality under 20  and/or  total length under 100 and/or entropy less than 0.01
+bbduk.sh   in1=$FOLDER_INPUT/$FOR in2=$FOLDER_INPUT/$REV   out1=processed_FASTQ/$OUT_FOR out2=processed_FASTQ/$OUT_REV   ref=$ADAPTERS_FILE   tpe tbo qtrim=r trimq=20 minlen=100 entropy=0.01   outm=FASTQ_check/BBDuk/Discarded/$i.txt 2> FASTQ_check/BBDuk/${i}_Quality.txt
+
+# Reducing the space occupied by discarded reads
+#grep "^@" FASTQ_check/BBDuk/Discarded/$i.txt -A 1 --no-group-separator | sed "s/@/>/g" > FASTQ_check/BBDuk/Discarded/$i.fasta
+#gzip FASTQ_check/BBDuk/Discarded/$i.fasta -f   # -f is "force" (overwrites)
+# rm FASTQ_check/BBDuk/Discarded/$i.txt
+# rm FASTQ_check/BBDuk/Discarded/$i.fasta
+
+rm -r FASTQ_check/BBDuk/Discarded/  # delete this folder if it is not required (save a lot of GB)
+
+done
+
+
+
+
+####### CLEANING SAMPLES FROM rRNA WITH BBDUK #######
+
+# preparing the rRNA database file
+zcat $database_rRNA_LSU $database_rRNA_SSU > temp_SILVA.fasta
+awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' temp_SILVA.fasta > temp_SILVA_EachoneLine.fasta
+# this command resolves line breaks in the fasta file (one return every 60 character... bad for salmon). It's copied from https://itecnote.com/tecnote/remove-line-breaks-in-a-fasta-file/#google_vignette
+
+
+# beginning the loop on each sample
+FOLDER_INPUT="processed_FASTQ"
+SAMPLE_LIST=$(ls $FOLDER_INPUT | grep "CLEANED.fastq" | extract_name )
+
+for i in $SAMPLE_LIST    ### beginning of the loop
+do
+
+echo -e "\n\n\n *** Removing every rRNA from sample $i ... *** \n"
+
+### declaring the inputs and outputs for this cicle
+TARGETS=$(ls $FOLDER_INPUT | grep $i)
+FOR=$(echo "$TARGETS" | grep "_R1" )
+REV=$(echo "$TARGETS" | grep "_R2" )
+OUT_FOR=${FOR/CLEANED.fastq/noRRNA.fastq}
+OUT_REV=${REV/CLEANED.fastq/noRRNA.fastq}
+
+### Using bbduk for filtering reads right portion with quality under 20  and/or  total length under 100 and/or entropy less than 0.01
+bbduk.sh   in1=$FOLDER_INPUT/$FOR in2=$FOLDER_INPUT/$REV   out1=processed_FASTQ/$OUT_FOR out2=processed_FASTQ/$OUT_REV   ref=temp_SILVA_EachoneLine.fasta   tpe tbo qtrim=r trimq=20 minlen=100 entropy=0.01   outm=FASTQ_check/BBDuk/rRNA/$i.txt   2> FASTQ_check/BBDuk/${i}_rRNA.txt
+
+# Reducing the space occupied by discarded reads
+grep "^@" FASTQ_check/BBDuk/rRNA/$i.txt -A 1 --no-group-separator | sed "s/@/>/g" > FASTQ_check/BBDuk/rRNA/$i.fasta
+gzip FASTQ_check/BBDuk/rRNA/$i.fasta -f   # -f is "force" (overwrites)
+rm FASTQ_check/BBDuk/rRNA/$i.txt
+
+# rm -r FASTQ_check/BBDuk/Discarded/  # delete this folder if it is not required (save a lot of GB)
+
+done
+
+
+### Removing the fastq with rRNA
+if [ $(ls $FOLDER_INPUT | grep -c "noRRNA" ) -eq $(ls $FOLDER_INPUT | grep -c "CLEANED" ) ]
+then
+for r in $(ls $FOLDER_INPUT/ | grep -v 'noRRNA' ) ; do rm $FOLDER_INPUT/$r ; done
+# rm temp_SILVA_EachoneLine.fasta
+fi
+
+
+rm temp_SILVA.fasta  temp_SILVA_EachoneLine.fasta
+
+
+
+
+####### CLASSIFYING THE rRNAs WITH BOWTIE2 #######
+
+targets=$(ls FASTQ_check/BBDuk/rRNA/ )
+
+mkdir FASTQ_check/BBDuk/rRNA_alignments
+
+
+for x in $targets
+do
+
+echo -e "\n\n\n *** Classifying rRNA from sample $x ... *** \n"
+
+bowtie2 -x $bowtie2_rRNA_db -U FASTQ_check/BBDuk/rRNA/$x -S bowtie2_SAM_$x.txt -f -p $threads --very-sensitive
+# NB: used with high sensitivity, as this step is performed AFTER BBDuk which already selected rRNA (2 consecutive errors are unlikely!)
+
+grep -v "@" bowtie2_SAM_$x.txt | awk '$2 != 4' | grep  -P "\t0\t|\t16\t" > temp.txt
+# Briefly, remove the headers of the SAM, then look the second column and if 4 (unmapped) removed it, while maintain these mapped to forward (0) or reverse (16) of the reference
+# NB: the flags 0 and 16 may change if the alignment is performed on paired reads, re-use this command carefully ;)
+
+cut -f 1,2,3 temp.txt | sort | awk '!seen[$1]++' | cut -f 3 > FASTQ_check/BBDuk/rRNA_alignments/${x/.fasta.gz/_SILVA.txt}
+# Cut the first 3 columns (read name, flag, taxon) then sort --> the same read flagged with both 0 and 16 will appear in the file with 0 before the 16, otherwise only with 16 (reverse, unlikely) --> awk removes duplicated along the 1st column
+
+rm  temp.txt  bowtie2_SAM_$x.txt
+
+done
+
+
+
+
+####### MAPPING TO UNIREF USING DIAMOND AND THEN QUANTIFY THE RESULT #######
+
+# to use paired information through the so called 'congruent strategy'
+diamond_as_paired="/home/matteo/Desktop/Tool_box/Scripts/Scripts_RNAseq_microbial_community/Diamond_as_paired.R"
+
+# to count mapping among every sample
+parsing_diamond="/home/matteo/Desktop/Tool_box/Scripts/Scripts_RNAseq_microbial_community/Parsing_Diamond_mappings.R"
+
+
+FOLDER_INPUT="processed_FASTQ"
+SAMPLE_LIST=$(ls $FOLDER_INPUT | grep "noRRNA" | extract_name )
+
+for i in $SAMPLE_LIST
+do
+
+echo -e "\n\n\n *** Translating and mapping cDNA of sample $i ... *** \n"
+
+TARGETS=$(ls $FOLDER_INPUT | grep $i)
+FOR=$(echo "$TARGETS" | grep "_R1" )
+REV=$(echo "$TARGETS" | grep "_R2" )
+
+echo -e "\n ... Forward ... \n"
+diamond blastx -d $diamond_db/Diamond_UniRef100_AGSmicrobial_luglio2025.dmnd -q $FOLDER_INPUT/$FOR -o Diamond_output/matches_1.tsv --evalue 0.0001 --outfmt 6 qseqid sseqid slen evalue --unal 1 -b 6 -c 1 --quiet
+echo -e "\n ... Reverse ... \n"
+diamond blastx -d $diamond_db/Diamond_UniRef100_AGSmicrobial_luglio2025.dmnd -q $FOLDER_INPUT/$REV -o Diamond_output/matches_2.tsv --evalue 0.0001 --outfmt 6 qseqid sseqid slen evalue --unal 1 -b 6 -c 1 --quiet
+# NB: reduce -b and increase -c (or use the default values) if the RAM does not support the operation with those settings
+
+echo -e "\n Evaluating both mappings... \n"
+Rscript $diamond_as_paired  Diamond_output  $i
+
+mv Diamond_output/Matching_percent_$i.tsv  FASTQ_check/Diamond_mapping_percentages/
+rm Diamond_output/matches_*  # Diamond concatenates if same name!
+
+done
+
+
+# re-ordering the matching percents files in an unique file
+cat FASTQ_check/Diamond_mapping_percentages/Matching_percent_* > FASTQ_check/Diamond_mapping_percentages/Matching_percentS.tsv
+sort FASTQ_check/Diamond_mapping_percentages/Matching_percentS.tsv -r | uniq > FASTQ_check/Diamond_matching_percents.tsv
+rm FASTQ_check/Diamond_mapping_percentages -R
+
+
+# parsing the outputs
+Rscript $parsing_diamond   Diamond_output   $diamond_db
+
+
+# compressing the simil-BAM to save space
+tar -zcf Diamond_mappings.tar.gz Diamond_output
+rm Diamond_output/Diamond_*
+
+mv  *_counts_from_Diamond.tsv  Diamond_output
+mv  IDs_infos.tsv  Diamond_output
+mv Diamond_mappings.tar.gz Diamond_output/DiamondMappings.tar.gz
+
+cp FASTQ_check/Diamond_matching_percents.tsv Diamond_output/   # this file is important for further analyses --> putting it also in the main results folder
+
+
+
+
+############ EXTRA: COUNTING ncRNA READS ##############
+
+# NB: rRNA already removed
+
+FOLDER_INPUT="processed_FASTQ"
+SAMPLE_LIST=$(ls $FOLDER_INPUT | grep ".fastq" | extract_name )
+
+for x in $SAMPLE_LIST    ### beginning of the loop
+do
+
+### declaring the inputs and outputs for this cicle
+TARGETS=$(ls $FOLDER_INPUT | grep $x)
+FOR=$(echo "$TARGETS" | grep "_R1" )
+REV=$(echo "$TARGETS" | grep "_R2" )
+
+echo -e "\n\n\n *** Classifying ncRNA from sample $x ... *** \n"
+
+bowtie2 -x $bowtie2_ncRNA_db -1 $FOLDER_INPUT/$FOR -2 $FOLDER_INPUT/$REV -S bowtie2_SAM_$x.txt -p $threads  --no-discordant  -q  2> FASTQ_check/BBDuk/${x}_ncRNA.txt
+# NB: used with standard sensitivity , discordant reads discarded   (-q specifies that the reads are fastq)
+
+samtools view -F 4 bowtie2_SAM_$x.txt | cut -f 1,3 >FASTQ_check/BBDuk/ncRNA_alignments/${x}_ncRNA.tsv
+
+rm  bowtie2_SAM_$x.txt
+
+done
+
+
+
+
+####### EXTRA: QUALITY CONTROL AFTER THE CLEANING #######
+
+#mkdir FASTQ_check/fastqc_processed_reads
+
+#for i in ./processed_FASTQ/*_OUTncRNA* ; do fastqc $i -o FASTQ_check/fastqc_processed_reads --threads $threads; done
+
+#multiqc FASTQ_check/fastqc_processed_reads -o FASTQ_check/fastqc_processed_reads
+
+#rm FASTQ_check/fastqc_processed_reads/*fastqc.zip
+
+
+## open FASTQ_check/fastqc_processed_reads/multiqc_report.html
+#cat FASTQ_check/fastqc_processed_reads/multiqc_data/multiqc_general_stats.txt | cut -f 1,3,4,5,7,9 | sed 's/FastQC_mqc-generalstats-fastqc-//g' > FASTQ_check/fastqc_processed_reads/General_info_Sequences_recap_AFTER_THE_CLEANING.txt
+#cat FASTQ_check/fastqc_processed_reads/General_info_Sequences_recap_AFTER_THE_CLEANING.txt

@@ -1,0 +1,419 @@
+R version 4.3.2 (2023-10-31 ucrt)   running on Windows 10 x64 (build 19045)
+ 
+
+NULL
+
+ 
+
+NULL
+
+ 
+
+NULL
+
+ 
+
+
+ 
+
+[1] "vegan"
+[1] ‘2.6.4’
+
+ 
+
+[1] "ecodist"
+[1] ‘2.1.3’
+
+ 
+
+
+ 
+ 
+Every package: 
+
+$compiler
+Package: compiler
+Version: 4.3.2
+Priority: base
+Title: The R Compiler Package
+Author: Luke Tierney <luke-tierney@uiowa.edu>
+Maintainer: R Core Team <do-use-Contact-address@r-project.org>
+Contact: R-help mailing list <r-help@r-project.org>
+Description: Byte code compiler for R.
+License: Part of R 4.3.2
+Built: R 4.3.2; ; 2023-10-31 13:56:29 UTC; windows
+
+-- File: C:/Program Files/R/R-4.3.2/library/compiler/Meta/package.rds 
+
+$magrittr
+Type: Package
+Package: magrittr
+Title: A Forward-Pipe Operator for R
+Version: 2.0.3
+Authors@R: c( person("Stefan Milton", "Bache", , "stefan@stefanbache.dk", role = c("aut",
+          "cph"), comment = "Original author and creator of magrittr"), person("Hadley",
+          "Wickham", , "hadley@rstudio.com", role = "aut"), person("Lionel", "Henry", ,
+          "lionel@rstudio.com", role = "cre"), person("RStudio", role = c("cph", "fnd")) )
+Description: Provides a mechanism for chaining commands with a new forward-pipe operator,
+          %>%. This operator will forward a value, or the result of an expression, into
+          the next function call/expression.  There is flexible support for the type of
+          right-hand side expressions.  For more information, see package vignette.  To
+          quote Rene Magritte, "Ceci n'est pas un pipe."
+License: MIT + file LICENSE
+URL: https://magrittr.tidyverse.org, https://github.com/tidyverse/magrittr
+BugReports: https://github.com/tidyverse/magrittr/issues
+Depends: R (>= 3.4.0)
+Suggests: covr, knitr, rlang, rmarkdown, testthat
+VignetteBuilder: knitr
+ByteCompile: Yes
+Config/Needs/website: tidyverse/tidytemplate
+Encoding: UTF-8
+RoxygenNote: 7.1.2
+NeedsCompilation: yes
+Packaged: 2022-03-29 09:34:37 UTC; lionel
+Author: Stefan Milton Bache [aut, cph] (Original author and creator of magrittr), Hadley
+          Wickham [aut], Lionel Henry [cre], RStudio [cph, fnd]
+Maintainer: Lionel Henry <lionel@rstudio.com>
+Repository: CRAN
+Date/Publication: 2022-03-30 07:30:09 UTC
+Built: R 4.3.2; x86_64-w64-mingw32; 2024-01-14 02:06:25 UTC; windows
+Archs: x64
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/magrittr/Meta/package.rds 
+
+$plyr
+Package: plyr
+Title: Tools for Splitting, Applying and Combining Data
+Version: 1.8.9
+Authors@R: person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre"))
+Description: A set of tools that solves a common set of problems: you need to break a big
+          problem down into manageable pieces, operate on each piece and then put all the
+          pieces back together.  For example, you might want to fit a model to each
+          spatial location or time point in your study, summarise data by panels or
+          collapse high-dimensional arrays to simpler summary statistics. The development
+          of 'plyr' has been generously supported by 'Becton Dickinson'.
+License: MIT + file LICENSE
+URL: http://had.co.nz/plyr, https://github.com/hadley/plyr
+BugReports: https://github.com/hadley/plyr/issues
+Depends: R (>= 3.1.0)
+Imports: Rcpp (>= 0.11.0)
+Suggests: abind, covr, doParallel, foreach, iterators, itertools, tcltk, testthat
+LinkingTo: Rcpp
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+NeedsCompilation: yes
+Packaged: 2023-09-27 13:58:04 UTC; hadleywickham
+Author: Hadley Wickham [aut, cre]
+Maintainer: Hadley Wickham <hadley@rstudio.com>
+Repository: CRAN
+Date/Publication: 2023-10-02 06:50:08 UTC
+Built: R 4.3.2; x86_64-w64-mingw32; 2024-01-14 02:47:27 UTC; windows
+Archs: x64
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/plyr/Meta/package.rds 
+
+$cli
+Package: cli
+Title: Helpers for Developing Command Line Interfaces
+Version: 3.6.2
+Authors@R: c( person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut",
+          "cre")), person("Hadley", "Wickham", role = "ctb"), person("Kirill", "Müller",
+          role = "ctb"), person("Salim", "Brüggemann", , "salim-b@pm.me", role = "ctb",
+          comment = c(ORCID = "0000-0002-5329-5987")), person("Posit Software, PBC", role
+          = c("cph", "fnd")) )
+Description: A suite of tools to build attractive command line interfaces ('CLIs'), from
+          semantic elements: headings, lists, alerts, paragraphs, etc. Supports custom
+          themes via a 'CSS'-like language. It also contains a number of lower level 'CLI'
+          elements: rules, boxes, trees, and 'Unicode' symbols with 'ASCII' alternatives.
+          It support ANSI colors and text styles as well.
+License: MIT + file LICENSE
+URL: https://cli.r-lib.org, https://github.com/r-lib/cli
+BugReports: https://github.com/r-lib/cli/issues
+Depends: R (>= 3.4)
+Imports: utils
+Suggests: callr, covr, crayon, digest, glue (>= 1.6.0), grDevices, htmltools, htmlwidgets,
+          knitr, methods, mockery, processx, ps (>= 1.3.4.9000), rlang (>= 1.0.2.9003),
+          rmarkdown, rprojroot, rstudioapi, testthat, tibble, whoami, withr
+Config/Needs/website: r-lib/asciicast, bench, brio, cpp11, decor, desc, fansi,
+          prettyunits, sessioninfo, tidyverse/tidytemplate, usethis, vctrs
+Config/testthat/edition: 3
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+NeedsCompilation: yes
+Packaged: 2023-12-10 22:38:10 UTC; gaborcsardi
+Author: Gábor Csárdi [aut, cre], Hadley Wickham [ctb], Kirill Müller [ctb], Salim
+          Brüggemann [ctb] (<https://orcid.org/0000-0002-5329-5987>), Posit Software, PBC
+          [cph, fnd]
+Maintainer: Gábor Csárdi <csardi.gabor@gmail.com>
+Repository: CRAN
+Date/Publication: 2023-12-11 07:40:13 UTC
+Built: R 4.3.2; x86_64-w64-mingw32; 2024-01-14 02:06:26 UTC; windows
+Archs: x64
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/cli/Meta/package.rds 
+
+$tools
+Package: tools
+Version: 4.3.2
+Priority: base
+Title: Tools for Package Development
+Author: R Core Team
+Maintainer: R Core Team <do-use-Contact-address@r-project.org>
+Contact: R-help mailing list <r-help@r-project.org>
+Description: Tools for package development, administration and documentation.
+License: Part of R 4.3.2
+Suggests: codetools, methods, xml2, curl, commonmark, knitr, xfun, mathjaxr, V8
+NeedsCompilation: yes
+Built: R 4.3.2; x86_64-w64-mingw32; 2023-10-31 13:56:28 UTC; windows
+
+-- File: C:/Program Files/R/R-4.3.2/library/tools/Meta/package.rds 
+
+$glue
+Package: glue
+Title: Interpreted String Literals
+Version: 1.7.0
+Authors@R: c( person("Jim", "Hester", role = "aut", comment = c(ORCID =
+          "0000-0002-2739-7082")), person("Jennifer", "Bryan", , "jenny@posit.co", role =
+          c("aut", "cre"), comment = c(ORCID = "0000-0002-6983-2759")), person("Posit
+          Software, PBC", role = c("cph", "fnd")) )
+Description: An implementation of interpreted string literals, inspired by Python's
+          Literal String Interpolation <https://www.python.org/dev/peps/pep-0498/> and
+          Docstrings <https://www.python.org/dev/peps/pep-0257/> and Julia's Triple-Quoted
+          String Literals
+          <https://docs.julialang.org/en/v1.3/manual/strings/#Triple-Quoted-String-Literals-1>.
+License: MIT + file LICENSE
+URL: https://glue.tidyverse.org/, https://github.com/tidyverse/glue
+BugReports: https://github.com/tidyverse/glue/issues
+Depends: R (>= 3.6)
+Imports: methods
+Suggests: crayon, DBI (>= 1.2.0), dplyr, knitr, magrittr, rlang, rmarkdown, RSQLite,
+          testthat (>= 3.2.0), vctrs (>= 0.3.0), waldo (>= 0.3.0), withr
+VignetteBuilder: knitr
+ByteCompile: true
+Config/Needs/website: bench, forcats, ggbeeswarm, ggplot2, R.utils, rprintf, tidyr,
+          tidyverse/tidytemplate
+Config/testthat/edition: 3
+Encoding: UTF-8
+RoxygenNote: 7.2.3.9000
+NeedsCompilation: yes
+Packaged: 2024-01-08 16:10:57 UTC; jenny
+Author: Jim Hester [aut] (<https://orcid.org/0000-0002-2739-7082>), Jennifer Bryan [aut,
+          cre] (<https://orcid.org/0000-0002-6983-2759>), Posit Software, PBC [cph, fnd]
+Maintainer: Jennifer Bryan <jenny@posit.co>
+Repository: CRAN
+Date/Publication: 2024-01-09 23:13:08 UTC
+Built: R 4.3.2; x86_64-w64-mingw32; 2024-01-14 02:06:26 UTC; windows
+Archs: x64
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/glue/Meta/package.rds 
+
+$rstudioapi
+Package: rstudioapi
+Title: Safely Access the RStudio API
+Description: Access the RStudio API (if available) and provide informative error messages
+          when it's not.
+Version: 0.15.0
+Authors@R: c( person("Kevin", "Ushey", role = c("aut", "cre"), email =
+          "kevin@rstudio.com"), person("JJ", "Allaire", role = c("aut"), email =
+          "jj@posit.co"), person("Hadley", "Wickham", role = c("aut"), email =
+          "hadley@posit.co"), person("Gary", "Ritchie", role = c("aut"), email =
+          "gary@posit.co"), person(family = "RStudio", role = "cph") )
+Maintainer: Kevin Ushey <kevin@rstudio.com>
+License: MIT + file LICENSE
+URL: https://rstudio.github.io/rstudioapi/, https://github.com/rstudio/rstudioapi
+BugReports: https://github.com/rstudio/rstudioapi/issues
+RoxygenNote: 7.2.3
+Suggests: testthat, knitr, rmarkdown, clipr, covr
+VignetteBuilder: knitr
+Encoding: UTF-8
+NeedsCompilation: no
+Packaged: 2023-07-07 17:59:12 UTC; jacquelinegutman
+Author: Kevin Ushey [aut, cre], JJ Allaire [aut], Hadley Wickham [aut], Gary Ritchie
+          [aut], RStudio [cph]
+Repository: CRAN
+Date/Publication: 2023-07-07 19:10:02 UTC
+Built: R 4.3.2; ; 2024-01-16 01:43:24 UTC; windows
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/rstudioapi/Meta/package.rds 
+
+$Rcpp
+Package: Rcpp
+Title: Seamless R and C++ Integration
+Version: 1.0.12
+Date: 2024-01-08
+Author: Dirk Eddelbuettel, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou, Nathan
+          Russell, Inaki Ucar, Douglas Bates and John Chambers
+Maintainer: Dirk Eddelbuettel <edd@debian.org>
+Description: The 'Rcpp' package provides R functions as well as C++ classes which offer a
+          seamless integration of R and C++. Many R data types and objects can be mapped
+          back and forth to C++ equivalents which facilitates both writing of new code as
+          well as easier integration of third-party libraries. Documentation about 'Rcpp'
+          is provided by several vignettes included in this package, via the 'Rcpp
+          Gallery' site at <https://gallery.rcpp.org>, the paper by Eddelbuettel and
+          Francois (2011, <doi:10.18637/jss.v040.i08>), the book by Eddelbuettel (2013,
+          <doi:10.1007/978-1-4614-6868-4>) and the paper by Eddelbuettel and Balamuta
+          (2018, <doi:10.1080/00031305.2017.1375990>); see 'citation("Rcpp")' for details.
+Imports: methods, utils
+Suggests: tinytest, inline, rbenchmark, pkgKitten (>= 0.1.2)
+URL: https://www.rcpp.org, https://dirk.eddelbuettel.com/code/rcpp.html,
+          https://github.com/RcppCore/Rcpp
+License: GPL (>= 2)
+BugReports: https://github.com/RcppCore/Rcpp/issues
+MailingList: rcpp-devel@lists.r-forge.r-project.org
+RoxygenNote: 6.1.1
+Encoding: UTF-8
+NeedsCompilation: yes
+Packaged: 2024-01-08 12:50:16 UTC; edd
+Repository: CRAN
+Date/Publication: 2024-01-09 08:20:35 UTC
+Built: R 4.3.2; x86_64-w64-mingw32; 2024-01-14 02:06:29 UTC; windows
+Archs: x64
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/Rcpp/Meta/package.rds 
+
+$stringi
+Package: stringi
+Version: 1.8.3
+Date: 2023-12-10
+Title: Fast and Portable Character String Processing Facilities
+Description: A collection of character string/text/natural language processing tools for
+          pattern searching (e.g., with 'Java'-like regular expressions or the 'Unicode'
+          collation algorithm), random string generation, case mapping, string
+          transliteration, concatenation, sorting, padding, wrapping, Unicode
+          normalisation, date-time formatting and parsing, and many more. They are fast,
+          consistent, convenient, and - thanks to 'ICU' (International Components for
+          Unicode) - portable across all locales and platforms. Documentation about
+          'stringi' is provided via its website at <https://stringi.gagolewski.com/> and
+          the paper by Gagolewski (2022, <doi:10.18637/jss.v103.i02>).
+URL: https://stringi.gagolewski.com/, https://github.com/gagolews/stringi,
+          https://icu.unicode.org/
+BugReports: https://github.com/gagolews/stringi/issues
+SystemRequirements: ICU4C (>= 61, optional)
+Type: Package
+Depends: R (>= 3.4)
+Imports: tools, utils, stats
+Biarch: TRUE
+License: file LICENSE
+Author: Marek Gagolewski [aut, cre, cph] (<https://orcid.org/0000-0003-0637-6028>), Bartek
+          Tartanus [ctb], and others (stringi source code); Unicode, Inc. and others
+          (ICU4C source code, Unicode Character Database)
+Maintainer: Marek Gagolewski <marek@gagolewski.com>
+RoxygenNote: 7.2.3
+Encoding: UTF-8
+NeedsCompilation: yes
+Packaged: 2023-12-10 07:26:05 UTC; gagolews
+License_is_FOSS: yes
+Repository: CRAN
+Date/Publication: 2023-12-11 22:50:03 UTC
+Built: R 4.3.2; x86_64-w64-mingw32; 2023-12-12 00:51:28 UTC; windows
+Archs: x64
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/stringi/Meta/package.rds 
+
+$stringr
+Package: stringr
+Title: Simple, Consistent Wrappers for Common String Operations
+Version: 1.5.1
+Authors@R: c( person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre",
+          "cph")), person("Posit Software, PBC", role = c("cph", "fnd")) )
+Description: A consistent, simple and easy to use set of wrappers around the fantastic
+          'stringi' package. All function and argument names (and positions) are
+          consistent, all functions deal with "NA"'s and zero length vectors in the same
+          way, and the output from one function is easy to feed into the input of another.
+License: MIT + file LICENSE
+URL: https://stringr.tidyverse.org, https://github.com/tidyverse/stringr
+BugReports: https://github.com/tidyverse/stringr/issues
+Depends: R (>= 3.6)
+Imports: cli, glue (>= 1.6.1), lifecycle (>= 1.0.3), magrittr, rlang (>= 1.0.0), stringi
+          (>= 1.5.3), vctrs (>= 0.4.0)
+Suggests: covr, dplyr, gt, htmltools, htmlwidgets, knitr, rmarkdown, testthat (>= 3.0.0),
+          tibble
+VignetteBuilder: knitr
+Config/Needs/website: tidyverse/tidytemplate
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+NeedsCompilation: no
+Packaged: 2023-11-14 15:03:52 UTC; hadleywickham
+Author: Hadley Wickham [aut, cre, cph], Posit Software, PBC [cph, fnd]
+Maintainer: Hadley Wickham <hadley@posit.co>
+Repository: CRAN
+Date/Publication: 2023-11-14 23:10:02 UTC
+Built: R 4.3.2; ; 2024-01-16 03:07:29 UTC; windows
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/stringr/Meta/package.rds 
+
+$lifecycle
+Package: lifecycle
+Title: Manage the Life Cycle of your Package Functions
+Version: 1.0.4
+Authors@R: c( person("Lionel", "Henry", , "lionel@posit.co", role = c("aut", "cre")),
+          person("Hadley", "Wickham", , "hadley@posit.co", role = "aut", comment = c(ORCID
+          = "0000-0003-4757-117X")), person("Posit Software, PBC", role = c("cph", "fnd"))
+          )
+Description: Manage the life cycle of your exported functions with shared conventions,
+          documentation badges, and user-friendly deprecation warnings.
+License: MIT + file LICENSE
+URL: https://lifecycle.r-lib.org/, https://github.com/r-lib/lifecycle
+BugReports: https://github.com/r-lib/lifecycle/issues
+Depends: R (>= 3.6)
+Imports: cli (>= 3.4.0), glue, rlang (>= 1.1.0)
+Suggests: covr, crayon, knitr, lintr, rmarkdown, testthat (>= 3.0.1), tibble, tidyverse,
+          tools, vctrs, withr
+VignetteBuilder: knitr
+Config/Needs/website: tidyverse/tidytemplate, usethis
+Config/testthat/edition: 3
+Encoding: UTF-8
+RoxygenNote: 7.2.1
+NeedsCompilation: no
+Packaged: 2023-11-06 16:07:36 UTC; lionel
+Author: Lionel Henry [aut, cre], Hadley Wickham [aut]
+          (<https://orcid.org/0000-0003-4757-117X>), Posit Software, PBC [cph, fnd]
+Maintainer: Lionel Henry <lionel@posit.co>
+Repository: CRAN
+Date/Publication: 2023-11-07 10:10:10 UTC
+Built: R 4.3.2; ; 2024-01-16 02:24:32 UTC; windows
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/lifecycle/Meta/package.rds 
+
+$rlang
+Package: rlang
+Version: 1.1.3
+Title: Functions for Base Types and Core R and 'Tidyverse' Features
+Description: A toolbox for working with base types, core R features like the condition
+          system, and core 'Tidyverse' features like tidy evaluation.
+Authors@R: c( person("Lionel", "Henry", ,"lionel@posit.co", c("aut", "cre")),
+          person("Hadley", "Wickham", ,"hadley@posit.co", "aut"), person(given = "mikefc",
+          email = "mikefc@coolbutuseless.com", role = "cph", comment = "Hash
+          implementation based on Mike's xxhashlite"), person(given = "Yann", family =
+          "Collet", role = "cph", comment = "Author of the embedded xxHash library"),
+          person(given = "Posit, PBC", role = c("cph", "fnd")) )
+License: MIT + file LICENSE
+ByteCompile: true
+Biarch: true
+Depends: R (>= 3.5.0)
+Imports: utils
+Suggests: cli (>= 3.1.0), covr, crayon, fs, glue, knitr, magrittr, methods, pillar,
+          rmarkdown, stats, testthat (>= 3.0.0), tibble, usethis, vctrs (>= 0.2.3), withr
+Enhances: winch
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+URL: https://rlang.r-lib.org, https://github.com/r-lib/rlang
+BugReports: https://github.com/r-lib/rlang/issues
+Config/testthat/edition: 3
+Config/Needs/website: dplyr, tidyverse/tidytemplate
+NeedsCompilation: yes
+Packaged: 2024-01-09 13:33:10 UTC; lionel
+Author: Lionel Henry [aut, cre], Hadley Wickham [aut], mikefc [cph] (Hash implementation
+          based on Mike's xxhashlite), Yann Collet [cph] (Author of the embedded xxHash
+          library), Posit, PBC [cph, fnd]
+Maintainer: Lionel Henry <lionel@posit.co>
+Repository: CRAN
+Date/Publication: 2024-01-10 12:00:02 UTC
+Built: R 4.3.2; x86_64-w64-mingw32; 2024-01-14 02:06:26 UTC; windows
+Archs: x64
+
+-- File: C:/Users/leand/AppData/Local/R/win-library/4.3/rlang/Meta/package.rds 
+
