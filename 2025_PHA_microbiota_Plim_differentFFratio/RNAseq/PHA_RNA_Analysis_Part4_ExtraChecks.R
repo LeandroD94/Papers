@@ -195,7 +195,7 @@ write.csv2(complete_table, file="FASTQ_check/Count_of_rRNA_assignments.csv", row
 # NB: this part of the script works only if the related optional step has been performed during the files processing
 
 # taxonomy <- read.delim("/media/matteo/SSD4/reference/prokaryotes_ncRNA/Dictionary_ncRNA_microb_scfbio_24_01_24.csv", sep=";", header = F)
-taxonomy <- read.delim("databases_dictionary/Dictionary_ncRNA_microb_scfbio_24_01_24.csv", sep=",", header = T)
+taxonomy <- read.delim("databases_dictionary/Dictionary_ncRNA_microb_scfbio_24_01_24.csv.gz", sep=",", header = T)
 # csv with code, description and reference taxon as columns, manually build from the downloaded ScfBio ncRNA fasta
 
 taxonomy$taxon <- gsub("uncultured ","uncultured_",taxonomy$taxon)
