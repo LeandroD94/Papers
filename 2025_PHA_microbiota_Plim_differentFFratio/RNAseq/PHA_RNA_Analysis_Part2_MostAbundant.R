@@ -74,15 +74,19 @@ table_top<- table[top, ]
 table_top$Protein<-row.names(table_top)
 ### Converting IDs
 selected_infos<-dictionary[dictionary$Entry %in% table_top$Protein, ]
+selected_infos$Description[selected_infos$Description=="Uncharact"]<-paste( selected_infos$Description[selected_infos$Description=="Uncharact"], selected_infos$Entry[selected_infos$Description=="Uncharact"] )
 infos<-paste0( selected_infos$Description," (", selected_infos$Taxon,")" )
 infos<- gsub("()", "(Unknown source)", infos, fixed=T)
 infos<- gsub("methanol/ethanol fam", "meth/eth fam", infos, fixed=T)
 infos<- gsub("prot-sorting", "sorting", infos, fixed=T)
-infos<- gsub("Uncharact (", "Uncharacterized (", infos, fixed=T)
+infos<- gsub("Uncharact ", "Uncharacterized ", infos, fixed=T)
 infos<- gsub("Candidatus","Ca.",infos,fixed=T)
 infos<- gsub("Ca_","Ca.",infos,fixed=T)
 infos<- gsub("Phasin fam prot","Phasin fam protein",infos,fixed=T)
 infos<- gsub("^phasin","Phasin",infos)
+infos<- gsub(" fam "," family ",infos)
+infos<- gsub("sp. 27","sp.27",infos, fixed=T)
+infos<- gsub(" prot "," ",infos, fixed=T)
 table_top$Protein<-infos
 # plotting ...
 table_to_plot<-table_top
@@ -153,11 +157,11 @@ ggplot(data=table_to_plot, aes(x=variable, y=value, fill=Protein)) +
         strip.text = element_text(size=10),
         plot.title = element_text(size=6.5),
         legend.key.height = unit(0.11, "cm"),
-        legend.key.width = unit(0.32, "cm"),
+        legend.key.width = unit(0.26, "cm"),
         legend.spacing.x = unit(0.3, "cm"),
         legend.title = element_text ( size = 9 ),
         legend.text = element_text ( size = 7.5 ),
-        legend.margin = margin(-14,0,2,-35),
+        legend.margin = margin(-14,0,2,-40),
         legend.position="bottom",
         plot.margin = margin(1,1,1,1)
   ) +
@@ -218,6 +222,7 @@ selected_infos<-dictionary[dictionary$Entry %in% table_top$Protein, ]
 infos<-paste0( selected_infos$Description," (", selected_infos$Taxon,")" )
 infos<- gsub("()", "(Unknown source)", infos, fixed=T)
 infos<- gsub("subunit", "", infos, fixed=T)
+infos<- gsub("Uncharact", "Uncharacterized", infos, fixed=T)
 infos<- gsub("PEP-CTERM prot-sorting domain", "PEP-CTERM sorting domain", infos, fixed=T)
 infos<- gsub("methanol/ethanol", "meth/eth", infos, fixed=T)
 infos<- gsub("Candidatus","Ca.",infos,fixed=T)
@@ -488,7 +493,6 @@ suppressWarnings(rm(table, table2, ordered_infos, table_top, table_to_plot, to_s
 ########### BAR PLOTS OF THE MOST ABUNDANT GENES (ABS_count) ###############
 # COMPUTATION ON THE WHOLE DATASET (BOTH R1 AND R2 SAMPLES)
 
-
 table <- as.data.frame(prop_GENE_with_unmap) # prop abs
 colnames(table)<- paste0(metadata$Reactor, "_", metadata$Experiment_day, "th day")
 
@@ -508,6 +512,15 @@ infos<- gsub("fam outer membrane", "outer membr", infos, fixed=T)
 infos<- gsub("PEP-CTERM prot-sorting", "PEP-CTERM sorting", infos, fixed=T)
 infos<- gsub("HPF/RaiA fam ", "HPF/RaiA ", infos, fixed=T)
 infos<- gsub("Uncharact (", "Uncharacterized (", infos, fixed=T)
+infos<- gsub(" fam "," family ",infos)
+infos<- gsub(" prot "," ",infos, fixed=T)
+infos<- gsub("Transmembrane (","Transmembrane protein (",infos, fixed=T)
+infos<- gsub(" membr (","membr prot (",infos, fixed=T)
+infos<- gsub(" dehydrog ("," dehydrogenase (",infos, fixed=T)
+infos<- gsub("containing (","containing protein (",infos, fixed=T)
+infos<- gsub("sorting domain-containing protein","sorting domain-containing prot",infos, fixed=T)
+infos<- gsub(" attachment ("," attachment protein (",infos, fixed=T)
+infos<- gsub(" lipoprot "," lipoprotein ",infos, fixed=T)
 table_top$Protein<-infos
 # plotting ...
 table_to_plot<-table_top
@@ -578,11 +591,11 @@ ggplot(data=table_to_plot, aes(x=variable, y=value, fill=Protein)) +
         strip.text = element_text(size=10),
         plot.title = element_text(size=6.5),
         legend.key.height = unit(0.11, "cm"),
-        legend.key.width = unit(0.362, "cm"),
+        legend.key.width = unit(0.29, "cm"),
         legend.spacing.x = unit(0.3, "cm"),
         legend.title = element_text ( size = 9 ),
         legend.text = element_text ( size = 7.5 ),
-        legend.margin = margin(-14,0,2,-38),
+        legend.margin = margin(-14,0,2,-40),
         legend.position="bottom",
         plot.margin = margin(1,1,1,1)
   ) +
