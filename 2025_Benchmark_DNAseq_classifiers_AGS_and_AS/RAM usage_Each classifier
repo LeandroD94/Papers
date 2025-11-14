@@ -1,0 +1,71 @@
+# top -o %MEM
+
+
+######## KRAKEN2 CON ENVIRONMENTAL EUKA DB
+
+MiB Mem : 1031751.+total, 221744.3 free, 285812.4 used, 524195.1 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used. 739302.7 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND           
+ 404812 matteo    20   0  275.0g 273.2g   3668 S 435.4  27.1   6:29.83 classify
+ 
+ 
+  
+######## KRAKEN2 CON NT_CORE DB
+ 
+     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                   
+ 406181 matteo    20   0  245.5g 243.2g   3840 S 129.4  24.1   9:33.40 classify
+ 
+ 
+ 
+######## KAIJU NR_EUK
+
+     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                   
+ 409388 matteo    20   0  198.6g 195.0g   4000 D 745.4  19.3  87:32.42 kaiju  
+
+
+######## KAIJU NR_EUK PLUS
+			  224.3g 222.4g   4172 S  1444  22.1  80:23.48 kaiju
+
+
+
+######## KAIJU VIRUS
+
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND  
+411215 matteo    20   0 3418340 795304   4156 R  3893   0.1 121:40.42 kaiju
+
+
+
+######## RIBOFRAME
+
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND 
+411647 matteo    20   0 4168420 310892   2928 R 100.0   0.0  13:15.00 hmmsearch
+
+# RDP on silva  
+412063 matteo    20   0   19.0g   5.6g  19520 S 100.7   0.6   1:32.42 java 
+
+
+
+######### MAGs
+
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+424637 matteo    20   0   10.8g  10.3g   4188 R  5781   1.0   9:19.36 megahit_core
+426303 matteo    20   0 4860996 267804   4616 R  4576   0.0   3:35.90 metabat
+
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                  
+435760 matteo    20   0   24.5g  16.4g  80044 R  98.7   1.6   0:34.53 kMetaShot_class
+ #NB: the latter process (kMetaShot) was repeated across the top table for each processor! 
+ 
+ 
+ 
+######### BOWTIE2
+
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 491122 matteo    20   0   32.1g  27.6g   4904 S  6246   2.7 319:13.25 bowtie2-ali+
+ 
+ 
+ 
+######## KRAKEN2 (Homo sapiens only db)
+
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 494765 matteo    20   0 9367076   6.3g   3712 S 427.2   0.6   3:15.82 classify
