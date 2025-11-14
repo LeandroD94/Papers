@@ -1,0 +1,2 @@
+The scripts are designed to be executed in order (from 0 to the last) in Linux environment in the same path 
+containing the "raw_FASTQ_dir" folder, where the mock raw paired FASTQs (fastq.gz) are stored.
