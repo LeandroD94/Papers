@@ -1,0 +1,4 @@
+Each of the files SRR17089440 and SRR17089441 has only reverse and forward reads respectively (40_2, 41_1), then are not paired... also downloading again does not solve this problem, then they are discarded from the analysis
+
+Moreover, also the FASTQ SRR17089439 has been discarded because its forward reads was much more than the reverse (?)
+

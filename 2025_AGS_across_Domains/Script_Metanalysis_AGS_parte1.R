@@ -253,7 +253,8 @@ evalslopes<-function(x,names,lim=0.5,t=10,cex=0.5) {
       cat(i,slope,check,"\n")
       #			text(as.numeric(rev(gsub("N","",names(x[[i]])))[1]),v[1],labels=slope,col=check,cex=0.5)
       #			points(as.numeric(rev(gsub("N","",names(x[[i]])))[1]),v[1],col=check,pch=16,cex=1)
-      text(as.numeric(rev(gsub("N","",names(x[[i]])))[1]),rev(v)[1],col=check,pch=16,cex=cex,labels=names[i])
+      text(as.numeric(rev(gsub("N","",names(x[[i]])))[1]),rev(v)[1],col=check,
+           pch=16,cex=cex,labels=names[i])
     }
   }
   # legend("bottomright",paste(sat,"saturated samples"),bty="n")

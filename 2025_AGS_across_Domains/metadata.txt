@@ -1,0 +1,58 @@
+FASTQ_ID	Project	Project_number	Reactor_number	Sample_number	Sample_name	Reactor_scale	Seq_depth	Sample_type	Influent	Influent_extra	Project_description	Sample_original_name
+ERR8521291	PRJEB50804	1	1	1	D01_R01_S01	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor1	Feb16_AGS1
+ERR8521294	PRJEB50804	1	1	2	D01_R01_S02	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor1	Jan7_AGS1
+ERR8521297	PRJEB50804	1	1	3	D01_R01_S03	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor1	Nov17_AGS1
+ERR8521300	PRJEB50804	1	1	4	D01_R01_S04	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor1	Sept28_AG1
+ERR8521292	PRJEB50804	1	2	5	D01_R02_S05	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor2	Feb16_AGS2
+ERR8521295	PRJEB50804	1	2	6	D01_R02_S06	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor2	Jan7_AGS2
+ERR8521298	PRJEB50804	1	2	7	D01_R02_S07	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor2	Nov17_AGS2
+ERR8521301	PRJEB50804	1	2	8	D01_R02_S08	Full	<5	AGS	Real	Sweden	Full scale\nSweden_reactor2	Sept28_AG2
+SRR27548884	PRJNA1054024	2	3	1	D02_R03_S01	Full	10	AGS	Real	Ireland\nsmall granules	Full scale\nRingsend 	AGS_MG_SG
+SRR27548885	PRJNA1054024	2	3	2	D02_R03_S02	Full	10	AGS	Real	Ireland\nlarge granules	Full scale\nRingsend 	AGS_MG_LG
+SRR17089433	PRJNA783874	3	4	1	D03_R04_S01	Full	10	AGS	Real	Holand	Full scale\nUtrecht	Beginning aeration small granules iDNA -d1
+SRR17089452	PRJNA783874	3	4	2	D03_R04_S02	Full	10	AGS	Real	Holand	Full scale\nUtrecht	End aeration exDNA -d1
+SRR17089454	PRJNA783874	3	4	3	D03_R04_S03	Full	10	AGS	Real	Holand	Full scale\nUtrecht	End aeration small granules iDNA -d1
+SRR17089455	PRJNA783874	3	4	4	D03_R04_S04	Full	10	AGS	Real	Holand	Full scale\nUtrecht	End aeration large granules iDNA -d1
+SRR17089456	PRJNA783874	3	4	5	D03_R04_S05	Full	10	AGS	Real	Holand	Full scale\nUtrecht	Beginning aeration exDNA -d1
+SRR17089436	PRJNA783874	3	4	6	D03_R04_S06	Full	10	AGS	Real	Holand	Full scale\nUtrecht	End aeration exDNA -d2
+SRR17089439	PRJNA783874	3	4	7	D03_R04_S07	Full	10	AGS	Real	Holand	Full scale\nUtrecht	Beginning aeration large granules iDNA -d1
+SRR17089440	PRJNA783874	3	4	8	D03_R04_S08	Full	<5	AGS	Real	Holand	Full scale\nUtrecht	End aeration small granules iDNA -d2
+SRR17089441	PRJNA783874	3	4	9	D03_R04_S09	Full	<5	AGS	Real	Holand	Full scale\nUtrecht	End aeration small granules iDNA -d2
+SRR17089442	PRJNA783874	3	4	10	D03_R04_S10	Full	10	AGS	Real	Holand	Full scale\nUtrecht	End aeration large granules iDNA -d2
+SRR17089443	PRJNA783874	3	4	11	D03_R04_S11	Full	10	AGS	Real	Holand	Full scale\nUtrecht	Beginning aeration exDNA -d2
+SRR17089445	PRJNA783874	3	4	12	D03_R04_S12	Full	10	AGS	Real	Holand	Full scale\nUtrecht	Beginning aeration small granules iDNA -d2
+SRR17089447	PRJNA783874	3	4	13	D03_R04_S13	Full	10	AGS	Real	Holand	Full scale\nUtrecht	Beginning aeration large granules iDNA -d2
+SRR17348322	PRJNA792132	4	5	1	D04_R05_S01	Full	15	AGS	Real	Holand	3 Full scales	Netherlands Garmerwolde
+SRR17348323	PRJNA792132	4	6	2	D04_R06_S02	Full	15	AGS	Real	Holand	3 Full scales	Netherlands Dinxperlo
+SRR17348321	PRJNA792132	4	7	3	D04_R07_S03	Full	15	AGS	Real	Holand	3 Full scales	Netherlands Simpelveld
+1623905	IDROSMART	5	8	1	D05_R08_S01	Pilot	20	AGS	Real	Tuscany	Pilot scale\nIDROSMART	IDROSM_Granular
+1623907	IDROSMART	5	8	2	D05_R08_S02	Pilot	20	AGS	Real	Tuscany	Pilot scale\nIDROSMART	IDROSM_Half granular
+1623908	IDROSMART	5	8	3	D05_R08_S03	Pilot	20	AGS	Real	Tuscany	Pilot scale\nIDROSMART	IDROSM_mature
+1623909	IDROSMART	5	15	4	D05_R15_S04	Lab	20	AGS	Synthetic		Lab scale\nIDROSMART	IDROSM_lab scale
+ERR5621419	PRJEB38840	6	9	1	D06_R09_S01	Lab	<10	AGS	Synthetic		Lab scale\nKitA_complex_monomeric_substrates	run2_RB_2016_08_11_G
+ERR5621420	PRJEB38840	6	9	2	D06_R09_S02	Lab	<10	AGS	Synthetic		Lab scale\nKitB_complex_monomeric_substrates	run2_RB_2016_08_11_G
+ERR5621423	PRJEB38840	6	9	3	D06_R09_S03	Lab	<10	AGS	Synthetic		Lab scale\nKitA_complex_monomeric_more_mature	run7_RA_2016_11_24_G
+ERR5621424	PRJEB38840	6	9	4	D06_R09_S04	Lab	<10	AGS	Synthetic		Lab scale\nKitB_complex_monomeric_more_mature	run7_RA_2016_11_24_G
+ERR5621425	PRJEB38840	6	9	5	D06_R09_S05	Lab	<10	AGS	Synthetic		Lab scale\nKitA_complex_polymeric_more_mature	run8_RB_2017_10_03_M
+ERR5621426	PRJEB38840	6	9	6	D06_R09_S06	Lab	<10	AGS	Synthetic		Lab scale\nKitB_complex_polymeric_more_mature	run8_RB_2017_10_03_M
+SRR24975225	PRJNA985882	7	10	1	D07_R10_S01	Lab	<10	AGS	Synthetic	low P with NO3- added in anoxic phase	Lab_scale_AGS_denitrif_organisms	R2_Lab
+SRR21902430	PRJNA890448	8	11	1	D08_R11_S01	Lab	15	AGS	Synthetic		Lab scale\n3 Granule Sizes	aerobic granular sludge small fraction B
+SRR21902431	PRJNA890448	8	11	2	D08_R11_S02	Lab	15	AGS	Synthetic		Lab scale\n3 Granule Sizes	aerobic granular sludge medium fraction B
+SRR21902432	PRJNA890448	8	11	3	D08_R11_S03	Lab	15	AGS	Synthetic		Lab scale\n3 Granule Sizes	aerobic granular sludge large fraction B
+SRR21902433	PRJNA890448	8	12	1	D08_R12_S04	Lab	15	AGS	Synthetic	Rich in\nfilaments	Lab scale\n3 Granule Sizes	aerobic granular sludge small fraction F
+SRR21902434	PRJNA890448	8	12	2	D08_R12_S05	Lab	15	AGS	Synthetic	Rich in\nfilaments	Lab scale\n3 Granule Sizes	aerobic granular sludge medium fraction F
+SRR21902435	PRJNA890448	8	12	3	D08_R12_S06	Lab	15	AGS	Synthetic	Rich in\nfilaments	Lab scale\n3 Granule Sizes	aerobic granular sludge large fraction F
+SRR22378307	PRJNA902909	9	13	1	D09_R13_S01	Lab	10	AGS	Synthetic	with antibiotics	Lab scale\nInner vs Surface	inner AGS
+SRR22378308	PRJNA902909	9	13	2	D09_R13_S02	Lab	10	AGS	Synthetic	with antibiotics	Lab scale\nInner vs Surface	outer AGS
+SRR22378309	PRJNA902909	9	13	3	D09_R13_S03	Lab	10	AGS	Synthetic	with antibiotics	Lab scale\nInner vs Surface	AGS
+SRR10267784	PRJNA576469	10	14	1	D10_R14_S01	Lab	15	AGS	Synthetic	acetate_propionate	Lab_scale	DNA-Total_S13 bulk
+SRR1051195	PRJNA231881	11	16	1	D11_R16_S01	Lab	10	AGS	Synthetic		Lab_scale	granular
+SRR25998717	PRJNA1015110	12	17	1	D12_R17_S01	Lab	10	AGS	Synthetic		Lab scale\nSemi Continuous	A3H
+SRR25998718	PRJNA1015110	12	17	2	D12_R17_S02	Lab	10	AGS	Synthetic		Lab scale\nSemi Continuous	A2H
+SRR25998719	PRJNA1015110	12	17	3	D12_R17_S03	Lab	10	AGS	Synthetic		Lab scale\nSemi Continuous	A1H
+SRR11091738	PRJNA606844	13	18	1	D13_R18_S01	Pilot	<10	AGS	Real	China,landfill leachate, inoculum in lab scale from pilot	Pilot scale\nAGS_China	Q1
+SRR11091736	PRJNA606844	13	19	2	D13_R19_S02	Lab	<10	AGS	Real	Diluted real infl	Lab scale\nReal industrial ww_continuous_more_mature	Q6
+SRR11091737	PRJNA606844	13	19	3	D13_R19_S03	Lab	<10	AGS	Real	Diluted real infl	Lab scale\nReal industrial ww_continuous_flow	Q5
+SRR28209420	PRJNA1082061	14	20	1	D14_R20_S01	Pilot	<10	AGS	Real	China,landfill leachate	Pilot scale\nChina PN	PN4_China
+SRR28209421	PRJNA1082061	14	20	2	D14_R20_S02	Pilot	<10	AGS	Real	China,landfill leachate	Pilot scale\nChina PN	PN3
+SRR28209422	PRJNA1082061	14	20	3	D14_R20_S03	Pilot	<10	AGS	Real	China,landfill leachate	Pilot scale\nChina PN	PN2
