@@ -1,7 +1,0 @@
-Sample_name	Group	Experiment_Date	Experiment_Day	FASTQ_ID	Type	Time_point	Notes
-Y1	Mixed liquor	14/02/2024	1	1607879	Mixed_Liq	1	Inoculo da saline
-Y2	Adherent	04/04/2024	50	1607880	Mixed_Liq	2	
-YS2	Mixed liquor	04/04/2024	50	1607881	Suspended	2	S sta per Sospeso
-Y3	Mixed liquor	02/05/2024	78	1607882	Mixed_Liq	3	
-YA3	Adherent	02/05/2024	78	1607883	Adherent	3	A sta per Adeso
-Y4	Mixed liquor	01/07/2024	138	1744948	Mixed_Liq	4	Altro batch
