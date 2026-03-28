@@ -1,0 +1,97 @@
+Genus	Unique_PHA_found	Reference	Notes
+Pannonibacter	PHA1	DOI: 10.1016/j.ijbiomac.2016.02.002	
+Xanthobacter	PHA2	DOI: 10.1016/j.wroa.2022.100150	
+Achromobacter	PHA3	DOI: 10.1016/j.wroa.2022.100150	
+Ancylobacter	PHA4	DOI: 10.1016/j.eti.2021.101692	
+Gemmobacter	PHA5	DOI: 10.1099/ijs.0.044735-0	
+Lysobacter	PHA6	DOI: 10.47277/jett/8(4)1273	
+Rhizobium	PHA7	DOI: 10.4014/jmb.1111.11040	
+Rhodobacter	PHA8	DOI: 10.1128/aem.63.8.3003-3009.1997	
+Bieblia	PHA8		synonimous of the one above (see https://doi.org/10.3389/fmicb.2020.00468)
+Fuscovulum	PHA8		synonimous of the one above
+Phaeovulum	PHA8		synonimous of the one above
+Sphingomonas	PHA9	DOI: 10.1590/S1516-89132013000400015	Sphingomonas paucimobilis has the pha gene
+Zooglea	PHA10	DOI: 10.4014/jmb.1111.11040	
+Zoogloea	PHA10		synonimous of the one above
+Thauera	PHA11	DOI: 10.1007/s00253-007-1301-5	
+Azoarcus	PHA12	DOI: 10.1007/s00253-007-1301-5	
+Amaricoccus	PHA13	DOI: 10.1007/s00253-007-1301-5	
+Plasticicumulans	PHA14	DOI: 10.1016/j.jbiotec.2014.10.022	
+Paracoccus	PHA15	DOI: 10.1007/s00253-007-1301-5	
+Acidovorax	PHA16	DOI: 10.1007/s00792-023-01311-5	
+Brevundimonas	PHA17	DOI: 10.1263/jbb.103.542	
+Brachymonas	PHA18	DOI: 10.1007/s11274-006-9271-9	
+Aminobacter	PHA19	DOI: 10.1016/j.nbt.2020.03.003	
+Flavisolibacter	PHA20	DOI: 10.3389/fmicb.2016.02106	
+Flavosolibacter 	PHA20		synonimous of the one above
+Meganema	PHA21	DOI: 10.1016/j.nbt.2023.05.005	
+Neomegalonema	PHA21		synonimous of the one above
+Cupriavidus	PHA22	DOI: 10.1002/jobm.202100184	
+Azohydromonas	PHA23	DOI: 10.1007/s13205-020-02550-5	
+Calidifontimicrobium	PHA23		synonimous of the one above
+Burkholderia	PHA24	DOI: 10.3389/fbioe.2020.631284	
+Pelomonas	PHA25	DOI: 10.1264/jsme2.ME18033	
+Roseateles	PHA25		synonimous of the one above
+Paucibacter	PHA25		synonimous of the one above
+Mitsuaria	PHA25		synonimous of the one above
+Kinneretia	PHA25		synonimous of the one above
+Comamonas	PHA26	DOI: 10.1023/A:1023295009846	
+Accumulibacter	PHA27	DOI: 10.1128/AEM.00808-20	
+Candidatus_Accumulibacter	PHA27		synonimous of the one above
+Competibacter	PHA28	DOI: 10.1111/j.1462-2920.2007.01456.x	
+Candidatus_Competibacter	PHA28		synonimous of the one above
+Sphaerotilus	PHA29	 DOI: 10.1002/bit.28306	
+Stenotrophomonas	PHA30	DOI: 10.1016/j.nbt.2021.08.004	
+Bacillus	PHA31	DOI: 10.1080/21655979.2021.1935524	
+Caulobacter	PHA32	DOI: 10.1099/00221287-147-12-3353	
+Pseudomonas	PHA33	DOI: 10.1023/A:1002082303615	
+Ralstonia	PHA34	DOI: 10.1155/2012/506153	
+Hydrogenophaga	PHA35	DOI: 10.1016/j.nbt.2012.11.019	
+Azospirillum	PHA36	DOI: 10.3390/polym15143027	
+Tsukamurella	PHA37	DOI: 10.3390/polym14071396	
+Novosphingobium	PHA38	 DOI: 10.3390/polym14071396	
+Novosphingomonas	PHA38		synonimous of the one above
+Flavobacterium	PHA39	DOI: 10.3390/polym14071396	
+Calothrix	PHA40	 DOI: 10.3390/polym14071396	
+Acinetobacter	PHA41	DOI: 10.3390/polym14071396	
+Dyella	PHA42	 DOI: 10.3390/polym14071396	
+Qipengyuania	PHA43	 DOI: 10.3390/polym14071396	
+Leadbetterella	PHA44	DOI: 10.1016/j.nbt.2023.05.005	
+	PHA45		
+Haloferax	PHA45	DOI: 10.1007/s13205-020-02550-5	halophile archaea
+Saccharophagus	PHA46	DOI: 10.1007/s13205-020-02550-5	
+Halomonas	PHA47	DOI: 10.1007/s13205-020-02550-5	halophile archaea
+Methylobacterium	PHA48	DOI: 10.1007/s13205-020-02550-5	
+Azotobacter	PHA49	DOI: 10.1007/s13205-020-02550-5	
+Zobellella	PHA50	DOI: 10.1007/s13205-020-02550-5	
+Erwinia	PHA51	DOI: 10.1007/s13205-020-02550-5	
+Chromobacterium	PHA52	DOI: 10.1007/s13205-020-02550-5	
+Bosea	PHA53	DOI: 10.1016/j.nbt.2023.05.005	
+Hyphomicrobium	PHA54	DOI: 10.1016/j.nbt.2023.05.005	
+Leucobacter	PHA55	DOI: 10.1016/j.nbt.2021.08.004	
+Thiothrix	PHA56	DOI: 10.1016/j.nbt.2021.08.004	
+Chelatococcus	PHA57	DOI: 10.1016/j.nbt.2021.08.004	
+Microbacterium	PHA58	DOI: 10.3906/biy-1103-2	
+Paramicrobacterium	PHA58		synonimous of the one above
+Aureobacterium	PHA58		synonimous of the one above
+Ideonella	PHA59	DOI: 10.1264/jsme2.ME18033	
+Yokenella	PHA60	DOI: 10.1155/2014/802984	
+Koserella	PHA60		synonimous of the one above
+Rhodococcus	PHA61	DOI: 10.1155/2014/802984	
+Prescottella	PHA61		synonimous of the one above
+Halobacterium	PHA62	DOI: 10.1155/2014/802984	halophile archaea
+Halorubrum	PHA63	DOI: 10.1155/2014/802984	halophile archaea
+Natronococcus	PHA64	DOI: 10.1155/2014/802984	haloakaliphile archaea
+Synechocystis	PHA65	DOI: 10.1155/2014/802984	cyanobacteria (photosynthetic)
+Nostoc	PHA66	DOI: 10.1155/2014/802984	cyanobacteria (photosynthetic)
+Spirulina	PHA67	DOI: 10.1155/2014/802984	cyanobacteria (photosynthetic)
+Sinorhizobium	PHA68	DOI: 10.1155/2014/802984	
+Ensifer Casida	PHA68		synonimous of the one above
+Streptomyces	PHA69	DOI: 10.1155/2014/802984	
+Microlunatus	PHA70	DOI: 10.1155/2014/802984	
+Defluviicoccus	PHA71	DOI: 10.1155/2014/802984	
+Haloarcula	PHA72	DOI: 10.1155/2014/802984	halophile archaea
+Aulosira	PHA73	DOI: 10.1155/2014/802984	
+Dechloromonas	PHA74	DOI: 10.1016/j.ese.2024.100387	
+Candidatus_Dechloromonas	PHA74		synonimous of the one above
+SM1A02	PHA75	DOI: 10.1016/j.envres.2024.118722	Planctomycetota
