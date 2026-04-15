@@ -157,6 +157,9 @@ table$Domain<-factor(table$Domain, levels =  c("unclassified","Bacteria","Archae
                                                "Platyhelminthes","Protist","Viruses") ) # NB: unclassified are invisible (see above)
 #table$Domain<-relevel(table$Domain,c("Unclassified","Bacteria") )
 
+levels(table$Sample_name) <- gsub("ML","ML-", levels(table$Sample_name) )
+levels(table$Sample_name) <- gsub("MS","MS-", levels(table$Sample_name) )
+
 ggplot(data=table, aes(x=Sample_name, y=Abundance, fill=as.factor(Domain))) +
   geom_bar( stat="identity", position="stack", na.rm = F) +
   facet_grid(~ Group, scales = "free_x", space = "free_x") +
@@ -214,7 +217,7 @@ dev.off()
 
 ############################ RAREFACTION ANALYSIS ################################
 
-png(file="Data_check/Rarefaction_curve.png",width=2500,height=2000, res=300)
+png(file="Data_check/Rarefaction_curve.png",width=2200,height=1800, res=300)
 r<-rarecurve(t(as(otu_table(data),"matrix")), step=5000,label=T) # using the filtered (analysed) data
 dev.off()
 rm(r)
@@ -242,6 +245,10 @@ data_temp<- transform_sample_counts(data_temp, fun= function(x) x/sum(x)*100 )
   tabella$Genus<-gsub ("Candidatus_","Ca.", tabella$Genus)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[! unique(tabella$Genus) %in% "Others"],"Others"))
 }
+
+levels(tabella$Sample_name) <- gsub("ML","ML-", levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("MS","MS-", levels(tabella$Sample_name) )
+
 ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Genus)) +
   facet_grid(cols= vars(Group),scales = "free_x", space = "free_x") +
   geom_bar(stat="identity", position="stack") +
@@ -274,11 +281,11 @@ dev.off()
 # means of TOP Genera
 to_save<- cbind.data.frame( "Domain"= as.data.frame(tax_table(prune.dat_top))[["Domain"]] , 
                             "Genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]] ,
-                            "Average R"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="R"]],1,mean)), 2),
-                            "Average T"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="T"]],1,mean)), 2) #,
+                            "Average MS"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="MS"]],1,mean)), 2),
+                            "Average ML"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="ML"]],1,mean)), 2) #,
                             #"Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2
                             )
-to_save<-to_save[order(to_save$`Average R`, decreasing=T), ]
+to_save<-to_save[order(to_save$`Average MS`, decreasing=T), ]
 write.xlsx(file = "Results_DNAseq/Abundances/TOP_Genera_Average_abundances.xlsx", row.names = F, to_save)
 
 
@@ -340,13 +347,11 @@ dev.off()
 # means of TOP Species
 to_save<- cbind.data.frame( "Domain"= as.data.frame(tax_table(prune.dat_top))[["Domain"]] , 
                             "Species"= as.data.frame(tax_table(prune.dat_top))[["Species"]] ,
-                            "Average R"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="R"]],1,mean)), 2),
-                            "Average T"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="T"]],1,mean)), 2) 
-                            )
-#,
-                            # "Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2)
-
-to_save<-to_save[order(to_save$`Average R`, decreasing=T), ]
+                            "Average MS"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="MS"]],1,mean)), 2),
+                            "Average ML"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="ML"]],1,mean)), 2) #,
+                            #"Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2
+)
+to_save<-to_save[order(to_save$`Average MS`, decreasing=T), ]
 write.xlsx(file = "Results_DNAseq/Abundances/TOP_Species_Average_abundances.xlsx", row.names = F, to_save)
 
 suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabella_others, top, others))
@@ -380,7 +385,11 @@ suppressWarnings(rm(top, others, tabella, unass_data))
   tabella$Genus <- gsub(".*: Others","Others",tabella$Genus)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[! unique(tabella$Genus) %in% "Others"],"Others"))
 }
+
 levels(tabella$Genus) <- gsub("Protozoa: Symbiodinium","Protist: Symbiodinium", levels(tabella$Genus), fixed = T)
+levels(tabella$Sample_name) <- gsub("ML","ML-", levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("MS","MS-", levels(tabella$Sample_name) )
+
 ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=as.factor(Genus))) +
   geom_bar( stat="identity", position="stack", na.rm = F) + 
   facet_grid(~ Group, scales = "free_x", space = "free_x") +
@@ -413,11 +422,12 @@ dev.off()
 # means of TOP Genera
 to_save<- cbind.data.frame( "Euk_clade"= as.data.frame(tax_table(prune.dat_top))[["Euk_clade"]] ,
                             "Genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]] ,
-                            "Average R"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="R"]],1,mean)), 2),
-                            "Average T"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="T"]],1,mean)), 2)
-                            ) #"Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2)
+                            "Average MS"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="MS"]],1,mean)), 2),
+                            "Average ML"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="ML"]],1,mean)), 2) #,
+                            #"Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2
+)
+to_save<-to_save[order(to_save$`Average MS`, decreasing=T), ]
 
-to_save<-to_save[order(to_save$`Average R`, decreasing=T), ]
 write.csv(to_save, file = "Results_DNAseq/Abundances/TOP_Eukaryota_genera_ONLY_EUKAR_average_abundances.csv", row.names = F, quote=F)
 
 
@@ -445,6 +455,10 @@ suppressWarnings(rm(top, others, tabella, unass_data))
   tabella$Genus <- gsub(".*: Others","Others",tabella$Genus)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[! unique(tabella$Genus) %in% "Others"],"Others"))
 }
+
+levels(tabella$Sample_name) <- gsub("ML","ML-", levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("MS","MS-", levels(tabella$Sample_name) )
+
 fill_color_customised<-c("navyblue","gray85","brown4",
                          "darkcyan", "darkgreen",
                          "gold3","orange",
@@ -540,11 +554,11 @@ dev.off()
 # means of TOP Species
 to_save<- cbind.data.frame( "Domain"= as.data.frame(tax_table(prune.dat_top))[["Domain"]] , 
                             "Species"= as.data.frame(tax_table(prune.dat_top))[["Species"]] ,
-                            "Average R"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="R"]],1,mean)), 2),
-                            "Average T"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="T"]],1,mean)), 2) ) # ,
-                            #"Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2)
-
-to_save<-to_save[order(to_save$`Average R`, decreasing=T), ]
+                            "Average MS"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="MS"]],1,mean)), 2),
+                            "Average ML"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="ML"]],1,mean)), 2) #,
+                            #"Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2
+)
+to_save<-to_save[order(to_save$`Average MS`, decreasing=T), ]
 write.xlsx(file = "Results_DNAseq/Abundances/TOP_Archaea_Average_abundances.xlsx", row.names = F, to_save)
 
 
@@ -645,7 +659,7 @@ obs <- pAlpha$data[pAlpha$data$variable=="Observed", ]
 pAlpha +
   geom_boxplot(data=pAlpha$data, aes(x=Group, y=value, color=NULL, shape=NULL), alpha=0) + 
   theme_classic() +
-  geom_text(aes(label=Sample_name), color="red2" , size=4)+
+  geom_text(aes(label=Sample_name), color="red2" , size=3)+
   # scale_color_manual(values = c("BBBB"="chartreuse", "AAAA"="coral")) +
   labs(title="Alpha diversity (Eubacteria genera)", 
        y="Alpha Diversity Measure",
@@ -682,7 +696,7 @@ obs <- pAlpha$data[pAlpha$data$variable=="Observed", ]
 pAlpha +
   geom_boxplot(data=pAlpha$data, aes(x=Group, y=value, color=NULL, shape=NULL), alpha=0) + 
   theme_classic() +
-  geom_text(aes(label=Sample_name), color="red2" , size=4)+
+  geom_text(aes(label=Sample_name), color="red2" , size=3)+
   # scale_color_manual(values = c("BBBB"="chartreuse", "AAAA"="coral")) +
   labs(title="Alpha diversity (Eubacteria species)", 
        y="Alpha Diversity Measure",
@@ -719,7 +733,7 @@ obs <- pAlpha$data[pAlpha$data$variable=="Observed", ]
 pAlpha +
   geom_boxplot(data=pAlpha$data, aes(x=Group, y=value, color=NULL, shape=NULL), alpha=0) + 
   theme_classic() +
-  geom_text(aes(label=Sample_name), color="red4" , size=4)+
+  geom_text(aes(label=Sample_name), color="red4" , size=3)+
   # scale_color_manual(values = c("BBBB"="chartreuse", "AAAA"="coral")) +
   labs(title="Alpha diversity (Archaea genera)", 
        y="Alpha Diversity Measure",
@@ -755,7 +769,7 @@ obs <- pAlpha$data[pAlpha$data$variable=="Observed", ]
 pAlpha +
   geom_boxplot(data=pAlpha$data, aes(x=Group, y=value, color=NULL, shape=NULL), alpha=0) + 
   theme_classic() +
-  geom_text(aes(label=Sample_name), color="chocolate3" , size=4)+
+  geom_text(aes(label=Sample_name), color="chocolate3" , size=3)+
   # scale_color_manual(values = c("BBBB"="chartreuse", "AAAA"="coral")) +
   labs(title="Alpha diversity (Eukaryota genera)", 
        y="Alpha Diversity Measure",
@@ -883,10 +897,11 @@ dev.off()
 # averages
 to_save<- cbind.data.frame( "Euk_clade"= as.data.frame(tax_table(prune.dat_top))[["Euk_clade"]] ,
                             "Genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]] ,
-                            "Average R"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="R"]],1,mean)), 2),
-                            "Average T"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="T"]],1,mean)), 2)
+                            "Average MS"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="MS"]],1,mean)), 2),
+                            "Average ML"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="ML"]],1,mean)), 2) #,
+                            #"Average Inoculum"= round( as.numeric(apply(otu_table(prune.dat_top)[ ,colnames(otu_table(prune.dat_top))%in%Metadata$FASTQ_ID[Metadata$Group=="Inoculum"]],1,mean)), 2
 )
-to_save<-to_save[order(to_save$`Average R`, decreasing=T), ]
+to_save<-to_save[order(to_save$`Average MS`, decreasing=T), ]
 write.xlsx(file = "Results_DNAseq/Abundances/AOB_AOA_NOB_organisms_Averages.xlsx", row.names = F, to_save)
 
 
@@ -917,5 +932,3 @@ print(package$loadedOnly)
 sink()
 close(con)
 suppressWarnings(rm(con))
-
-
