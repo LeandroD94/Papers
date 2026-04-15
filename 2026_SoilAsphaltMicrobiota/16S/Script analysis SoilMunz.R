@@ -165,7 +165,6 @@ proof1<-"This is the proof of having performed the filtering steps"
 
 
 
-
 ########################### % ASSIGNED IN SILVA ##################################
 
 {data.phy = tax_glom(data, taxrank = "Phylum", NArm = F)
@@ -360,10 +359,19 @@ suppressWarnings(rm(top, others, tabella, unass_data))
   tabella$Genus<-gsub ("Pedosphaer.","Pedosphaeraceae", tabella$Genus)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[unique(tabella$Genus)!="Others"],"Others"))
 }
-tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost","R1","R2","R3","R4",
-                                                             "S1","S2","S3","S4",
-                                                             "T1","T2","T3","T4")
-)
+# tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost","R1","R2","R3","R4",
+#                                                              "S1","S2","S3","S4",
+#                                                              "T1","T2","T3","T4")
+# )
+tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost",
+                                                             "MS0","MS10","MS25","MS50",
+                                                             "SL0","SL10","SL25","SL50",
+                                                             "ML0","ML10","ML25","ML50")
+                             )
+levels(tabella$Sample_name) <- gsub("MS","MS-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("SL","SL-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("ML","ML-",levels(tabella$Sample_name) )
+
 
 custom_colors<-c("chartreuse","deeppink", "firebrick3",
                  "orange","darkmagenta", 
@@ -434,10 +442,15 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabel
   tabella$Genus<-gsub ("KCM-B-112","Acidithiobacil. KCM-B-112", tabella$Genus, fixed=T)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[unique(tabella$Genus)!="Others"],"Others"))
 }
-tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost","R1","R2","R3","R4",
-                                                             "S1","S2","S3","S4",
-                                                             "T1","T2","T3","T4")
+tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost",
+                                                             "MS0","MS10","MS25","MS50",
+                                                             "SL0","SL10","SL25","SL50",
+                                                             "ML0","ML10","ML25","ML50")
                              )
+levels(tabella$Sample_name) <- gsub("MS","MS-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("SL","SL-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("ML","ML-",levels(tabella$Sample_name) )
+
 custom_colors<-c( rev(c("navyblue","gray80","brown4",
                          "darkgreen", "slateblue4",
                         "gold3","deepskyblue2",
@@ -473,8 +486,17 @@ ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Genus)) +
        #title = "Most abundant identified phyla (every sample)",
        fill="")
 ggsave(file="Results/Abundances/Most_Abundant_Genera___AveragesEverySample2.png",width=4.8,height=4, dpi=300)
-
 dev.off()
+
+# means of TOP Genera
+to_save<- cbind.data.frame("Overall Mean"=as.numeric( apply(otu_table(prune.dat_top),1,mean) ),
+                           "Mean in MS" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="MS")),1,mean) ) ,
+                           "Mean in ML" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="ML")),1,mean) ),
+                           "Mean in SL" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="SL")),1,mean) ),
+                           "genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]])
+to_save<-to_save[order(to_save$`Overall Mean`, decreasing=T), ]
+write.xlsx(file = "Results/Abundances/Most_Abundant_Genera___AveragesIncludingCompost.xlsx", row.names = F, 
+           x = to_save )
 
 suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabella_others, top, others))
 
@@ -506,6 +528,11 @@ data_subset <- subset_samples(data.genus.prop, Sample_name!="Compost")
   tabella$Genus<-gsub ("_terrestrial_group"," terrestrial", tabella$Genus)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[unique(tabella$Genus)!="Others"],"Others"))
 }
+
+levels(tabella$Sample_name) <- gsub("MS","MS-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("SL","SL-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("ML","ML-",levels(tabella$Sample_name) )
+
 custom_colors<-c("chartreuse","deeppink", "firebrick3",
                  "orange","darkmagenta", 
                  "darkblue","grey65", "cadetblue3",
@@ -547,9 +574,9 @@ dev.off()
 
 # means of TOP Genera
 to_save<- cbind.data.frame("Overall Mean"=as.numeric( apply(otu_table(prune.dat_top),1,mean) ),
-                           "Mean in R" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="R")),1,mean) ) ,
-                           "Mean in T" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="T")),1,mean) ),
-                           "Mean in S" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="S")),1,mean) ),
+                           "Mean in MS" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="MS")),1,mean) ) ,
+                           "Mean in ML" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="ML")),1,mean) ),
+                           "Mean in SL" = as.numeric( apply(otu_table(subset_samples(prune.dat_top,Group=="SL")),1,mean) ),
                            "genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]])
 to_save<-to_save[order(to_save$`Overall Mean`, decreasing=T), ]
 write.xlsx(file = "Results/Abundances/Most_Abundant_Genera___AveragesExcludingCompost_VALUES.xlsx", row.names = F, 
@@ -561,7 +588,7 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, top, others, tabel
 
 ### AGAIN, BUT ONLY GROUP R
 suppressWarnings(rm(top, others, tabella, unass_data))
-data_subset <- subset_samples(data.genus.prop, Group=="R" & Sample_name!="Compost")
+data_subset <- subset_samples(data.genus.prop, Group=="MS" & Sample_name!="Compost")
 {top <- names(sort(taxa_sums(data_subset), decreasing=TRUE))[1:29]
   prune.dat_top <- prune_taxa(top,data_subset)
   tax_selected<-as.data.frame(tax_table(prune.dat_top))
@@ -637,7 +664,7 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, top, others, tabel
 
 ### AGAIN, BUT ONLY GROUP S
 suppressWarnings(rm(top, others, tabella, unass_data))
-data_subset <- subset_samples(data.genus.prop, Group=="S")
+data_subset <- subset_samples(data.genus.prop, Group=="SL")
 {top <- names(sort(taxa_sums(data_subset), decreasing=TRUE))[1:29]
   prune.dat_top <- prune_taxa(top,data_subset)
   tax_selected<-as.data.frame(tax_table(prune.dat_top))
@@ -714,7 +741,7 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, top, others, tabel
 
 ### AGAIN, BUT ONLY GROUP T
 suppressWarnings(rm(top, others, tabella, unass_data))
-data_subset <- subset_samples(data.genus.prop, Group=="T")
+data_subset <- subset_samples(data.genus.prop, Group=="ML")
 {top <- names(sort(taxa_sums(data_subset), decreasing=TRUE))[1:29]
   prune.dat_top <- prune_taxa(top,data_subset)
   tax_selected<-as.data.frame(tax_table(prune.dat_top))
@@ -788,6 +815,7 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, top, others, tabel
 
 
 
+
 ###################### ABUNDANCES OF ARCHAEA ##########################
 
 ### TOP Genera Archaea
@@ -808,10 +836,15 @@ data.temp <- subset_taxa(data.genus.prop, Kingdom=="d__Archaea")
   tabella<-tabella[order(sort(tabella$Abundance, decreasing = T)), ]
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[unique(tabella$Genus)!="Others"],"Others"))
 }
-tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost","R1","R2","R3","R4",
-                                                             "S1","S2","S3","S4",
-                                                             "T1","T2","T3","T4")
+tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost",
+                                                             "MS0","MS10","MS25","MS50",
+                                                             "SL0","SL10","SL25","SL50",
+                                                             "ML0","ML10","ML25","ML50")
 )
+levels(tabella$Sample_name) <- gsub("MS","MS-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("SL","SL-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("ML","ML-",levels(tabella$Sample_name) )
+
 custom_colors<-c("chartreuse","black", "firebrick4",
                  "orange","red", 
                  "darkblue","grey65", "magenta",
@@ -869,7 +902,8 @@ pAlpha
   ev$variable<-rep("Evenness")
   # updating and ordering samples for pairwise wilcoxon
   New_data<-rbind.data.frame(obs,H,ev)
-  New_data$Sample_label <- gsub("[A-Z]","", New_data$Sample_name)
+  # New_data$Sample_label <- gsub("[A-Z]","", New_data$Sample_name)
+  New_data$Sample_label <- as.character(New_data$Sample_name)
   New_data$Sample_label[New_data$Sample_name=="Compost"] <- "Comp"
   pAlpha$data<-New_data
   pAlpha$data$variable<-gsub("Observed","Observed richness",pAlpha$data$variable)
@@ -878,14 +912,14 @@ pAlpha
 pAlpha + 
   geom_boxplot(data=pAlpha$data, aes(x=Group, y=value, color=NULL), alpha=0, linewidth=0.2, color="gray30") +
   theme_classic2(base_size = 8.2) + 
-  scale_color_manual(values = c("R"="coral", 
-                                "S"="royalblue1",
-                                "T"="chartreuse2")) +
+  scale_color_manual(values = c("MS"="coral", 
+                                "SL"="royalblue1",
+                                "ML"="chartreuse2")) +
   labs(x=""
        # title="Alpha diversity in Healthy and CCHS",
   ) +
-  geom_text(aes(label=pAlpha$data$Sample_label), color="white", size=2.1, show.legend = FALSE) +
-  geom_text(aes(label=pAlpha$data$Sample_label), color="black", size=1.95, vjust=0.54, show.legend = FALSE) +
+  geom_text(aes(label=pAlpha$data$Sample_label), color="white", size=1.7, show.legend = FALSE) +
+  geom_text(aes(label=pAlpha$data$Sample_label), color="black", size=1.55, vjust=0.54, show.legend = FALSE) +
   guides(fill="none", color="none") +
   theme(axis.text.x= element_text(angle=0, vjust=0.5, hjust=0.5, size=7.5))
 ggsave(file="Results/Alfa_diversity_of_Genera.png", width = 3.35,height =2.5, dpi=300)
@@ -908,9 +942,9 @@ sample_data(data.prop.labels)$Labels[sample_data(data.prop.labels)$Sample_name==
   eigval<- round((eigval/sum(eigval))*100, 1) # to get variation explained by every PC
 }
 plot_ordination(data.sqrt_prop, ordBC, color = "Group") +
-  scale_color_manual(values = c("R"="coral", 
-                                "S"="royalblue1",
-                                "T"="chartreuse")) +
+  scale_color_manual(values = c("MS"="coral", 
+                                "SL"="royalblue1",
+                                "ML"="chartreuse2")) +
   geom_point(size=3.5, alpha= 0.5) +
   theme_classic(base_size = 9) +
   theme( legend.text = element_text(size=9)) +
@@ -933,15 +967,15 @@ sample_data(data.prop.labels)$Labels <- gsub("[A-Z]","",sample_data(data.prop.la
   eigval<- round((eigval/sum(eigval))*100, 1) # to get variation explained by every PC
 }
 plot_ordination(data.sqrt_prop, ordBC, color = "Group") +
-  scale_color_manual(values = c("R"="coral", 
-                                "S"="royalblue1",
-                                "T"="chartreuse")) +
+  scale_color_manual(values = c("MS"="coral", 
+                                "SL"="royalblue1",
+                                "ML"="chartreuse2")) +
   geom_point(size=2.3, alpha= 0.4) +
   theme_classic(base_size = 8.25) +
   theme( legend.text = element_text(size=9)) +
   stat_ellipse( aes(group=Group) , linewidth=0.12) +
-  geom_text(aes(label=Labels), color="gray80", size=2.8, show.legend = FALSE) +
-  geom_text(aes(label=Labels), color="black", size=2.6, show.legend = FALSE) +
+  geom_text(aes(label=Labels), color="gray80", size=2, show.legend = FALSE) +
+  geom_text(aes(label=Labels), color="black", size=1.68, show.legend = FALSE) +
   labs( # title="PCoA with Hellinger distance\n (euclidean on Hellinger transformed Genera)",
     # subtitle= paste0("PERMANOVA Pr(>F) Healthy - CCHS: ", perm_g_H["Condition2", "Pr(>F)"] ),
     color="",
@@ -965,13 +999,13 @@ who<-as.vector(tax_table(data.venn)[row.names(who),"Genus"]) # to translate in A
 data.venn<-subset_taxa(data.venn, ! Genus %in% who)
 
 
-R<-subset_samples(data.venn, Group=="R")
+R<-subset_samples(data.venn, Group=="MS")
 R<-as.character(tax_table(prune_taxa(taxa_sums(R)>0, R))[,"Genus"])
 
-GroupT<-subset_samples(data.venn, Group=="T")
+GroupT<-subset_samples(data.venn, Group=="ML")
 GroupT<-as.character(tax_table(prune_taxa(taxa_sums(GroupT)>0, GroupT))[,"Genus"])
 
-S<-subset_samples(data.venn, Group=="S")
+S<-subset_samples(data.venn, Group=="SL")
 S<-as.character(tax_table(prune_taxa(taxa_sums(S)>0, S))[,"Genus"])
 
 
@@ -1217,10 +1251,15 @@ NOB_list <- c("Nitrospira","Nitrospirae", "Nitrospirae", "Nitrospirales","Nitros
   tabella$Genus<-gsub ("uncultured","uncult. ", tabella$Genus)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[unique(tabella$Genus)!="Others"],"Others"))
 }
-tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost","R1","R2","R3","R4",
-                                                             "S1","S2","S3","S4",
-                                                             "T1","T2","T3","T4")
+tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost",
+                                                             "MS0","MS10","MS25","MS50",
+                                                             "SL0","SL10","SL25","SL50",
+                                                             "ML0","ML10","ML25","ML50")
 )
+levels(tabella$Sample_name) <- gsub("MS","MS-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("SL","SL-",levels(tabella$Sample_name) )
+levels(tabella$Sample_name) <- gsub("ML","ML-",levels(tabella$Sample_name) )
+
 custom_colors<-c("gray30","deepskyblue","navyblue",
                  "royalblue1","red2","cadetblue3",
                  "tomato","black","skyblue1",
@@ -1311,9 +1350,9 @@ row.names(meta2) <- metadata$FASTQ_ID
 actual_names <- meta2[ colnames(this_table) , "Sample_name" ]
 colnames(this_table) <- actual_names
 
-Table_R <- this_table[ , c("R1","R2","R3","R4")]
-Table_S <- this_table[ , c("S1","S2","S3","S4")]
-Table_T <- this_table[ , c("T1","T2","T3","T4")]
+Table_R <- this_table[ , c("MS0","MS10","MS25","MS50")]
+Table_S <- this_table[ , c("SL0","SL10","SL25","SL50")]
+Table_T <- this_table[ , c("ML0","ML10","ML25","ML50")]
 
 # fill_color_thrends<-c("navyblue","firebrick3","springgreen2","blue1","cadetblue2","deeppink2",
 #                       "wheat","coral2","cyan","slateblue","black", "yellow3","darkmagenta","indianred3","magenta",
@@ -1407,8 +1446,6 @@ cat("\n", "\n", fill=TRUE)
 package$otherPkgs$ggplot2[1:2]
 cat("\n", "\n", fill=TRUE)
 package$otherPkgs$vegan[c(1,3)]
-cat("\n", "\n", fill=TRUE)
-package$otherPkgs$mixOmics[c(1,4)]
 cat("\n \n \nEvery package: \n", fill=TRUE)
 print(package$otherPkgs)
 
