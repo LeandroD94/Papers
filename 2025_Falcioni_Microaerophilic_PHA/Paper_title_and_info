@@ -25,3 +25,6 @@ The data was analysed using R and packages as phyloseq, ggplot2 and vegan.
 Genera capable of accumulating PHA were recognised according to the literature. 
 Principal Coordinate Analysis (PCoA) was computed using the Hellinger distance on genera percent abundances.
 Significant differences in genus abundances between reactors were assessed using DESeq2.
+
+SRA BioProject ID (raw reads):
+PRJNA1354825
