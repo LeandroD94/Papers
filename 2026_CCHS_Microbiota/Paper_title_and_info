@@ -1,3 +1,23 @@
-TITLE: Uncovering gut microbiota and derived metabolites in Congenital Central Hypoventilation Syndrome
+TITLE: Microbiota–Metabolome Alterations Suggest Pro-Inflammatory Phenotype in Congenital Central Hypoventilation Syndrome
 
-work_in_progress ...
+AUTHORS: Leandro Di Gloria1, Marta Peruzzi2, Marzia Vasarri1, Marta Menicatti3, Gianluca Bartolucci3, Monica Annunziata2, Arianna Bedeschi4, Matteo Ramazzotti1*, Donatella Degl’Innocenti1 # and Niccolò Nassi2#
+1-	Department of Experimental and Clinical Biomedical Sciences, University of Florence, 50134 Florence, Italy
+2-	Sleep Disorder Breathing and SIDS Center, Meyer Children’s Hospital IRCCS, 50134 Florence, Italy 
+3-	Department of Neurosciences, Psychology, Drug Research and Child Health Section of Pharmaceutical and Nutraceutical Sciences, University of Florence, 50134 Florence, Italy 
+4-	Gastroenterology Unit, Meyer Children’s Hospital IRCCS, 50134 Florence, Italy
+*Corresponding Author (matteo.ramazzotti@unifi.it)
+# Joint last co-authors
+
+ABSTRACT: Congenital Central Hypoventilation Syndrome (CCHS) is a genetic disorder caused by mutations in the PHOX2B gene, characterized by impaired autonomic control of breathing and systemic consequences that may affect gut homeostasis.
+This study provides the first integrated multi-omics analysis in a CCHS group and matched controls, combining fecal DNA-based gut taxonomic profiling with targeted quantification of fatty acids and aromatic carboxylic acids.
+While overall microbial diversity and community structure remained largely preserved, significant alterations were observed in specific taxa within the CCHS group.
+Notably, the control group exhibited an enrichment of short-chain fatty acid (SCFA)-producing genera, which are associated with eubiotic gut ecosystems, whereas the CCHS group showed higher abundance of taxa commonly linked to inflammatory contexts.
+Consistently, fecal levels of beneficial SCFAs – particularly valeric acid, and to a lesser extent butyric acid – were reduced in CCHS group.
+These findings point to a dysbiotic gut microbiota in CCHS patients, likely supporting putative inflammatory processes that would further worsen overall health status if confirmed.
+Furthermore, this work provides exploratory functional signatures for future studies aimed at understanding systemic consequences, guiding mechanistic investigations, and informing strategies to improve supportive care and long-term health outcomes in this rare patient population.
+
+KEYWORDS: CCHS; Dysbiosis; Microbiota; Metabolic profiling; Inflammation
+
+DATA AVAILABILITY:
+The raw sequencing data is publicly available on NCBI SRA (Sequence Read Archive) at bio-project PRJNA1412517.
+The raw metabolite tables and the analysis scripts are available on GitHub: https://github.com/LeandroD94/Papers/tree/main/2026_CCHS_Microbiota .
