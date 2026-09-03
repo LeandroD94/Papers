@@ -431,6 +431,7 @@ sample_data(data.prop.labels)$Storage <- gsub("No_storage","Room T", sample_data
   eigval<-ordBC$values$Eigenvalues # to get eigen values of every PC
   eigval<- round((eigval/sum(eigval))*100, 1) # to get variation explained by every PC
 }
+
 values_color<-c("Direct"="coral",
                 "-20C" = "deepskyblue3")
 plot_this <- plot_ordination(data.sqrt_prop, ordBC, color="Storage" )+
@@ -508,6 +509,158 @@ ggsave(file="Results/Beta_diversity_PCoA/CUOID_PCoA_Hellinger_Genus_OnlyGLY_20C_
 
 
 
+####### EXTRA: PCoA FOCUSED ON *ONLY* STORED *OR* DIRECT TIMELINE IN THE CUOIODEPUR FROZEN ONLY ###########
+
+### Trying with the inclusion of only oldest sample in the comparison (e.g. 1 year)
+direct_samples <- as.character(metadata$Sample_name[metadata$Reactor=="CuoioDepur_Aero" & metadata$Storage=="Direct"])
+direct_ID <- as.character(metadata$Collection_data[metadata$Sample_name%in%direct_samples])
+# picking the oldest sample (stored for a longer period) for each collection data (ID)
+already_picked_ID <- NULL
+selected_samples <- direct_samples
+for( time in c("3y","1y","6m","3m")){
+  selected_table <- metadata[metadata$Collection_data%in%direct_ID & metadata$Time_before_extr2==time & metadata$Storage=="-20C", ]
+  selected_samples <- c(selected_samples, as.character(selected_table$Sample_name[!selected_table$Sample_name%in%selected_samples & ! selected_table$Collection_data%in%already_picked_ID]) )
+  already_picked_ID <- c(already_picked_ID, as.character(selected_table$Collection_data))
+}
+subset_target <- subset_samples(data.genus.prop, Sample_name %in% selected_samples ) # Sample_name%in%c("PGB10","PGB1"))
+# View(sample_data(subset_target))   # to check --> OK
+
+
+# STORED ONLY (ONLY THE OLDEST SAMPLES)
+subset_target2 <- subset_samples(subset_target, Storage!="Direct")
+{data.sqrt_prop<-transform_sample_counts(subset_target2, sqrt) # square root of proportion
+  DistBC = phyloseq::distance(data.sqrt_prop, method = "euclidean")
+  ordBC = ordinate(data.sqrt_prop, method = "PCoA", distance = DistBC)
+  eigval<-ordBC$values$Eigenvalues # to get eigen values of every PC
+  eigval<- round((eigval/sum(eigval))*100, 1) # to get variation explained by every PC
+}
+# base plot here...
+base_plot <- plot_ordination(data.sqrt_prop, ordBC )+
+  geom_point(size=3.7, alpha=0.5,  show.legend = F, color="deepskyblue2") +
+  guides(shape="none") +
+  theme_classic(base_size = 9) +
+  theme(legend.text =element_text(size=9)) +
+  labs(
+    x=paste("PC1: ",eigval[1],"% variation"), y=paste("PC2: ",eigval[2],"% variation"),
+    color="")
+# adjusting few aesthetics...
+base_plot$data$Axis.1 <-  -base_plot$data$Axis.1
+base_plot$data$Reactor_ID<-gsub("A ","", base_plot$data$Reactor_ID)
+base_plot$data <- base_plot$data[order(base_plot$data$Collection_data), ]
+# plotting
+base_plot +
+  geom_text(aes(label=Reactor_ID), color="black", size=1.8, show.legend = FALSE, vjust= 1.5) +
+  geom_path(aes(group="Collection_data"), color="darkgray" , linewidth = 0.16, alpha=0.85,
+            arrow=arrow(length =unit(0.2,"cm"), type = "closed")
+  )
+ggsave(file="Results/Beta_diversity_PCoA/CUOID_PCoA_Hellinger_ONLY_OLDER_STORAGES.png", width = 4.8, height = 2.5, dpi=300)
+
+
+### DIRECT ONLY
+subset_target2 <- subset_samples(subset_target, Storage=="Direct")
+{data.sqrt_prop<-transform_sample_counts(subset_target2, sqrt) # square root of proportion
+  DistBC = phyloseq::distance(data.sqrt_prop, method = "euclidean")
+  ordBC = ordinate(data.sqrt_prop, method = "PCoA", distance = DistBC)
+  eigval<-ordBC$values$Eigenvalues # to get eigen values of every PC
+  eigval<- round((eigval/sum(eigval))*100, 1) # to get variation explained by every PC
+}
+# base plot here...
+base_plot <- plot_ordination(data.sqrt_prop, ordBC )+
+  geom_point(size=3.7, alpha=0.5,  show.legend = F, color="coral") +
+  guides(shape="none") +
+  theme_classic(base_size = 9) +
+  theme(legend.text =element_text(size=9)) +
+  labs(
+    x=paste("PC1: ",eigval[1],"% variation"), y=paste("PC2: ",eigval[2],"% variation"),
+    color="")
+# adjusting few aesthetics...
+base_plot$data$Reactor_ID<-gsub("A ","", base_plot$data$Reactor_ID)
+base_plot$data$Reactor_ID<-gsub("01/24","01/24           ", base_plot$data$Reactor_ID)
+base_plot$data$Reactor_ID<-gsub("02/24","   02/24", base_plot$data$Reactor_ID)
+base_plot$data <- base_plot$data[order(base_plot$data$Collection_data), ]
+# plotting
+base_plot +
+  geom_text(aes(label=Reactor_ID), color="black", size=1.8, show.legend = FALSE, vjust= 1.5) +
+  geom_path(aes(group="Collection_data"), color="darkgray" , linewidth = 0.165, alpha=0.85,
+            arrow=arrow(length =unit(0.2,"cm"), type = "closed")
+  )
+ggsave(file="Results/Beta_diversity_PCoA/CUOID_PCoA_Hellinger_ONLY_DIRECT.png", width = 4.8, height = 2.5, dpi=300)
+
+
+
+
+############ EXTRA: ADDING A PERMANOVA ON THE CUOIODEPUR FROZEN ONLY ####################
+
+
+#### 1) Trying with the inclusion of only oldest sample in the comparison (e.g. 1 year)
+direct_samples <- as.character(metadata$Sample_name[metadata$Reactor=="CuoioDepur_Aero" & metadata$Storage=="Direct"])
+direct_ID <- as.character(metadata$Collection_data[metadata$Sample_name%in%direct_samples])
+# picking the oldest sample (stored for a longer period) for each collection data (ID)
+already_picked_ID <- NULL
+selected_samples <- direct_samples
+for( time in c("3y","1y","6m","3m")){
+  selected_table <- metadata[metadata$Collection_data%in%direct_ID & metadata$Time_before_extr2==time & metadata$Storage=="-20C", ]
+  selected_samples <- c(selected_samples, as.character(selected_table$Sample_name[!selected_table$Sample_name%in%selected_samples & ! selected_table$Collection_data%in%already_picked_ID]) )
+  already_picked_ID <- c(already_picked_ID, as.character(selected_table$Collection_data))
+}
+subset_target <- subset_samples(data.genus.prop, Sample_name %in% selected_samples ) # Sample_name%in%c("PGB10","PGB1"))
+# View(sample_data(subset_target))   # to check --> OK
+
+# the lines below format the according to the other analysis and thus and thus using the same code (the time will be displayed correctly in the plot due to the other column)
+levels(sample_data(subset_target)$Time_before_extr) <- gsub("[1-9]month","6month", levels(sample_data(subset_target)$Time_before_extr))
+levels(sample_data(subset_target)$Time_before_extr) <- gsub("1year","6month", levels(sample_data(subset_target)$Time_before_extr))
+levels(sample_data(subset_target)$Time_before_extr) <- gsub("3year","6month", levels(sample_data(subset_target)$Time_before_extr))
+# Clearly, this is NOT always the 6th month, but the oldest sample for each
+
+# Computing the PERMANOVA... 
+ASV.genus.prop<-as.data.frame(otu_table(subset_target))
+sample_OTU<-as.data.frame(t(sqrt(ASV.genus.prop))) # samples has to be on rows --> t
+meta <- as(sample_data(subset_target), "data.frame")
+BC.dist<-vegan::vegdist(t(sqrt(ASV.genus.prop)), distance="euclidean")
+
+set.seed(1994)
+vegan::adonis2( sample_OTU ~ Time_before_extr , strata = meta$Reactor_ID, data=meta, permutations = 9999, method="euclidean")
+#                  Df SumOfSqs      R2      F    Pr(>F)    
+# Time_before_extr  1    35.22 0.10712 2.3994 0.0009766 ***
+# Residual         20   293.55 0.89288                     
+# Total            21   328.77 1.00000
+vegan::adonis2( sample_OTU ~ Time_before_extr + Reactor_ID, data=meta, permutations = 9999, method="euclidean")
+#                  Df SumOfSqs      R2      F Pr(>F)    
+# Time_before_extr  1    35.22 0.10712 7.1126 0.0001 ***
+# Reactor_ID       10   244.04 0.74228 4.9288 0.0001 ***
+# Residual         10    49.51 0.15060                  
+# Total            21   328.77 1.00000
+
+
+
+#### 2) Trying with only 6month vs Direct
+subset_target <- subset_samples(data.genus.prop, Reactor=="CuoioDepur_Aero" ) # Sample_name%in%c("PGB10","PGB1"))
+subset_target <- subset_samples(subset_target, Time_before_extr %in% c("None","6month") & Storage != "No_storage")
+# View(sample_data(subset_target))   # to check --> OK
+
+# Computing the PERMANOVA... 
+ASV.genus.prop<-as.data.frame(otu_table(subset_target))
+sample_OTU<-as.data.frame(t(sqrt(ASV.genus.prop))) # samples has to be on rows --> t
+meta <- as(sample_data(subset_target), "data.frame")
+BC.dist<-vegan::vegdist(t(sqrt(ASV.genus.prop)), distance="euclidean")
+
+set.seed(1994)
+vegan::adonis2( sample_OTU ~ Time_before_extr , strata = meta$Reactor_ID, data=meta, permutations = 9999, method="euclidean")
+#                  Df SumOfSqs      R2      F    Pr(>F)    
+# Time_before_extr  1    35.22 0.10712 2.3994 0.0009766 ***
+# Residual         20   293.55 0.89288                     
+# Total            21   328.77 1.00000
+set.seed(1994)
+vegan::adonis2( sample_OTU ~ Time_before_extr + Reactor_ID, data=meta, permutations = 9999, method="euclidean")
+#                  Df SumOfSqs      R2      F Pr(>F)    
+# Time_before_extr  1    35.22 0.10712 7.1126 0.0001 ***
+# Reactor_ID       10   244.04 0.74228 4.9288 0.0001 ***
+# Residual         10    49.51 0.15060                  
+# Total            21   328.77 1.00000
+
+
+
+
 ###################### PCoA BETA DIV (AGS Pilot Scale, vs -80C no Gly) #######################
 
 # on genera
@@ -564,7 +717,7 @@ ggsave(file="Results/Beta_diversity_PCoA/AGS_PCoA_Hellinger_Genus_80C_withouthNO
 ### TOP Genera
 suppressWarnings(rm(top, others, tabella, unass_data))
 { top_data <- subset_samples(data.genus.prop, Reactor=="Pilot_AGS" )
-  top <- names(sort(taxa_sums(top_data), decreasing=TRUE))[1:29]
+  top <- names(sort(taxa_sums(top_data), decreasing=TRUE))[1:23]
   prune.dat_top <- prune_taxa(top,top_data)
   tax_selected<-as.data.frame(tax_table(prune.dat_top))
   if( identical(taxa_names(data.genus) , taxa_names(top_data)) ){
@@ -594,47 +747,68 @@ suppressWarnings(rm(top, others, tabella, unass_data))
 }
 levels(tabella$Storage) <- gsub("C noGly"," °C (no Gly)", levels(tabella$Storage) )
 levels(tabella$Collection_data) <- gsub("/202","/2", levels(tabella$Collection_data) )
+levels(tabella$Collection_data) <- paste("AGS ", levels(tabella$Collection_data) )
 
-fill_color_30_customised<-c("firebrick3","darkblue","lightblue1","black",
-                            "darkcyan","darkmagenta", 
-                            "brown4","grey50", "aquamarine3",
-                            "bisque","cyan","darkgreen","yellow3",
-                            "springgreen4", "grey80", 
-                            "deepskyblue4","lightgreen","orange2",
-                            "green", "violet", "blue",
-                            "yellow", "pink3","yellow4", "chocolate4","darkorchid","red",
-                            "lightgrey", "orange2","darkslategray3")
+fill_color_customised<-c("slateblue3",
+                            "yellow",
+                            "springgreen1","black",
+                         "deeppink","gray", "darkmagenta", 
+                            "firebrick2","red",
+                            "bisque","darkgreen","slateblue",
+                            "springgreen3", "cyan","green",
+                         "gold2","forestgreen",
+                            "orange2",
+                         "royalblue2", 
+                         "violet",
+                         "blue3",
+                         "chocolate4",
+                         "coral","darkslategray3")
 ggplot(data=tabella, aes(x= Storage, y=Abundance, fill=Genus)) +
   geom_bar( stat="identity", position="stack", na.rm = F) + 
-  scale_fill_manual(values=fill_color_30_customised) +
+  scale_fill_manual(values=fill_color_customised) +
   facet_grid( . ~ Collection_data ,
               scales = "free_x", space="free"
               #strip = strip_nested(size = "variable")
   ) +
   theme_classic(base_size =11) +
   scale_y_continuous(expand=c(0,1) ) +
-  theme(axis.text.x=element_text(angle=30,
+  theme(axis.text.x=element_text(angle=22,
                                  vjust=1.1,
                                  hjust=1,
-                                 size= 7.2
+                                 size= 7.3
   ),
   axis.text.y=element_text(size=7),
   axis.ticks.x = element_blank(),
-  strip.text.x = element_text(size=8.75, angle=0),
+  strip.text.x = element_text(size=8.9, angle=0),
   legend.key.height = unit(0.14, "cm"),
   legend.key.width = unit(0.2, "cm"),
   legend.text = element_text ( size = 8 , face="italic"  ),
   legend.position="bottom",
-  legend.margin = margin(-14 ,34, 1 ,0),
+  legend.margin = margin(-17 ,34, 1 ,0),
   plot.margin = margin(2,1,2,1),
   panel.spacing.x = unit(0.05,"cm"),
   ) +
-  guides(fill=guide_legend(nrow=8)) +
+  guides(fill=guide_legend(nrow=6)) +
   labs(x="", y="Percentual abundance of clades",
        fill="")
 ggsave(file="Results/Abundances/AGSpilot_TOP_genera.png",width=5.2,height=4.25, dpi=300)
-
 dev.off()
+
+### Exporting table
+to_save<- cbind.data.frame(round( otu_table(prune.dat_top) ,2 ),
+                           "Phylum" = as.data.frame(tax_table(prune.dat_top))[["Phylum"]] ,
+                           "Family" =as.data.frame(tax_table(prune.dat_top))[["Family"]],
+                           "Genus"= as.data.frame(tax_table(prune.dat_top))[["Genus"]]
+)
+re_subset_metadata <- metadata
+row.names(re_subset_metadata) <- metadata$FASTQ_ID
+colnames(to_save)<- c(
+  paste( "AGS", as.character(re_subset_metadata[sample_names(prune.dat_top), "Collection_data"]) ,  as.character(re_subset_metadata[sample_names(prune.dat_top), "Storage"]) ,sep="_" ),
+                       "Phylum","Family","Genus" 
+  )
+colnames(to_save) <- gsub("/20","/", colnames(to_save), fixed=T)
+colnames(to_save) <- gsub("-80C_noG","80CnoG", colnames(to_save), fixed=T)
+write.csv2(file = "Results/Abundances/AGSpilot_TOP_genera_TABLE.csv", row.names = F, to_save )
 
 suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabella_others, top, others))
 
@@ -1315,6 +1489,345 @@ ggsave(filename = "Results/Differently_abundant_bact/StorageAGS_Differently_abun
 
 
 
+############# EXTRA: DA WITH DESEQ2 (Direct vs 6month storage, only CUOIODEPUR at -20gly) ##################
+
+subset_target <- subset_samples(data.genus, Reactor=="CuoioDepur_Aero" )
+subset_target <- subset_samples(subset_target, Time_before_extr %in% c("None","6month") & Storage != "No_storage")
+# View(sample_data(subset_target))   # to check --> OK
+
+#### STARTING THE DIFFERENTIAL ANALYSIS
+data_pruned<- prune_taxa(taxa_sums(subset_target) > 10, subset_target) 
+# Trimming under sum of 10 (see DeSeq2 tutorial) and preparing new data (other ASV may be selected after glomming)
+
+sample_data(data_pruned)$Reactor_ID  <- gsub("/", "_", sample_data(data_pruned)$Reactor_ID , fixed=T)
+sample_data(data_pruned)$Reactor_ID  <- gsub(" ", "_", sample_data(data_pruned)$Reactor_ID )
+sample_data(data_pruned)$Reactor_ID  <- gsub("-", "_", sample_data(data_pruned)$Reactor_ID , fixed=T)
+
+Table_tot<-NULL
+Res_tot<-NULL
+for( t in c("Genus","Family") ){
+  cat("\nWorking on",t,"level...\n")
+  suppressWarnings(rm(list=c("d", "d.prop", "Taxa.d", "res","DE", "target", "r", "r_level")))
+  d <- tax_glom(data_pruned, taxrank = t, NArm = F)
+  d.prop<- transform_sample_counts(d, function(x) x/sum(x)*100)
+  
+  if(t=="Genus"){ # updating missing names (NA and uncultured) but only for genus level
+    taxa_temp<-as.data.frame(tax_table(d))
+    for( x in 1: length(which(taxa_temp$Genus=="uncultured")) ) {
+      taxa_temp$Genus[which(taxa_temp$Genus=="uncultured")[1]]<-paste("uncultured_ f",taxa_temp[which(taxa_temp$Genus=="uncultured")[1],"Family"])}
+    for( x in 1: length(which(taxa_temp=="uncultured_ f uncultured")) ) {
+      taxa_temp$Genus[ which(taxa_temp$Genus=="uncultured_ f uncultured")[1] ]<-paste("uncultured_ o",taxa_temp[which(taxa_temp$Genus=="uncultured_ f uncultured")[1],"Order"])}
+    for( x in 1: length(which(is.na(taxa_temp$Genus))) ) {
+      taxa_temp$Genus[ which(is.na(taxa_temp$Genus))[1] ]<-paste("NA_ f",taxa_temp[which(is.na(taxa_temp$Genus))[1],"Family"])}
+    for( x in 1: length(which(taxa_temp=="NA_ f NA")) ) {
+      taxa_temp$Genus[ which(taxa_temp$Genus=="NA_ f NA")[1] ]<-paste("NA_ o",taxa_temp[which(taxa_temp$Genus=="NA_ f NA")[1],"Order"])}
+    for( x in 1: length(which(duplicated(taxa_temp$Genus[taxa_temp$Genus=="NA_ o NA"]))) ) {
+      taxa_temp$Genus[ which(taxa_temp$Genus=="NA_ o NA")[1] ]<-paste("NA_ o NA",x+1) }
+    tax_table(d)<-as.matrix(taxa_temp)
+    tax_table(d.prop)<-as.matrix(taxa_temp)
+    rm(taxa_temp) }
+  
+  ### starting the analysis
+  DEseq_data<-phyloseq_to_deseq2(d, ~Reactor_ID + Time_before_extr)
+  DE<-DESeq(DEseq_data)
+  res<-results(DE, contrast= c("Time_before_extr", "None", "6month"))
+  res = res[order(res$padj, na.last=NA), ]
+  res<-res[(res$padj < 0.05) & abs(res$log2FoldChange)>0 ,]
+  #res<-res[(res$padj < 0.05) ,]
+  res<-res[res$baseMean > 50, ] # arbitrary threshold to avoid the most noisy result
+  res
+  if(length(res$log2FoldChange)>0){ # if there are results...
+    cat(paste(length(res$log2FoldChange),"results for the",t,"level\n"))
+    Sys.sleep(1)
+    r<-as.data.frame(res)
+    r$ASV<-row.names(r)
+    Taxa.d<-as.data.frame(tax_table(d))
+    Taxa.d$ASV<-row.names(Taxa.d)
+    r<-dplyr::left_join(r, Taxa.d, by="ASV")
+    r$Kingdom<-NULL
+    r$Species<-NULL
+    assign(paste(t,"results",sep="_"), r)
+    # write.csv2(r, file=paste0("Results/DA_DESeq2/DA_",t,"_ratio_Direct_extract_vs_Mixed_liquor.csv"), row.names = F, quote=F, na = "")
+    r_level<-r
+    r_level[, "Taxon"]<- rep(t)
+    Res_tot<-rbind.data.frame(Res_tot,r_level)
+    ### single box plots
+    target<-r[[t]]
+    colnames(tax_table(d.prop))[colnames(tax_table(d.prop))==t]<-"Aimed_taxa"
+    target<-subset_taxa(d.prop, Aimed_taxa %in% target) # cannot use t %in% target in this function, then it's scripted in this way
+    Table_DE<-psmelt(target)
+    colnames(Table_DE)[colnames(Table_DE)=="Aimed_taxa"]<-t # restored the original name
+    Table_DE$ASV<-NULL
+    # Table_DE$Abundance<-sqrt(Table_DE$Abundance) # then sqrt of proportion
+    assign(paste("Table_DE_plot",t,sep="_"), Table_DE)
+    ### appending to unique box plot
+    index<- which(colnames(Table_DE)=="Kingdom") : which(colnames(Table_DE)==t)
+    index<- index[-length(index)] # removing the last index, regarding the taxa of interest
+    Table_DE[,index]<-NULL
+    Table_DE$Taxa<-t
+    colnames(Table_DE)[colnames(Table_DE)==t]<-"Bacteria"
+    Table_tot<-rbind.data.frame(Table_tot, Table_DE)
+  } else {
+    cat("Any results for the",t,"level\n")
+    Sys.sleep(1)
+  }
+}
+
+# View(Res_tot)
+write.csv2(Res_tot, file="Results/Differently_abundant_bact/Storage_20gly_DESEQ2_CuoioDepur_only6months.csv", row.names = F)
+
+
+
+
+######### EXTRA: DA WITH ALDEx2 (Direct vs OLDEST STORAGE, only CUOIODEPUR at -20gly) ################
+
+# building the list of samples to test
+direct_samples <- as.character(metadata$Sample_name[metadata$Reactor=="CuoioDepur_Aero" & metadata$Storage=="Direct"])
+direct_ID <- as.character(metadata$Collection_data[metadata$Sample_name%in%direct_samples])
+# picking the oldest sample (stored for a longer period) for each collection data (ID)
+already_picked_ID <- NULL
+selected_samples <- direct_samples
+for( time in c("3y","1y","6m","3m")){
+  selected_table <- metadata[metadata$Collection_data%in%direct_ID & metadata$Time_before_extr2==time & metadata$Storage=="-20C", ]
+  selected_samples <- c(selected_samples, as.character(selected_table$Sample_name[!selected_table$Sample_name%in%selected_samples & ! selected_table$Collection_data%in%already_picked_ID]) )
+  already_picked_ID <- c(already_picked_ID, as.character(selected_table$Collection_data))
+}
+suppressWarnings(rm(data_pruned, data.genus_pruned, subset_target))
+
+subset_target <- subset_samples(data.genus, Sample_name %in% selected_samples ) # Sample_name%in%c("PGB10","PGB1"))
+# View(sample_data(subset_target))   # to check --> OK
+
+# the lines below format the according to the other analysis and thus and thus using the same code (the time will be displayed correctly in the plot due to the other column)
+levels(sample_data(subset_target)$Time_before_extr) <- gsub("[1-9]month","6month", levels(sample_data(subset_target)$Time_before_extr))
+levels(sample_data(subset_target)$Time_before_extr) <- gsub("1year","6month", levels(sample_data(subset_target)$Time_before_extr))
+levels(sample_data(subset_target)$Time_before_extr) <- gsub("3year","6month", levels(sample_data(subset_target)$Time_before_extr))
+# Clearly, this is NOT always the 6th month, but the oldest sample for each
+
+
+
+##### STARTING THE DIFFERENTIAL ANALYSIS
+data_pruned<- prune_taxa(taxa_sums(subset_target) > 10, subset_target) 
+# Trimming under sum of 10 (see DeSeq2 tutorial) and preparing new data (other ASV may be selected after glomming)
+sample_data(data_pruned)$Reactor_ID  <- gsub("/", "_", sample_data(data_pruned)$Reactor_ID , fixed=T)
+sample_data(data_pruned)$Reactor_ID  <- gsub(" ", "_", sample_data(data_pruned)$Reactor_ID )
+sample_data(data_pruned)$Reactor_ID  <- gsub("-", "_", sample_data(data_pruned)$Reactor_ID , fixed=T)
+
+# sample_data(data_pruned)[["Time_before_extr"]]<-factor(sample_data(data_pruned)[["Time_before_extr"]], levels = c("None","6month"))
+sample_data(data_pruned)[["Time_before_extr"]] <- relevel(sample_data(data_pruned)[["Time_before_extr"]], ref = "None")
+# The level "None" will be the base level --> Denominator of fold change
+
+
+Table_tot<-NULL
+Res_tot<-NULL
+### Starting the analysis on each taxon level
+for( t in c("Genus","Family") ){
+  cat("\nWorking on",t,"level...\n")
+  suppressWarnings(rm(list=c("d", "d.prop", "Taxa.d", "res","DE", "target", "r", "r_level")))
+  
+  d <- tax_glom(data_pruned, taxrank = t, NArm = F)
+  d.prop<- transform_sample_counts(d, function(x) x/sum(x)*100)
+  
+  # using the "manual" pipeline of Aldex2 to better specify the design ...
+  mm <- model.matrix(~Reactor_ID + Time_before_extr, as(sample_data(d),"data.frame") ) # name of the sample data for last
+  set.seed(1994)
+  aldx <- aldex.clr(otu_table(d),  mm,
+                    mc.samples=128,   #"DMC"
+                    # according to ALDEx2 vignette, the number of samples in the smallest group multiplied by the number of DMC be equal at least to 1000
+                    # length(which(sample_data(data)[["Time_before_extr"]]=="6month"))
+                    denom="all", # every feature as denominator
+                    verbose=T
+  )
+  # aldx@reads # the original counts _ NB: added 0.5 to every number
+  
+  aldx2 <- aldex.glm(aldx, verbose = T, fdr.method = "BH")
+  # THEN, the summary of the results
+  aldx3 <- aldex.glm.effect(aldx, # calculates the effect size for every binary variable in the mm
+                            CI = T # confidence interval of the effect size
+  ) 
+  aldx_final <- cbind.data.frame(aldx2,aldx3)
+  colnames(aldx_final) <- gsub(":",".", colnames(aldx_final), fixed=T)
+  res2<-aldx_final
+  
+  #### ALTERNATIVE 1) the vignette suggests an effect size cutoff of 1 or greater be used when analyzing HTS 
+  # eff_size<-aldx_final$Time_before_extr6month.effect 
+  # Enough_eff_size <- eff_size>1
+  # res2<-res2[res2$p_adj_BH<0.05 & Enough_eff_size, ]
+  #### ALTERNATIVE 2) using ongly the p-adj
+  # res2$p_adj_BH<-aldx_final$Time_before_extr6month.pval.padj
+  # res2<-res2[res2$p_adj_BH<=0.05 , ]
+  #### ALTERNATIVE 3) Using the unadjusted p-value
+  res2<-res2[res2$Time_before_extr6month.pval<=0.05 , ]
+  
+  results<-row.names(res2)
+  if(length(res2[,1])>0){ # if there are results...
+    cat(paste( length(res2[,1]) ,"results for the",t,"level\n"))
+    Sys.sleep(1)
+    r<-as.data.frame(res2)
+    Taxa.d<-as.data.frame(tax_table(d))
+    Taxa.d$Tax_ID<-row.names(Taxa.d)
+    r<- cbind.data.frame(Taxa.d[row.names(r), ] , r )
+    # r<-r[ r[,t] !="none", ] # removing the taxa labeled "none", they are artifact from glomming, composed of different taxa with no name for that level in NCBI
+    if( length(r[,1])>0 ){ # if there are still results after removing the "none"
+      # assign(paste(t,"results",sep="_"), r)
+      r_level<-r
+      r_level[, "Taxon"]<- rep(t)
+      r_level <- r_level[r_level[,t] != "none" , ]
+      # adding to the pool of results...
+      Res_tot<-rbind.data.frame(Res_tot,r_level)
+      ### Preparing also single box plots ...
+      target<-r[[t]]
+      colnames(tax_table(d.prop))[colnames(tax_table(d.prop))==t]<-"Aimed_taxa"
+      target<-subset_taxa(d.prop, Aimed_taxa %in% target) # cannot use t %in% target in this function, then it's scripted in this way
+      Table_DE<-psmelt(target)
+      colnames(Table_DE)[colnames(Table_DE)=="Aimed_taxa"]<-t # restored the original name
+      # assign(paste("Table_DE_plot",t,sep="_"), Table_DE)
+      ### appending to a unique box plot ...
+      index<- which(colnames(Table_DE)=="Kingdom") : which(colnames(Table_DE)==t) # from : to
+      index<- index[-length(index)] # removing the last index, regarding the taxa of interest
+      Table_DE[,index]<-NULL
+      Table_DE$Taxa<-t
+      colnames(Table_DE)[colnames(Table_DE)==t]<-"Bacteria"
+      Table_tot<-rbind.data.frame(Table_tot, Table_DE)
+    } # closing the nested "if r > 0" (after the "none" removal)
+  } else {  # closing the initial "if r > 0"
+    cat("Any results for the",t,"level\n")
+    Sys.sleep(1)
+  }
+  
+}
+
+# columns_to_remove<- grepl("Intercept",colnames(Res_tot)) | grepl("sequencing_depth",colnames(Res_tot)) | grepl("pval.holm",colnames(Res_tot)) 
+columns_to_maintain<- c("Taxon", "Family", "Genus", colnames(Res_tot)[grepl("Time_before_extr",colnames(Res_tot))] )
+Res_tot<-Res_tot[ !is.na(Res_tot[,1]) , columns_to_maintain ]
+colnames(Res_tot)<-gsub("Time_before_extr","", colnames(Res_tot))
+colnames(Res_tot)<-gsub("6month.","", colnames(Res_tot), fixed=T)  # to remove ALSO the name of the level from the columns
+#View(Res_tot)
+write.csv2(Res_tot, file="Results/Differently_abundant_bact/ALDEx2_20gly_CuoioDep_Differently_abundant.csv", row.names = F)
+
+# system(" echo 'According to many papers (e.g. PMID: 33986544  or  https://doi.org/10.1186/s12859-021-04212-6  or  https://doi.org/10.1186/s12864-022-08803-2 ) many low abundance taxa (e.g. about 0.1%) are potentially false positives (bad calls)! ' > Results/DA_Aldex2/WATCH_OUT_FOR_LOW_ABUNDANCES.txt ")
+
+
+
+
+######### EXTRA: DA WITH ALDEx2 (Direct vs stored, ONLY AGS and PN-AGS2 at -80 no gly) ################
+
+suppressWarnings(rm(data_pruned, data.genus_pruned, subset_target))
+
+# building the list of samples to test
+subset_target <- subset_samples(data, Reactor=="Pilot_AGS" | Sample_name%in%c("PGB11","PGB1") )
+# the line below formats the table according to the other analysis and thus using the same code (the time will be displayed correctly in the plot due to the other column)
+levels(sample_data(subset_target)$ Time_before_extr) <- gsub("[1-9]month","6month", levels(sample_data(subset_target)$Time_before_extr))
+data_pruned<- prune_taxa(taxa_sums(subset_target) > 10, subset_target)
+# Trimming under sum of 10 (see DeSeq2 tutorial) and preparing new data (other ASV may be selected after glomming)
+
+sample_data(data_pruned)$Reactor_ID  <- gsub("/", "_", sample_data(data_pruned)$Reactor_ID )
+sample_data(data_pruned)$Reactor_ID  <- gsub(" ", "_", sample_data(data_pruned)$Reactor_ID )
+
+
+##### STARTING THE DIFFERENTIAL ANALYSIS
+data_pruned<- prune_taxa(taxa_sums(subset_target) > 10, subset_target) 
+# Trimming under sum of 10 (see DeSeq2 tutorial) and preparing new data (other ASV may be selected after glomming)
+sample_data(data_pruned)$Reactor_ID  <- gsub("/", "_", sample_data(data_pruned)$Reactor_ID , fixed=T)
+sample_data(data_pruned)$Reactor_ID  <- gsub(" ", "_", sample_data(data_pruned)$Reactor_ID )
+sample_data(data_pruned)$Reactor_ID  <- gsub("-", "_", sample_data(data_pruned)$Reactor_ID , fixed=T)
+
+# sample_data(data_pruned)[["Time_before_extr"]]<-factor(sample_data(data_pruned)[["Time_before_extr"]], levels = c("None","6month"))
+sample_data(data_pruned)[["Time_before_extr"]] <- relevel(sample_data(data_pruned)[["Time_before_extr"]], ref = "None")
+# The level "None" will be the base level --> Denominator of fold change
+
+
+Table_tot<-NULL
+Res_tot<-NULL
+### Starting the analysis on each taxon level
+for( t in c("Genus","Family") ){
+  cat("\nWorking on",t,"level...\n")
+  suppressWarnings(rm(list=c("d", "d.prop", "Taxa.d", "res","DE", "target", "r", "r_level")))
+  
+  d <- tax_glom(data_pruned, taxrank = t, NArm = F)
+  d.prop<- transform_sample_counts(d, function(x) x/sum(x)*100)
+  
+  # using the "manual" pipeline of Aldex2 to better specify the design ...
+  mm <- model.matrix(~Reactor_ID + Time_before_extr, as(sample_data(d),"data.frame") ) # name of the sample data for last
+  set.seed(1994)
+  aldx <- aldex.clr(otu_table(d),  mm,
+                    mc.samples=128,   #"DMC"
+                    # according to ALDEx2 vignette, the number of samples in the smallest group multiplied by the number of DMC be equal at least to 1000
+                    # length(which(sample_data(data)[["Time_before_extr"]]=="6month"))
+                    denom="all", # every feature as denominator
+                    verbose=T
+  )
+  # aldx@reads # the original counts _ NB: added 0.5 to every number
+  
+  aldx2 <- aldex.glm(aldx, verbose = T, fdr.method = "BH")
+  # THEN, the summary of the results
+  aldx3 <- aldex.glm.effect(aldx, # calculates the effect size for every binary variable in the mm
+                            CI = T # confidence interval of the effect size
+  ) 
+  aldx_final <- cbind.data.frame(aldx2,aldx3)
+  colnames(aldx_final) <- gsub(":",".", colnames(aldx_final), fixed=T)
+  res2<-aldx_final
+  
+  #### ALTERNATIVE 1) the vignette suggests an effect size cutoff of 1 or greater be used when analyzing HTS 
+  # eff_size<-aldx_final$Time_before_extr6month.effect 
+  # Enough_eff_size <- eff_size>1
+  # res2<-res2[res2$p_adj_BH<0.05 & Enough_eff_size, ]
+  #### ALTERNATIVE 2) using ongly the p-adj
+  # res2$p_adj_BH<-aldx_final$Time_before_extr6month.pval.padj
+  # res2<-res2[res2$p_adj_BH<=0.05 , ]
+  #### ALTERNATIVE 3) Using the unadjusted p-value
+  res2<-res2[res2$Time_before_extr6month.pval<=0.05 , ]
+  
+  results<-row.names(res2)
+  if(length(res2[,1])>0){ # if there are results...
+    cat(paste( length(res2[,1]) ,"results for the",t,"level\n"))
+    Sys.sleep(1)
+    r<-as.data.frame(res2)
+    Taxa.d<-as.data.frame(tax_table(d))
+    Taxa.d$Tax_ID<-row.names(Taxa.d)
+    r<- cbind.data.frame(Taxa.d[row.names(r), ] , r )
+    # r<-r[ r[,t] !="none", ] # removing the taxa labeled "none", they are artifact from glomming, composed of different taxa with no name for that level in NCBI
+    if( length(r[,1])>0 ){ # if there are still results after removing the "none"
+      # assign(paste(t,"results",sep="_"), r)
+      r_level<-r
+      r_level[, "Taxon"]<- rep(t)
+      r_level <- r_level[r_level[,t] != "none" , ]
+      # adding to the pool of results...
+      Res_tot<-rbind.data.frame(Res_tot,r_level)
+      ### Preparing also single box plots ...
+      target<-r[[t]]
+      colnames(tax_table(d.prop))[colnames(tax_table(d.prop))==t]<-"Aimed_taxa"
+      target<-subset_taxa(d.prop, Aimed_taxa %in% target) # cannot use t %in% target in this function, then it's scripted in this way
+      Table_DE<-psmelt(target)
+      colnames(Table_DE)[colnames(Table_DE)=="Aimed_taxa"]<-t # restored the original name
+      # assign(paste("Table_DE_plot",t,sep="_"), Table_DE)
+      ### appending to a unique box plot ...
+      index<- which(colnames(Table_DE)=="Kingdom") : which(colnames(Table_DE)==t) # from : to
+      index<- index[-length(index)] # removing the last index, regarding the taxa of interest
+      Table_DE[,index]<-NULL
+      Table_DE$Taxa<-t
+      colnames(Table_DE)[colnames(Table_DE)==t]<-"Bacteria"
+      Table_tot<-rbind.data.frame(Table_tot, Table_DE)
+    } # closing the nested "if r > 0" (after the "none" removal)
+  } else {  # closing the initial "if r > 0"
+    cat("Any results for the",t,"level\n")
+    Sys.sleep(1)
+  }
+  
+}
+
+# columns_to_remove<- grepl("Intercept",colnames(Res_tot)) | grepl("sequencing_depth",colnames(Res_tot)) | grepl("pval.holm",colnames(Res_tot)) 
+columns_to_maintain<- c("Taxon", "Family", "Genus", colnames(Res_tot)[grepl("Time_before_extr",colnames(Res_tot))] )
+Res_tot<-Res_tot[ !is.na(Res_tot[,1]) , columns_to_maintain ]
+colnames(Res_tot)<-gsub("Time_before_extr","", colnames(Res_tot))
+colnames(Res_tot)<-gsub("6month.","", colnames(Res_tot), fixed=T)  # to remove ALSO the name of the level from the columns
+#View(Res_tot)
+write.csv2(Res_tot, file="Results/Differently_abundant_bact/ALDEx2_StorageAGS_Differently_abundant.csv", row.names = F)
+
+# system(" echo 'According to many papers (e.g. PMID: 33986544  or  https://doi.org/10.1186/s12859-021-04212-6  or  https://doi.org/10.1186/s12864-022-08803-2 ) many low abundance taxa (e.g. about 0.1%) are potentially false positives (bad calls)! ' > Results/DA_Aldex2/WATCH_OUT_FOR_LOW_ABUNDANCES.txt ")
+
+
+
+
 ####################### OBSERVING MAIN THRENDS THROUGH TIME ####################### 
 
 data_selected_all <- subset_taxa(data.genus.prop, Genus %in% c("Nitrosomonas","Candidatus_Kaiserbacteria","Leptospira",
@@ -1519,21 +2032,24 @@ for(x in c("PN_AGS_4","A 11/23") ){
 
 dir.create("Results/Abundances/Abund_over_time/Extra_check_on_certain_taxa/")
 
-data_selected_all <- subset_taxa(data.genus.prop, Genus %in% c("Candidatus_Accumulibacter","Propionivibrio",
-                                                               "Tetrasphaera", "Candidatus_Brocadia",
+data_selected_all <- subset_taxa(data.genus.prop, Genus %in% c(#"Candidatus_Accumulibacter","Propionivibrio",
+                                                               #"Tetrasphaera",
+                                                               "Candidatus_Brocadia",
                                                                #"Nitrospira","Nitrobacter",
-                                                               "Candidatus_Competibacter",  # add because they are important!
-                                                               "Thauera","Neomegalonema")
+                                                               "Candidatus_Competibacter"  # add because they are important!
+                                                               # "Thauera",
+                                                               #"Neomegalonema"
+                                                               )
 )
 colors_taxa <- c(
-  "Ca. Accumulibacter"="red2",   # Candidatus will be modified in Ca. below
-  "Ca. Competibacter"="green2",
-  "Propionivibrio"="darkgreen",
-  "Tetrasphaera"="brown4",
-  "Ca. Brocadia"="gray20",
+  #"Ca. Accumulibacter"="lightblue",   # Candidatus will be modified in Ca. below
+  "Ca. Competibacter"="blue",
+  #"Propionivibrio"="darkgreen",
+  #"Tetrasphaera"="brown4",
+  "Ca. Brocadia"="chocolate4"
   # "Nitrosomonas"="darkblue",
-  "Neomegalonema"="orange",
-  "Thauera"="violet"
+  # "Neomegalonema"="orange"
+  # "Thauera"="violet"
 )
 
 
@@ -1570,12 +2086,12 @@ for(x in c("PN_AGS_4","A 11/23") ){
            legend.margin = margin(-1,24,0,1),
            title= element_text(size=9)
     ) +
-    guides(color=guide_legend(nrow=4,byrow=T)) +
+    guides(color=guide_legend(nrow=1,byrow=T)) +
     labs(color="",group="", y= "Percent abundance in the sample",
          title= paste("Abundances in",title_here,"over time (-20C NO gly)")
     )
   ggsave(paste0("Results/Abundances/Abund_over_time/Extra_check_on_certain_taxa/EXTRA__20C__NOgly__focusOnKeyTaxa",file_name,".png"),
-         dpi=300, width=4.25, height = 3.5)
+         dpi=300, width=3.85, height = 3)
 }
 
 
@@ -1613,12 +2129,12 @@ for(x in c("PN_AGS_4","A 11/23") ){
            legend.margin = margin(-1,24,0,1),
            title= element_text(size=9)
     ) +
-    guides(color=guide_legend(nrow=4,byrow=T)) +
+    guides(color=guide_legend(nrow=1,byrow=T)) +
     labs(color="",group="", y= "Percent abundance in the sample",
          title= paste("Abundances in",title_here,"over time (-80C NO gly)")
     )
   ggsave(paste0("Results/Abundances/Abund_over_time/Extra_check_on_certain_taxa/EXTRA__80C__NOgly__focusOnKeyTaxa",file_name,".png"),
-         dpi=300, width=4.25, height = 3.5)
+         dpi=300, width=3.85, height = 3)
 }
 
 
@@ -1655,12 +2171,12 @@ for(x in c("PN_AGS_4","A 11/23", "A 07/22") ){
            legend.margin = margin(-1,24,0,1),
            title= element_text(size=9)
     ) +
-    guides(color=guide_legend(nrow=4,byrow=T)) +
+    guides(color=guide_legend(nrow=1,byrow=T)) +
     labs(color="",group="", y= "Percent abundance in the sample",
          title= paste("Abundances in",title_here,"over time (-20C gly)")
     )
   ggsave(paste0("Results/Abundances/Abund_over_time/Extra_check_on_certain_taxa/EXTRA_20C_gly__focusOnKeyTaxa",file_name,".png"),
-         dpi=300, width=4.25, height = 3.5)
+         dpi=300, width=3.85, height = 3)
 }
 
 
@@ -1697,11 +2213,11 @@ for(x in c("PN_AGS_4","A 11/23") ){
            legend.margin = margin(-1,24,0,1),
            title= element_text(size=9)
     ) +
-    guides(color=guide_legend(nrow=4,byrow=T)) +
+    guides(color=guide_legend(nrow=1,byrow=T)) +
     labs(color="",group="", y= "Percent abundance in the sample",
          title= paste("Abundances in",title_here,"over time (-80C gly)")
     )
   ggsave(paste0("Results/Abundances/Abund_over_time/Extra_check_on_certain_taxa/EXTRA_80C_gly__focusOnKeyTaxa",file_name,".png"),
-         dpi=300, width=4.25, height = 3.5)
+         dpi=300, width=3.85, height = 3)
 }
 
