@@ -1,0 +1,14 @@
+	ML0	SL0	MS0	ML10	SL10	MS10	ML25	SL25	MS25	ML50	SL50	MS50
+Benzo[a]anthracene	0	0	0	0	0	0.03	0.02	0.03	0.02	0.1	0.05	0.11
+Benzo[a]pyrene	0	0	0	0.01	0	0.03	0.04	0.08	0.03	0.2	0.15	0.25
+Benzo[b]fluoranthene	0	0	0	0.01	0	0.05	0.05	0.07	0.05	0.18	0.12	0.24
+Benzo[k]fluoranthene	0	0	0	0	0	0.02	0.02	0.03	0.02	0.06	0.05	0.07
+Benzo[g,h,i]perylene	0	0	0	0.04	0	0.11	0.13	0.19	0.12	0.38	0.33	0.69
+Chrysene	0	0	0	0.02	0	0.07	0.06	0.08	0.07	0.23	0.12	0.29
+Dibenzo[a,h]anthracene	0	0	0	0	0	0	0.01	0.01	0	0.02	0.02	0.03
+Indeno[1,2,3-c,d]pyrene	0	0	0	0.01	0	0.02	0.03	0.05	0.02	0.1	0.08	0.15
+Pyrene	0	0	0	0.01	0	0.05	0.04	0.07	0.04	0.16	0.13	0.22
+Dibenzo[a,e]pyrene	0	0	0	0	0	0.02	0.03	0.04	0.02	0.08	0.08	0.17
+Dibenzo[a,h]pyrene	0	0	0	0	0	0	0	0	0	0	0	0
+Dibenzo[a,i]pyrene	0	0	0	0	0	0	0	0	0	0.05	0	0
+Dibenzo[a,l]pyrene	0	0	0	0	0	0	0	0	0.03	0	0.13	0.22

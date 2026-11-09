@@ -293,6 +293,7 @@ rm(taxa_temp)
 
 
 # save.image("data_prepared_for_analysis.RData")
+# load("data_prepared_for_analysis.RData")
 
 
 
@@ -439,7 +440,7 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabel
   tabella$Genus<-gsub ("Saprospir.","Saprospiraceae", tabella$Genus)
   tabella$Genus<-gsub ("Pedosphaer.","Pedosphaeraceae", tabella$Genus)
   tabella$Genus<-gsub ("67-14","Solirubrobacterac. 67-14", tabella$Genus, fixed=T)
-  tabella$Genus<-gsub ("KCM-B-112","Acidithiobacil. KCM-B-112", tabella$Genus, fixed=T)
+  tabella$Genus<-gsub ("KCM-B-112","Acidithiobac. KCM-B-112", tabella$Genus, fixed=T)
   tabella$Genus<-factor(tabella$Genus, levels = c(unique(tabella$Genus)[unique(tabella$Genus)!="Others"],"Others"))
 }
 tabella$Sample_name<- factor(tabella$Sample_name, levels = c("Compost",
@@ -476,8 +477,8 @@ ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Genus)) +
   axis.title =element_text(size=10),
   strip.text = element_text(size=10),
   legend.key.height = unit(0.12, "cm"),
-  legend.key.width = unit(0.18, "cm"),
-  legend.text = element_text ( size = 7.85 ),
+  legend.key.width = unit(0.15, "cm"),
+  legend.text = element_text ( size = 7.9 , face = "italic"),
   legend.position="bottom",
   legend.margin = margin(-13 ,35, 1 ,5),
   plot.margin = margin(2,1,1,1)) +
@@ -485,7 +486,7 @@ ggplot(data=tabella, aes(x=Sample_name, y=Abundance, fill=Genus)) +
   labs(x="", y="Percentual abundance of clades",
        #title = "Most abundant identified phyla (every sample)",
        fill="")
-ggsave(file="Results/Abundances/Most_Abundant_Genera___AveragesEverySample2.png",width=4.8,height=4, dpi=300)
+ggsave(file="Results/Abundances/Most_Abundant_Genera___AveragesEverySample2.png",width=4.8,height=4, dpi=500)
 dev.off()
 
 # means of TOP Genera
@@ -885,7 +886,7 @@ suppressWarnings(rm(tabella,prune.data.others, prune.dat_top, tabella_top, tabel
 
 
 
-########################## ALFA DIVERSITY ############################
+########################## ALPHA DIVERSITY ############################
 
 # no normalization according to phyloseq https://www.bioconductor.org/packages/release/bioc/vignettes/phyloseq/inst/doc/phyloseq-FAQ.html#should-i-normalize-my-data-before-alpha-diversity-analysis
 # moreover, the alpha diversity is calculated genera (DADA2 overestimates the ASV richness, see doi.org/10.1186/s40168-020-00856-3 )
@@ -905,6 +906,7 @@ pAlpha
   # New_data$Sample_label <- gsub("[A-Z]","", New_data$Sample_name)
   New_data$Sample_label <- as.character(New_data$Sample_name)
   New_data$Sample_label[New_data$Sample_name=="Compost"] <- "Comp"
+  New_data$Sample_label <- gsub("^[A-Z][A-Z]","", New_data$Sample_label )
   pAlpha$data<-New_data
   pAlpha$data$variable<-gsub("Observed","Observed richness",pAlpha$data$variable)
   pAlpha$data$variable<-factor(pAlpha$data$variable,levels = c("Observed richness","Shannon","Evenness"))
@@ -922,7 +924,25 @@ pAlpha +
   geom_text(aes(label=pAlpha$data$Sample_label), color="black", size=1.55, vjust=0.54, show.legend = FALSE) +
   guides(fill="none", color="none") +
   theme(axis.text.x= element_text(angle=0, vjust=0.5, hjust=0.5, size=7.5))
-ggsave(file="Results/Alfa_diversity_of_Genera.png", width = 3.35,height =2.5, dpi=300)
+ggsave(file="Results/Alfa_diversity_of_Genera.png", width = 3.35,height =2.5, dpi=500)
+
+
+### STATISTICAL TESTS
+con <- file("Results/AlphaDiv_Dunnet_Kruskal.txt") 
+sink(con, append = TRUE)
+
+for ( x in unique(pAlpha$data$variable) ){
+  test_alpha <- pAlpha$data[ pAlpha$data$variable==x , ]
+  test_alpha <- test_alpha[ test_alpha$Sample_name!="Compost" ,  ]
+  cat( paste("\n\n Testing",x,"... \n") , fill=TRUE)
+  # kruskal.test( test_alpha$value , test_alpha$Group )
+  dunn.test::dunn.test( x=test_alpha$value, g= test_alpha$Group ,
+                        method="bh" , kw = T )
+}
+
+sink()
+close(con)
+
 
 suppressWarnings ( rm(con, pAlpha, alphadt,H, ev, obs, a, New_data) )
 
@@ -959,6 +979,16 @@ ggsave(file="Results/Beta_Diversity/PCoA_EVERY_SAMPLE_computed_on_genera.png", w
 
 ### AGAIN, EXCLUDING THE COMPOST
 data.prop.labels<-subset_samples( data.genus.prop , Sample_name!="Compost" )
+
+suppressWarnings(rm(ASV.genus.prop))
+ASV.genus.prop<-as.data.frame(otu_table( data.prop.labels ) )
+transformed_prop<-as.data.frame(t(sqrt(ASV.genus.prop)))
+set.seed(1994)
+perm_g<- vegan::adonis2(transformed_prop ~Group , data= as(sample_data(data.prop.labels),"data.frame") ,
+                        permutations = 9999, method="euclidean")
+perm_g_res<-perm_g$`Pr(>F)`[1]   # R2 0.67 p 0.0003
+perm_g_res
+
 sample_data(data.prop.labels)$Labels <- gsub("[A-Z]","",sample_data(data.prop.labels)$Sample_name) 
 {data.sqrt_prop<-transform_sample_counts(data.prop.labels, sqrt) # square root of proportion
   DistBC = phyloseq::distance(data.sqrt_prop, method = "euclidean")
@@ -972,11 +1002,13 @@ plot_ordination(data.sqrt_prop, ordBC, color = "Group") +
                                 "ML"="chartreuse2")) +
   geom_point(size=2.3, alpha= 0.4) +
   theme_classic(base_size = 8.25) +
-  theme( legend.text = element_text(size=9)) +
+  theme( legend.text = element_text(size=9),
+         plot.title = element_text(size=5)
+         ) +
   stat_ellipse( aes(group=Group) , linewidth=0.12) +
   geom_text(aes(label=Labels), color="gray80", size=2, show.legend = FALSE) +
   geom_text(aes(label=Labels), color="black", size=1.68, show.legend = FALSE) +
-  labs( # title="PCoA with Hellinger distance\n (euclidean on Hellinger transformed Genera)",
+  labs( title= paste0("Permanova Pr(>F): " , perm_g_res),
     # subtitle= paste0("PERMANOVA Pr(>F) Healthy - CCHS: ", perm_g_H["Condition2", "Pr(>F)"] ),
     color="",
     x=paste("PC1: ",eigval[1],"% variation"), y=paste("PC2: ",eigval[2],"% variation"))
@@ -1335,6 +1367,43 @@ ggsave(file="Results/AOA_AOB_NOB_genera2.png",width=4.5,height=3.8, dpi=300)
 
 
 
+### CORRELATING AOB, NOB AND AOA THROUGH AND ACROSS GROUPS
+
+#data.genus.temp<-microbiome::transform(data.genus, "clr") # clr using natural logarithm and adding minimal pseudocounts to rows (half of lowest relative percentace among the samples)
+data.genus.temp <- data.genus.prop
+vector_without_Ca <- gsub("Candidatus_","", tax_table( data.genus.temp )[ ,"Genus"])  # No "Candidatus" but same order, to a easier use of the logical below
+subset_phylo <- subset_taxa(data.genus.temp , vector_without_Ca %in% c(AOB_list,AOA_list,NOB_list,Nitrosomonadaceae) )
+this_table <- as.data.frame( as( otu_table(subset_phylo) , "matrix" ) )
+row.names(this_table) <- as.data.frame(tax_table(subset_phylo))[["Genus"]]
+
+meta2 <- metadata
+row.names(meta2) <- metadata$FASTQ_ID
+actual_names <- meta2[ colnames(this_table) , "Sample_name" ]
+colnames(this_table) <- actual_names
+
+Table_R <- this_table[ , c("MS0","MS10","MS25","MS50")]
+Table_S <- this_table[ , c("SL0","SL10","SL25","SL50")]
+Table_T <- this_table[ , c("ML0","ML10","ML25","ML50")]
+
+
+Corr_results<-NULL
+to_loop <- list( Table_R, Table_S, Table_T)
+names(to_loop) <- c("Group_R","Group_S","Group_T")
+for( i in 1:length(to_loop)){
+  # i = 1
+  x <- to_loop[[ i ]]
+  for(r in 1:length(row.names(x))) {  # r= across taxa
+    asphalt_percent <- as.numeric(gsub("[A-Z][A-Z]","", colnames(x) ))
+    save <- suppressWarnings( cor.test( as.numeric(x[r,]), asphalt_percent, method = "spearman") )  # correlated with %
+    new_row<-cbind.data.frame( row.names(x)[r] ,  names(to_loop)[i] , save$estimate , save$p.value )
+    Corr_results<-rbind.data.frame(Corr_results, new_row)
+  }
+}
+colnames(Corr_results)<- c("Genus","Sample_SubGroup","rho","p_value")
+Corr_results$p_adj <- p.adjust( Corr_results$p_value , method= "BH" )
+
+# NOT SIGNIFICANT... BUT THIS WAS EXPECTED: THE DECREASE IS OBSERVED ONLY AT 50% ASPHALT, IT IS NOT A GRADUAL CORRELATION!
+
 
 ################### SEARCHING FOR COMMON TRENDS ######################
 
@@ -1425,6 +1494,55 @@ cat(common_in_three)
 sink()
 close(con)
 suppressWarnings(rm(con))
+
+
+
+
+##################### PAH VALUES GROUP DISTANCES ######################
+
+PAH <- read.table(file="Concentrations_PAH.txt", sep="\t", header = T, row.names = 1)
+
+dist_pah <- vegan::vegdist( t(PAH) , method = "euclidean", na.rm = T)   # rows must be samples --> translated
+ord_pah <- ecodist::pco(dist_pah, negvals = "zero")
+eigval<-ord_pah$values # to get eigen values of every PC
+eigval<- round((eigval/sum(eigval))*100, 1) # to get variation explained by every PC
+meta_PAH <- metadata[ colnames(PAH) , ]
+ggplot(ord_pah$vectors, aes(x = X1, y = X2 ) , color=meta_PAH$Group ) +
+scale_color_manual(values = c("MS"="coral", 
+                              "SL"="royalblue1",
+                              "ML"="chartreuse2")) +
+  geom_point(size=3.5, alpha= 0.5 , aes(color=meta_PAH$Group) ) +
+  theme_classic(base_size = 9) +
+  theme( legend.text = element_text(size=9),
+         plot.title = element_text(size=6) 
+         ) +
+  geom_text(aes(label= gsub("[A-Z][A-Z]","", as.character(meta_PAH$Sample_name) )),
+                color="gray15", size=2.5, show.legend = FALSE 
+            )+
+  labs( title="PCoA with Euclidean distance on PAH concentrations ",
+        color="", 
+        x=paste("PC1: ",eigval[1],"% variation"), y=paste("PC2: ",eigval[2],"% variation"))
+ggsave(file="Results/Beta_Diversity/PAH_concentrations.png", width = 3.5, height = 3.2, dpi=300)
+
+# Mantel test (PAH distances vs Genera distances)
+data.prop.labels<-subset_samples( data.genus.prop , Sample_name!="Compost" )
+data.sqrt_prop<-transform_sample_counts(data.prop.labels, sqrt) # square root of proportion
+sample_names(data.sqrt_prop) <- as.character( sample_data(data.sqrt_prop)$Sample_name )
+dist_bact <- phyloseq::distance(data.sqrt_prop, method = "euclidean")
+# They MUST have the same sample order...
+dist_matrix <- as.matrix(dist_bact)
+dist_matrix <- dist_matrix [ labels(dist_pah) , labels(dist_pah) ]
+dist_bact <- as.dist( dist_matrix )
+
+# The mantel test 1) correlates the two distance matrix (i.e., it checks if two series, which derive from the *same* samples intersections in *both* matrixes, are two vectors with positive correlations)
+# and then 2) permute the matrix distance distances
+mantel_test <- ecodist::mantel(  dist_pah ~ dist_bact, nperm = 9999 , mrank = T )  # mrank = spearman correlation
+# Three p-values:  1 tail for r>0 ,  1 tail for r<0  AND  2 tails
+# If the p-value is <0.05 and the r>0 thus more different samples in matrix A are more different also in the other matrix
+# Otherwise, if r<0 thus similar samples in matrix A are more dissimilar across matrix B
+mantel_test
+# mantelr   pval1   pval2   pval3   llim.2.5%   ulim.97.5% 
+# 0.13601556    0.17091709    0.82918292    0.35103510    0.01539458    0.24968558
 
 
 
